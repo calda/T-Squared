@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2E4207A71B8FB828002B79E6 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4207A61B8FB828002B79E6 /* libxml2.2.dylib */; };
+		2E4207BD1B8FBA27002B79E6 /* TSReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4207BC1B8FBA27002B79E6 /* TSReader.swift */; };
 		2E7C6F601B8E6DDE00E95183 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F5F1B8E6DDE00E95183 /* AppDelegate.swift */; };
 		2E7C6F621B8E6DDE00E95183 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */; };
 		2E7C6F651B8E6DDE00E95183 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F631B8E6DDE00E95183 /* Main.storyboard */; };
@@ -17,6 +19,7 @@
 		2E7C6F881B8E70C200E95183 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F871B8E70C200E95183 /* main.swift */; };
 		2E7C6F8C1B8E70C900E95183 /* HttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */; };
 		2E7C6F8E1B8E94BA00E95183 /* CoreSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */; };
+		373101B7C0015F93AB0201EE /* Pods_T_Square.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 578C2BFFE673C532D8ADDCF6 /* Pods_T_Square.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +45,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2E4207A61B8FB828002B79E6 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = ../../../../../usr/lib/libxml2.2.dylib; sourceTree = "<group>"; };
+		2E4207BC1B8FBA27002B79E6 /* TSReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSReader.swift; sourceTree = "<group>"; };
 		2E7C6F5C1B8E6DDE00E95183 /* T-Square.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "T-Square.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7C6F5F1B8E6DDE00E95183 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -56,6 +61,9 @@
 		2E7C6F851B8E70C200E95183 /* OS X Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "OS X Tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7C6F871B8E70C200E95183 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreSwift.swift; sourceTree = "<group>"; };
+		50300C8C5BD5B54F8EDFA4E2 /* Pods-T-Square.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-T-Square.release.xcconfig"; path = "Pods/Target Support Files/Pods-T-Square/Pods-T-Square.release.xcconfig"; sourceTree = "<group>"; };
+		578C2BFFE673C532D8ADDCF6 /* Pods_T_Square.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_T_Square.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABA8169D999B5C2627FC2CE0 /* Pods-T-Square.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-T-Square.debug.xcconfig"; path = "Pods/Target Support Files/Pods-T-Square/Pods-T-Square.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +71,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E4207A71B8FB828002B79E6 /* libxml2.2.dylib in Frameworks */,
+				373101B7C0015F93AB0201EE /* Pods_T_Square.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,10 +96,13 @@
 		2E7C6F531B8E6DDE00E95183 = {
 			isa = PBXGroup;
 			children = (
+				2E4207A61B8FB828002B79E6 /* libxml2.2.dylib */,
 				2E7C6F5E1B8E6DDE00E95183 /* T-Square */,
 				2E7C6F731B8E6DDE00E95183 /* T-SquareTests */,
 				2E7C6F861B8E70C200E95183 /* OS X Tests */,
 				2E7C6F5D1B8E6DDE00E95183 /* Products */,
+				F7FF072F62393C482BE3E1EB /* Pods */,
+				CF29F57F4EF7AE02BDBF795F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -113,6 +126,7 @@
 				2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */,
 				2E7C6F681B8E6DDE00E95183 /* LaunchScreen.storyboard */,
 				2E7C6F6B1B8E6DDE00E95183 /* Info.plist */,
+				2E4207BC1B8FBA27002B79E6 /* TSReader.swift */,
 				2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */,
 			);
 			path = "T-Square";
@@ -135,6 +149,23 @@
 			path = "OS X Tests";
 			sourceTree = "<group>";
 		};
+		CF29F57F4EF7AE02BDBF795F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				578C2BFFE673C532D8ADDCF6 /* Pods_T_Square.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F7FF072F62393C482BE3E1EB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				ABA8169D999B5C2627FC2CE0 /* Pods-T-Square.debug.xcconfig */,
+				50300C8C5BD5B54F8EDFA4E2 /* Pods-T-Square.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -142,9 +173,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2E7C6F791B8E6DDE00E95183 /* Build configuration list for PBXNativeTarget "T-Square" */;
 			buildPhases = (
+				83249FB1CC7BA7808AACAA76 /* Check Pods Manifest.lock */,
 				2E7C6F581B8E6DDE00E95183 /* Sources */,
 				2E7C6F591B8E6DDE00E95183 /* Frameworks */,
 				2E7C6F5A1B8E6DDE00E95183 /* Resources */,
+				C58F4F905F21D4EE7A4BCEC5 /* Embed Pods Frameworks */,
+				2E2C794E77F81BD8996A7EFA /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -252,6 +286,54 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2E2C794E77F81BD8996A7EFA /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-T-Square/Pods-T-Square-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		83249FB1CC7BA7808AACAA76 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		C58F4F905F21D4EE7A4BCEC5 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-T-Square/Pods-T-Square-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		2E7C6F581B8E6DDE00E95183 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -261,6 +343,7 @@
 				2E7C6F621B8E6DDE00E95183 /* LoginViewController.swift in Sources */,
 				2E7C6F801B8E6E5100E95183 /* HttpClient.swift in Sources */,
 				2E7C6F601B8E6DDE00E95183 /* AppDelegate.swift in Sources */,
+				2E4207BD1B8FBA27002B79E6 /* TSReader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -347,7 +430,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -386,7 +470,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -396,9 +481,11 @@
 		};
 		2E7C6F7A1B8E6DDE00E95183 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = ABA8169D999B5C2627FC2CE0 /* Pods-T-Square.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "T-Square/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -409,9 +496,11 @@
 		};
 		2E7C6F7B1B8E6DDE00E95183 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 50300C8C5BD5B54F8EDFA4E2 /* Pods-T-Square.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "T-Square/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -499,6 +588,7 @@
 				2E7C6F8B1B8E70C200E95183 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

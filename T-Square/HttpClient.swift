@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Kanna
 
 let TSNetworkQueue = dispatch_queue_create("edu.gatech.cal.network-queue", DISPATCH_QUEUE_CONCURRENT)
 
@@ -167,6 +168,12 @@ class HttpClient {
             didCompletion = true
             sync() { completion(true) }
         }
+    }
+    
+    static func contentsOfPage(url: String) -> HTMLDocument {
+        let page = HttpClient(url: url)
+        let string = page.sendGet()
+        return Kanna.HTML(html: string, encoding: NSUTF8StringEncoding)!
     }
     
 }

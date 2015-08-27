@@ -57,11 +57,12 @@ class LoginViewController: UIViewController {
         animateActivityIndicator(on: true)
         
         dispatch_async(TSNetworkQueue, {
-            HttpClient.authenticateWithUsername(self.usernameField.text!, password: self.passwordField.text!, completion: { success in
+            TSReader.authenticatedReader(user: self.usernameField.text!, password: self.passwordField.text!, completion: { reader in
                 
-                if success {
+                if let reader = reader {
                     self.animateFormSubviewsWithDuration(0.5, hidden: false)
                     self.animateActivityIndicator(on: false)
+                    reader.getClasses()
                 }
                 
                 else {

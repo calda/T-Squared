@@ -1,0 +1,20 @@
+PODS:
+  - Kanna (0.1.2)
+
+DEPENDENCIES:
+  - Kanna (from `https://github.com/tid-kijyun/Kanna.git`, branch `feat/Swift2`)
+
+EXTERNAL SOURCES:
+  Kanna:
+    :branch: feat/Swift2
+    :git: https://github.com/tid-kijyun/Kanna.git
+
+CHECKOUT OPTIONS:
+  Kanna:
+    :commit: 15c59b2ce2f7ea417fce109491e663408627d895
+    :git: https://github.com/tid-kijyun/Kanna.git
+
+SPEC CHECKSUMS:
+  Kanna: c1c58cee98ec72f0ff9823462d0b2013d084776f
+
+COCOAPODS: 0.38.2

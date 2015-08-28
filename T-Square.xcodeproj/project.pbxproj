@@ -11,6 +11,7 @@
 		2E4207BD1B8FBA27002B79E6 /* TSReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4207BC1B8FBA27002B79E6 /* TSReader.swift */; };
 		2E4207BF1B9004F7002B79E6 /* Class.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4207BE1B9004F7002B79E6 /* Class.swift */; };
 		2E4207D61B9009F8002B79E6 /* ClassesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */; };
+		2E78739D1B90D49900C1F4BE /* Announcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78739C1B90D49900C1F4BE /* Announcement.swift */; settings = {ASSET_TAGS = (); }; };
 		2E7C6F601B8E6DDE00E95183 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F5F1B8E6DDE00E95183 /* AppDelegate.swift */; };
 		2E7C6F621B8E6DDE00E95183 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */; };
 		2E7C6F651B8E6DDE00E95183 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F631B8E6DDE00E95183 /* Main.storyboard */; };
@@ -51,6 +52,7 @@
 		2E4207BC1B8FBA27002B79E6 /* TSReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSReader.swift; sourceTree = "<group>"; };
 		2E4207BE1B9004F7002B79E6 /* Class.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Class.swift; sourceTree = "<group>"; };
 		2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassesViewController.swift; sourceTree = "<group>"; };
+		2E78739C1B90D49900C1F4BE /* Announcement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Announcement.swift; sourceTree = "<group>"; };
 		2E7C6F5C1B8E6DDE00E95183 /* T-Squared.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "T-Squared.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7C6F5F1B8E6DDE00E95183 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -131,9 +133,10 @@
 				2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */,
 				2E7C6F681B8E6DDE00E95183 /* LaunchScreen.storyboard */,
 				2E7C6F6B1B8E6DDE00E95183 /* Info.plist */,
-				2E4207BC1B8FBA27002B79E6 /* TSReader.swift */,
 				2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */,
+				2E4207BC1B8FBA27002B79E6 /* TSReader.swift */,
 				2E4207BE1B9004F7002B79E6 /* Class.swift */,
+				2E78739C1B90D49900C1F4BE /* Announcement.swift */,
 			);
 			path = "T-Square";
 			sourceTree = "<group>";
@@ -345,6 +348,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E78739D1B90D49900C1F4BE /* Announcement.swift in Sources */,
 				2E4207BF1B9004F7002B79E6 /* Class.swift in Sources */,
 				2E7C6F8E1B8E94BA00E95183 /* CoreSwift.swift in Sources */,
 				2E7C6F621B8E6DDE00E95183 /* LoginViewController.swift in Sources */,

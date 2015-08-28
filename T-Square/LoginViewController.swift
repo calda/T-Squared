@@ -112,7 +112,7 @@ class LoginViewController: UIViewController {
                     self.animateFormSubviewsWithDuration(0.5, hidden: false)
                     self.animateActivityIndicator(on: false)
                     self.setSavedCredentials(correct: true)
-                    self.presentClassesView(reader.getClasses())
+                    self.presentClassesView(reader)
                 }
                 
                 else {
@@ -187,7 +187,8 @@ class LoginViewController: UIViewController {
     
     //MARK: - Switching Views
     
-    func presentClassesView(classes: [Class]) {
+    func presentClassesView(reader: TSReader) {
+        let classes = reader.getClasses()
         classesViewController.classes = classes
         classesViewController.tableView.reloadData()
         
@@ -197,6 +198,13 @@ class LoginViewController: UIViewController {
             self.containerLeading.constant = 0.0
             self.view.layoutIfNeeded()
         }, completion: nil)
+        
+        dispatch_async(TSNetworkQueue, {
+            print("loading")
+            for currentClass in classes {
+                reader.getAnnouncementsForClass(currentClass)
+            }
+        })
     }
     
     

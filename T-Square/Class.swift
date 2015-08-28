@@ -7,7 +7,6 @@
 //
 
 import Foundation
-
 import Kanna
 
 class Class : CustomStringConvertible {
@@ -16,26 +15,29 @@ class Class : CustomStringConvertible {
     let subjectName: String?
     var name: String
     let link: String
+    var classPage: HTMLDocument?
     
     var description: String {
         return name
     }
     
     init(fromElement element: XMLElement) {
-        ID = element.text!
-        link = element["href"]!
+        ID = element.text!.cleansed()
+        link = element["href"]!.stringByReplacingOccurrencesOfString("site", withString: "pda")
         
         //create user-facing name
         let nameParts = ID.componentsSeparatedByString("-")
         self.name = nameParts[0] + " " + nameParts[1]
         self.subjectName = GTSubjects[nameParts[0]]
-    
-        print(link)
-        print(HttpClient.contentsOfPage(link).text)
     }
     
     func useSectionName() {
         self.name = (ID as NSString).stringByReplacingOccurrencesOfString("-", withString: " ")
+    }
+    
+    func getClassPage() ->  HTMLDocument? {
+        if let classPage = self.classPage { return classPage }
+        return HttpClient.contentsOfPage(self.link)
     }
     
 }

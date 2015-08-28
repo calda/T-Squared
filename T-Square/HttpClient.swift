@@ -18,11 +18,14 @@ class HttpClient {
     private var url: NSURL!
     private var session: NSURLSession
     
-    internal init(url: String) {
+    internal init(url: String, useMobile: Bool = true) {
         self.url = NSURL(string: url)
         
         let config = NSURLSessionConfiguration.defaultSessionConfiguration()
         config.requestCachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
+        if useMobile {
+            config.HTTPAdditionalHeaders = ["User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4"]
+        }
         self.session = NSURLSession(configuration: config)
         NSURLCache.setSharedURLCache(NSURLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil))
         
@@ -170,14 +173,41 @@ class HttpClient {
         }
     }
     
-    static func contentsOfPage(url: String) -> HTMLDocument {
+    static func contentsOfPage(url: String) -> HTMLDocument? {
         let page = HttpClient(url: url)
-        let string = page.sendGet()
-        return Kanna.HTML(html: string, encoding: NSUTF8StringEncoding)!
+        let text = page.sendGet()
+        //let URL = NSURL(string: url.stringByReplacingOccurrencesOfString("site", withString: "pda"))!
+        //let data = NSData(contentsOfURL: URL)!
+        //let text = NSString(data: data, encoding: NSUTF8StringEncoding)!
+        
+        return Kanna.HTML(html: text as String, encoding: NSUTF8StringEncoding)
     }
     
 }
 
+extension String {
+    
+    func cleansed() -> String {
+        var text = self as NSString
+        //cleanse text of weird formatting
+        //tabs and newlines
+        text = (text as NSString).stringByReplacingOccurrencesOfString("\n", withString: "")
+        text = (text as NSString).stringByReplacingOccurrencesOfString("\t", withString: "")
+        
+        //leading spaces
+        while text.hasPrefix(" ") {
+            text = text.substringFromIndex(1)
+        }
+        
+        //trailing spaces
+        while text.hasSuffix(" ") {
+            text = text.substringToIndex(text.length - 2)
+        }
+        
+        return text as String
+    }
+    
+}
 
 
 

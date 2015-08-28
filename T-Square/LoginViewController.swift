@@ -8,6 +8,9 @@
 
 import UIKit
 
+let TSUsernamePath = "edu.gatech.cal.username"
+let TSPasswordPath = "edu.gatech.cal.password"
+
 class LoginViewController: UIViewController {
 
     @IBOutlet weak var formCenter: NSLayoutConstraint!
@@ -17,6 +20,27 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var usernameField: UITextField!
     @IBOutlet weak var passwordField: UITextField!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var saveCredentialsSwitch: UISwitch!
+    @IBOutlet weak var containerLeading: NSLayoutConstraint!
+    
+    var classesViewController: ClassesViewController!
+    
+    override func viewWillAppear(animated: Bool) {
+        self.containerLeading.constant = UIScreen.mainScreen().bounds.width
+        self.view.layoutIfNeeded()
+        let data = NSUserDefaults.standardUserDefaults()
+        if let savedUsername = data.stringForKey(TSUsernamePath), let savedPassword = data.stringForKey(TSPasswordPath) {
+            usernameField.text = savedUsername
+            passwordField.text = savedPassword
+            //loginPressed(self.view)
+        }
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let classes = segue.destinationViewController as? ClassesViewController {
+            classesViewController = classes
+        }
+    }
     
     override func viewDidAppear(animated: Bool) {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardHeightChanged:", name: UIKeyboardWillChangeFrameNotification, object: nil)
@@ -45,7 +69,7 @@ class LoginViewController: UIViewController {
             self.formCenter.constant = -10.0
             self.backgroundBottom.constant = 0.0
             self.view.layoutIfNeeded()
-        }, completion: nil)
+            }, completion: nil)
     }
 
     @IBAction func switchToPasswordInput(sender: AnyObject) {
@@ -53,26 +77,41 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func loginPressed(sender: AnyObject) {
+        //center the form
+        self.passwordField.resignFirstResponder()
+        self.usernameField.resignFirstResponder()
+        centerForm()
+        //animate the activity indicator
         animateFormSubviewsWithDuration(0.5, hidden: true)
         animateActivityIndicator(on: true)
         
+        //attempt to authenticate
         dispatch_async(TSNetworkQueue, {
             TSReader.authenticatedReader(user: self.usernameField.text!, password: self.passwordField.text!, completion: { reader in
                 
                 if let reader = reader {
                     self.animateFormSubviewsWithDuration(0.5, hidden: false)
                     self.animateActivityIndicator(on: false)
-                    reader.getClasses()
+                    self.setSavedCredentials(correct: true)
+                    self.presentClassesView(reader.getClasses())
                 }
                 
                 else {
                     shakeView(self.formView)
                     self.animateFormSubviewsWithDuration(0.5, hidden: false)
                     self.animateActivityIndicator(on: false)
+                    self.setSavedCredentials(correct: false)
                 }
                 
             })
         })
+    }
+    
+    func setSavedCredentials(correct correct: Bool) {
+        let save = correct && saveCredentialsSwitch.on
+        let data = NSUserDefaults.standardUserDefaults()
+        data.setValue(save ? usernameField.text! : nil, forKey: TSUsernamePath)
+        data.setValue(save ? passwordField.text! : nil, forKey: TSPasswordPath)
     }
     
     func animateFormSubviewsWithDuration(duration: Double, hidden: Bool) {
@@ -119,5 +158,19 @@ class LoginViewController: UIViewController {
             centerForm()
         }
     }
+    
+    func presentClassesView(classes: [Class]) {
+        classesViewController.classes = classes
+        classesViewController.tableView.reloadData()
+        
+        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+            self.formView.alpha = 0.0
+            self.formView.transform = CGAffineTransformMakeScale(0.6, 0.6)
+            self.containerLeading.constant = 0.0
+            self.view.layoutIfNeeded()
+        }, completion: nil)
+    }
+    
+    
 }
 

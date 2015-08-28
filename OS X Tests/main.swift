@@ -8,5 +8,3 @@
 
 import Foundation
 
-HttpClient.authenticateWithUsername("jstephens60", password: "#Periapsis123")
-

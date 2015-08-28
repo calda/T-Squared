@@ -51,7 +51,7 @@
 		2E4207BC1B8FBA27002B79E6 /* TSReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSReader.swift; sourceTree = "<group>"; };
 		2E4207BE1B9004F7002B79E6 /* Class.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Class.swift; sourceTree = "<group>"; };
 		2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassesViewController.swift; sourceTree = "<group>"; };
-		2E7C6F5C1B8E6DDE00E95183 /* T-Square.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "T-Square.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2E7C6F5C1B8E6DDE00E95183 /* T-Squared.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "T-Squared.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7C6F5F1B8E6DDE00E95183 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		2E7C6F641B8E6DDE00E95183 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -113,7 +113,7 @@
 		2E7C6F5D1B8E6DDE00E95183 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2E7C6F5C1B8E6DDE00E95183 /* T-Square.app */,
+				2E7C6F5C1B8E6DDE00E95183 /* T-Squared.app */,
 				2E7C6F701B8E6DDE00E95183 /* T-SquareTests.xctest */,
 				2E7C6F851B8E70C200E95183 /* OS X Tests */,
 			);
@@ -175,9 +175,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2E7C6F5B1B8E6DDE00E95183 /* T-Square */ = {
+		2E7C6F5B1B8E6DDE00E95183 /* T-Squared */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2E7C6F791B8E6DDE00E95183 /* Build configuration list for PBXNativeTarget "T-Square" */;
+			buildConfigurationList = 2E7C6F791B8E6DDE00E95183 /* Build configuration list for PBXNativeTarget "T-Squared" */;
 			buildPhases = (
 				83249FB1CC7BA7808AACAA76 /* Check Pods Manifest.lock */,
 				2E7C6F581B8E6DDE00E95183 /* Sources */,
@@ -190,9 +190,9 @@
 			);
 			dependencies = (
 			);
-			name = "T-Square";
+			name = "T-Squared";
 			productName = "T-Square";
-			productReference = 2E7C6F5C1B8E6DDE00E95183 /* T-Square.app */;
+			productReference = 2E7C6F5C1B8E6DDE00E95183 /* T-Squared.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2E7C6F6F1B8E6DDE00E95183 /* T-SquareTests */ = {
@@ -265,7 +265,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2E7C6F5B1B8E6DDE00E95183 /* T-Square */,
+				2E7C6F5B1B8E6DDE00E95183 /* T-Squared */,
 				2E7C6F6F1B8E6DDE00E95183 /* T-SquareTests */,
 				2E7C6F841B8E70C200E95183 /* OS X Tests */,
 			);
@@ -377,7 +377,7 @@
 /* Begin PBXTargetDependency section */
 		2E7C6F721B8E6DDE00E95183 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 2E7C6F5B1B8E6DDE00E95183 /* T-Square */;
+			target = 2E7C6F5B1B8E6DDE00E95183 /* T-Squared */;
 			targetProxy = 2E7C6F711B8E6DDE00E95183 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -571,7 +571,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2E7C6F791B8E6DDE00E95183 /* Build configuration list for PBXNativeTarget "T-Square" */ = {
+		2E7C6F791B8E6DDE00E95183 /* Build configuration list for PBXNativeTarget "T-Squared" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2E7C6F7A1B8E6DDE00E95183 /* Debug */,

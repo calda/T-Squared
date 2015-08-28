@@ -15,18 +15,18 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2E7C6F5B1B8E6DDE00E95183"
-               BuildableName = "T-Square.app"
-               BlueprintName = "T-Square"
+               BuildableName = "T-Squared.app"
+               BlueprintName = "T-Squared"
                ReferencedContainer = "container:T-Square.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Debug">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -43,8 +43,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2E7C6F5B1B8E6DDE00E95183"
-            BuildableName = "T-Square.app"
-            BlueprintName = "T-Square"
+            BuildableName = "T-Squared.app"
+            BlueprintName = "T-Squared"
             ReferencedContainer = "container:T-Square.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -52,11 +52,11 @@
       </AdditionalOptions>
    </TestAction>
    <LaunchAction
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Debug"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
@@ -66,8 +66,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2E7C6F5B1B8E6DDE00E95183"
-            BuildableName = "T-Square.app"
-            BlueprintName = "T-Square"
+            BuildableName = "T-Squared.app"
+            BlueprintName = "T-Squared"
             ReferencedContainer = "container:T-Square.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -75,18 +75,18 @@
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
+      buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2E7C6F5B1B8E6DDE00E95183"
-            BuildableName = "T-Square.app"
-            BlueprintName = "T-Square"
+            BuildableName = "T-Squared.app"
+            BlueprintName = "T-Squared"
             ReferencedContainer = "container:T-Square.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

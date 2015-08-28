@@ -31,6 +31,10 @@ class TSReader {
         var saveLinksAsClasses: Bool = false
         
         for link in doc.css("a, link") {
+            print(link.text!)
+        }
+        
+        for link in doc.css("a, link") {
             if let text = link.text {
                 
                 //class links start after My Workspace tab

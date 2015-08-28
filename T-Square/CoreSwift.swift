@@ -164,7 +164,7 @@ func downsampleImageInView(imageView: UIImageView) {
         if let original = imageView.image where original.size.width > scaleSize.width {
             UIGraphicsBeginImageContext(scaleSize)
             let context = UIGraphicsGetCurrentContext()
-            CGContextSetInterpolationQuality(context, kCGInterpolationHigh)
+            //CGContextSetInterpolationQuality(context, kCGInterpolationHigh)
             CGContextSetShouldAntialias(context, true)
             original.drawInRect(CGRect(origin: CGPointZero, size: scaleSize))
             let newImage = UIGraphicsGetImageFromCurrentImageContext()
@@ -283,11 +283,10 @@ class LocationManager : NSObject, CLLocationManagerDelegate {
         manager.startUpdatingLocation()
     }
     
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [AnyObject]) {
-        if let location = locations[0] as? CLLocation {
-            for (completion, _) in waitingForUpdate {
-                completion(location)
-            }
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations[0]
+        for (completion, _) in waitingForUpdate {
+            completion(location)
         }
         waitingForUpdate = []
         manager.stopUpdatingLocation()
@@ -337,7 +336,7 @@ struct Stack<T> {
 
 extension Array {
     ///Returns a copy of the array in random order
-    func shuffled() -> [T] {
+    func shuffled() -> [Element] {
         var list = self
         for i in 0..<(list.count - 1) {
             let j = Int(arc4random_uniform(UInt32(list.count - i))) + i

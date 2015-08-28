@@ -42,7 +42,7 @@ class HttpClient {
             content = NSString(data: data!, encoding: NSASCIIStringEncoding) as! String
             ready = true
         }
-        task?.resume()
+        task.resume()
         while !ready {
             usleep(10)
         }
@@ -69,7 +69,7 @@ class HttpClient {
             content = NSString(data: data!, encoding: NSASCIIStringEncoding) as! String
             ready = true
         }
-        task?.resume()
+        task.resume()
         while !ready {
             usleep(10)
         }

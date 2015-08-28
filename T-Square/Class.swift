@@ -29,6 +29,9 @@ class Class : CustomStringConvertible {
         let nameParts = ID.componentsSeparatedByString("-")
         self.name = nameParts[0] + " " + nameParts[1]
         self.subjectName = GTSubjects[nameParts[0]]
+    
+        print(link)
+        print(HttpClient.contentsOfPage(link).text)
     }
     
     func useSectionName() {

@@ -9,7 +9,11 @@
 import Foundation
 import UIKit
 
-class ClassesViewController : UIViewController, UITableViewDelegate, UITableViewDataSource {
+//MARK: View Controller and initial Delegate
+
+let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled"
+
+class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate {
 
     var classes: [Class]?
     var loadingAnnouncements: Bool = true
@@ -19,13 +23,13 @@ class ClassesViewController : UIViewController, UITableViewDelegate, UITableView
             return (announcements.count == 0 ? 2 : 1)
         }
     }
-    @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var bottomView: UIView!
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
+    @IBOutlet var touchRecognizer: UITouchGestureRecognizer!
     
     //MARK: - Table View cell arrangement
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 { return (classes?.count ?? 0) }
         else { return announcements.count + (announcements.count == 0 ? 2 : 1) }
     }
@@ -34,17 +38,19 @@ class ClassesViewController : UIViewController, UITableViewDelegate, UITableView
         return 2
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath!) -> CGFloat {
+        if indexPath == nil { return 50.0 }
+        
         if indexPath.section == 0 {
             return 70.0
         }
         if indexPath.section == 1 {
-            return indexPath.item == 0 ? 30.0 : 60.0
+            return indexPath.item == 0 ? 40.0 : 60.0
         }
         return 50.0
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let index = indexPath.item
         let section = indexPath.section
         
@@ -54,6 +60,9 @@ class ClassesViewController : UIViewController, UITableViewDelegate, UITableView
                 let displayClass = classes[index]
                 let cell = tableView.dequeueReusableCellWithIdentifier("class") as! ClassNameCell
                 cell.decorate(displayClass)
+                if index == classes.count - 1 {
+                    cell.hideSeparator()
+                }
                 return cell
             }
         }
@@ -119,10 +128,17 @@ class ClassesViewController : UIViewController, UITableViewDelegate, UITableView
     
     override func viewDidAppear(animated: Bool) {
         updateBottomView()
+        tableView.contentInset = UIEdgeInsets(top: 25.0, left: 0.0, bottom: 0.0, right: 0.0)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setTouchDelegateEnabled:", name: TSSetTouchDelegateEnabledNotification, object: nil)
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {
         updateBottomView()
+        
+        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+        delay(0.5) {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+        }
     }
     
     func updateBottomView() {
@@ -133,6 +149,88 @@ class ClassesViewController : UIViewController, UITableViewDelegate, UITableView
         let viewHeight = max(0, height - (contentHeight - scroll))
         bottomViewHeight.constant = viewHeight
         self.view.layoutIfNeeded()
+    }
+    
+    //MARK: - User Interaction
+    
+    @IBAction func touchDown(sender: UITapGestureRecognizer) {
+        let touch = sender.locationInView(tableView)
+        self.processTouchInTableView(touch, state: sender.state)
+    }
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
+    func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
+        let background: UIColor
+        if indexPath.section == 0 {
+            background = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
+        }
+        else { //if section == 1
+            if selected {
+                background = UIColor(hue: 0.5833333333, saturation: 1.0, brightness: 1.0, alpha: 0.1)
+            }
+            else {
+                background = UIColor(hue: 0.5833333333, saturation: 0.5, brightness: 1.0, alpha: 0.4)
+            }
+        }
+        
+        UIView.animateWithDuration(0.3, animations: {
+            cell.backgroundColor = background
+        })
+    }
+    
+    func setTouchDelegateEnabled(notification: NSNotification) {
+        if let enabled = notification.object as? Bool {
+            touchRecognizer.enabled = enabled
+            
+            if !enabled {
+                for cell in tableView.visibleCells {
+                    let index = tableView.indexPathForCell(cell)!
+                    if (tableView.delegate as? StackableTableDelegate)?.canHighlightCell(index) == true {
+                        animateSelection(cell, indexPath: index, selected: false)
+                    }
+                }
+            }
+        }
+    }
+    
+    //MARK: - Stackable Table Delegate methods
+    
+    func processSelectedCell(index: NSIndexPath) {
+        if index.section == 1 {
+            let announcement = announcements[index.item - 1]
+            let delegate = AnnouncementDelegate(announcement: announcement, controller: self)
+            self.pushDelegate(delegate)
+        }
+    }
+    
+    override func pushDelegate(delegate: StackableTableDelegate) {
+        self.bottomView.hidden = true
+        super.pushDelegate(delegate)
+    }
+    
+    override func popDelegate() {
+        super.popDelegate()
+        if tableView.delegate is TableViewStackController {
+            self.bottomView.hidden = false
+        }
+    }
+    
+    func canHighlightCell(index: NSIndexPath) -> Bool {
+        return index != NSIndexPath(forItem: 0, inSection: 1)
+    }
+    
+}
+
+extension StackableTableDelegate {
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+        delay(0.5) {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+        }
     }
     
 }
@@ -163,6 +261,10 @@ class AnnouncementCell : UITableViewCell {
         }
         
         titleLabel.text = announcement.name
+        
+        if !announcement.hasBeenRead() {
+            titleLabel.text = "⭐️ \(titleLabel.text!)"
+        }
         
         //decorate label with time
         let timeAgo = announcement.date?.agoString() ?? announcement.rawDateString

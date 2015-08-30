@@ -9,12 +9,20 @@
 import Foundation
 import Kanna
 
+let TSInstallDateKey = "edu.gatech.cal.appInstallDate"
+
 class TSReader {
     
     static func authenticatedReader(user user: String, password: String, completion: (TSReader?) -> ()) {
         HttpClient.authenticateWithUsername(user, password: password, completion: { success in
             completion(success ? TSReader() : nil)
         })
+        
+        //check if this is first time logging in
+        let data = NSUserDefaults.standardUserDefaults()
+        if data.valueForKey(TSInstallDateKey) == nil {
+            data.setValue(NSDate(), forKey: TSInstallDateKey)
+        }
     }
     
     

@@ -9,6 +9,8 @@
 import Foundation
 import Kanna
 
+let TSReadAnnouncementsKey = "edu.gatech.cal.readAnnouncements"
+
 class Announcement : CustomStringConvertible {
     
     let owningClass: Class
@@ -65,6 +67,30 @@ class Announcement : CustomStringConvertible {
                 sync() { completion("Couldn't load message.") }
             }
         })
+    }
+    
+    func hasBeenRead() -> Bool {
+        guard let date = self.date else { return false }
+        let data = NSUserDefaults.standardUserDefaults()
+        
+        //mark as read if the announcement pre-dates the install date of the app
+        if let installDate = data.valueForKey(TSInstallDateKey) as? NSDate {
+            let now = NSDate()
+            if installDate.timeIntervalSinceDate(now) < 0 {
+                return true
+            }
+        }
+        
+        guard let read = data.valueForKey(TSReadAnnouncementsKey) as? [NSDate] else { return false }
+        return read.contains(date)
+    }
+    
+    func markRead() {
+        let data = NSUserDefaults.standardUserDefaults()
+        var read = data.valueForKey(TSReadAnnouncementsKey) as? [NSDate] ?? []
+        let now = NSDate()
+        read.insert(now, atIndex: 0)
+        data.setValue(read, forKey: TSReadAnnouncementsKey)
     }
     
 }

@@ -201,13 +201,20 @@ func cropImageToCircle(image: UIImage) -> UIImage {
     let cropped = UIGraphicsGetImageFromCurrentImageContext()
     UIGraphicsEndImageContext()
     return cropped
-    
+}
+
+///Determines the height required to display the text in the given label
+func heightForText(text: String, width: CGFloat, font: UIFont) -> CGFloat {
+    let context = NSStringDrawingContext()
+    let size = CGSizeMake(width, CGFloat.max)
+    let rect = text.boundingRectWithSize(size, options: .UsesLineFragmentOrigin, attributes: [NSFontAttributeName : font], context: context)
+    return rect.height
 }
 
 //MARK: - Classes
 
 ///A touch gesture recognizer that sends events on both .Began (down) and .Ended (up)
-class UITouchGestureRecognizer : UIGestureRecognizer {
+class UITouchGestureRecognizer : UITapGestureRecognizer {
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent) {
         super.touchesBegan(touches, withEvent: event)
@@ -332,6 +339,84 @@ struct Stack<T> {
     
 }
 
+///Pushing and Poping delegates on a Table View
+class TableViewStackController : UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    var tableView: UITableView!
+    var delegateStack: Stack<(delegate: StackableTableDelegate, contentOffset: CGPoint)> = Stack()
+    var currentDelegate: StackableTableDelegate!
+    
+    func popDelegate() {
+        if let (newDelegate, offset) = delegateStack.pop() {
+            pushDelegate(newDelegate, isBack: true, atOffset: offset)
+        }
+    }
+    
+    func pushDelegate(delegate: StackableTableDelegate) {
+        pushDelegate(delegate, isBack: false, atOffset: CGPointZero)
+    }
+    
+    private func pushDelegate(delegate: StackableTableDelegate, isBack: Bool, atOffset offset: CGPoint?) {
+        if let currentDelegate = tableView.delegate as? StackableTableDelegate where !isBack {
+            let delegateInfo = (delegate: currentDelegate, contentOffset: self.tableView.contentOffset)
+            delegateStack.push(delegateInfo)
+        }
+        currentDelegate = delegate //store a strong reference of the delegate
+        tableView.delegate = delegate
+        tableView.dataSource = delegate
+        tableView.reloadData()
+        let subtype = isBack ? kCATransitionFromLeft : kCATransitionFromRight
+        playTransitionForView(tableView, duration: 0.3, transition: kCATransitionPush, subtype: subtype)
+    }
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        print("numberOfRowsInSection must be implemented by the subclass")
+        return 0
+    }
+    
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        print("cellForRowAtIndexPath must be implemented by the subclass")
+        return UITableViewCell()
+    }
+    
+    func processTouchInTableView(touch: CGPoint, state: UIGestureRecognizerState) {
+        for cell in tableView.visibleCells {
+            let delegate = tableView.delegate as? StackableTableDelegate
+            if let index = tableView.indexPathForCell(cell) {
+                if cell.frame.contains(touch) {
+                    
+                    if state == .Ended {
+                        delegate?.processSelectedCell(index)
+                    }
+                    else {
+                        if delegate?.canHighlightCell(index) == true {
+                            delegate?.animateSelection(cell, indexPath: index, selected: true)
+                            continue
+                        }
+                    }
+                }
+                
+                if delegate?.canHighlightCell(index) == true {
+                    delegate?.animateSelection(cell, indexPath: index, selected: false)
+                }
+            }
+        }
+    }
+    
+}
+
+@objc protocol StackableTableDelegate : UITableViewDelegate, UITableViewDataSource {
+    
+    func processSelectedCell(index: NSIndexPath)
+    func canHighlightCell(index: NSIndexPath) -> Bool
+    func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool)
+    optional func getTitle() -> String
+    optional func getBackButtonImage() -> UIImage
+    optional func scrollViewDidScroll(scrollView: UIScrollView)
+    
+}
+
 //MARK: - Standard Library Extensions
 
 extension Array {
@@ -393,4 +478,11 @@ extension NSDate {
         }
     }
     
+}
+
+extension UITableViewCell {
+    //hides the line seperator the sell
+    func hideSeparator() {
+        self.separatorInset = UIEdgeInsetsMake(0, self.frame.size.width, 0, 0)
+    }
 }

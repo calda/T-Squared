@@ -25,6 +25,7 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var saveCredentialsSwitch: UISwitch!
     @IBOutlet weak var containerLeading: NSLayoutConstraint!
+    @IBOutlet var tapRecognizer: UITapGestureRecognizer!
     
     var classesViewController: ClassesViewController!
     
@@ -188,6 +189,7 @@ class LoginViewController: UIViewController {
     //MARK: - Switching Views
     
     func presentClassesView(reader: TSReader) {
+        tapRecognizer.enabled = false
         let classes = reader.getClasses()
         classesViewController.classes = classes
         classesViewController.reloadTable()

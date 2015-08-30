@@ -190,7 +190,7 @@ class LoginViewController: UIViewController {
     func presentClassesView(reader: TSReader) {
         let classes = reader.getClasses()
         classesViewController.classes = classes
-        classesViewController.tableView.reloadData()
+        classesViewController.reloadTable()
         
         UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             self.formView.alpha = 0.0
@@ -200,10 +200,13 @@ class LoginViewController: UIViewController {
         }, completion: nil)
         
         dispatch_async(TSNetworkQueue, {
-            print("loading")
             for currentClass in classes {
-                reader.getAnnouncementsForClass(currentClass)
+                let announcements = reader.getAnnouncementsForClass(currentClass)
+                sync() {
+                    self.classesViewController.addAnnouncements(announcements)
+                }
             }
+            sync() { self.classesViewController.doneLoadingAnnoucements() }
         })
     }
     

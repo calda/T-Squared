@@ -15,7 +15,8 @@ class Announcement : CustomStringConvertible {
     let name: String
     var message: String?
     var author: String
-    var date: String
+    var date: NSDate?
+    var rawDateString: String
     let link: String
     
     var description: String {
@@ -26,8 +27,22 @@ class Announcement : CustomStringConvertible {
         self.owningClass = inClass
         self.name = name
         self.author = author
-        self.date = date
         self.link = link
+        self.rawDateString = date
+        
+        //convert date string to NSDate
+        let formatter = NSDateFormatter()
+        formatter.dateStyle = .MediumStyle
+        formatter.timeStyle = .ShortStyle
+        //correct formatting to match required style
+        //(Aug 27, 2015 11:27 am) -> (Aug 27, 2015, 11:27 AM)
+        var dateString = date.stringByReplacingOccurrencesOfString("pm", withString: "PM")
+        dateString = dateString.stringByReplacingOccurrencesOfString("am", withString: "AM")
+        
+        for year in 1990...2040 { //add comma after years
+            dateString = dateString.stringByReplacingOccurrencesOfString("\(year) ", withString: "\(year), ")
+        }
+        self.date = formatter.dateFromString(dateString)
     }
     
     func loadMessage(completion: (String) -> ()) {
@@ -40,29 +55,11 @@ class Announcement : CustomStringConvertible {
         //load message
         dispatch_async(TSNetworkQueue, {
             if let page = HttpClient.contentsOfPage(self.link) {
-                //sift through the table
-                var author: String = ""
-                var date: String = ""
-                
-                let table = page.css("table")[0]
-                for row in table.css("tr") {
-                    let rowName = row.css("th")[0].text!
-                    let rowData = row.css("td")[0].text!.cleansed()
-                    
-                    //save data from row is it's important
-                    switch(rowName) {
-                    case "Saved By": author = rowData; break;
-                    case "Modified Date": date = rowData; break;
-                    default: break;
-                    }
-                }
-                
-                self.author = author
-                self.date = date
                 
                 let messageTag = page.css("p")[0]
                 self.message = messageTag.text!.cleansed().cleansed()
                 sync() { completion(self.message!) }
+                
             }
             else {
                 sync() { completion("Couldn't load message.") }

@@ -99,7 +99,6 @@ class TSReader {
                 }
             }
             
-            print(announcements)
             return announcements
         }
         

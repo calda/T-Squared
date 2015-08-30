@@ -40,7 +40,7 @@ func playTransitionForView(view: UIView, duration: Double, transition transition
     //else if subtype == kCATransitionFromBottom { subtype = kCATransitionFromTop }
     //}
     
-    transition.subtype = subtype!
+    transition.subtype = subtype
     view.layer.addAnimation(transition, forKey: nil)
 }
 
@@ -362,4 +362,35 @@ extension NSObject {
     func observeNotification(name: String, selector: Selector) {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: selector, name: name, object: nil)
     }
+}
+
+extension NSDate {
+    ///converts to a "10 seconds ago" / "1 day ago" syntax
+    func agoString() -> String {
+        let deltaTime = -self.timeIntervalSinceNow
+        
+        if deltaTime < 3600 { //less than an hour
+            let amount = Int(deltaTime/60.0)
+            let plural = amount == 1 ? "" : "s"
+            return "\(amount) minute\(plural) ago"
+        }
+        else if deltaTime < 86400 { //less than a day
+            let amount = Int(deltaTime/3600.0)
+            let plural = amount == 1 ? "" : "s"
+            return "\(amount) hour\(plural) ago"
+        }
+        else if deltaTime < 432000 { //less than five days
+            let amount = Int(deltaTime/86400.0)
+            let plural = amount == 1 ? "" : "s"
+            if amount == 1 {
+                return "Yesterday"
+            }
+            return "\(amount) day\(plural) ago"
+        }
+        else {
+            let dateString = NSDateFormatter.localizedStringFromDate(self, dateStyle: .MediumStyle, timeStyle: .NoStyle)
+            return dateString
+        }
+    }
+    
 }

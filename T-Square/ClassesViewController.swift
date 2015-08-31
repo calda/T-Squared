@@ -12,6 +12,7 @@ import UIKit
 //MARK: View Controller and initial Delegate
 
 let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled"
+let TSBackNotification = "edu.gatech.cal.backTriggered"
 
 class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate {
 
@@ -26,6 +27,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     @IBOutlet weak var bottomView: UIView!
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet var touchRecognizer: UITouchGestureRecognizer!
+    @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
     
     //MARK: - Table View cell arrangement
     
@@ -88,9 +90,22 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         return tableView.dequeueReusableCellWithIdentifier("class")!
     }
     
-    func reloadTable() {
+    func reloadTable(centerTable: Bool = false) {
         self.tableView.reloadData()
         updateBottomView()
+        
+        if centerTable {
+            let contentHeight = tableView.contentSize.height
+            let availableHeight = self.view.frame.height
+            if contentHeight < availableHeight {
+                let difference = contentHeight - availableHeight
+                collectionViewHeight.constant = difference * 0.9
+            }
+            else {
+                collectionViewHeight.constant = 0.0
+            }
+            self.view.layoutIfNeeded()
+        }
     }
     
     //MARK: - Handle announcements as they're loaded
@@ -130,6 +145,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         updateBottomView()
         tableView.contentInset = UIEdgeInsets(top: 25.0, left: 0.0, bottom: 0.0, right: 0.0)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setTouchDelegateEnabled:", name: TSSetTouchDelegateEnabledNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "backTriggered", name: TSBackNotification, object: nil)
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {
@@ -172,7 +188,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 background = UIColor(hue: 0.5833333333, saturation: 1.0, brightness: 1.0, alpha: 0.1)
             }
             else {
-                background = UIColor(hue: 0.5833333333, saturation: 0.5, brightness: 1.0, alpha: 0.4)
+                background = UIColor(red: 0.43, green: 0.69, blue: 1.0, alpha: 0.4)
             }
         }
         
@@ -194,6 +210,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 }
             }
         }
+        
+        updateBottomView()
+    }
+    
+    func backTriggered() {
+        popDelegate()
     }
     
     //MARK: - Stackable Table Delegate methods
@@ -203,34 +225,26 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             let announcement = announcements[index.item - 1]
             let delegate = AnnouncementDelegate(announcement: announcement, controller: self)
             self.pushDelegate(delegate)
+            updateBottomView()
         }
     }
     
     override func pushDelegate(delegate: StackableTableDelegate) {
-        self.bottomView.hidden = true
+        bottomView.hidden = !(delegate is ClassesViewController || delegate is AnnouncementDelegate)
         super.pushDelegate(delegate)
+        updateBottomView()
     }
     
     override func popDelegate() {
         super.popDelegate()
-        if tableView.delegate is TableViewStackController {
+        let delegate = tableView.delegate!
+        if !(delegate is ClassesViewController || delegate is AnnouncementDelegate) {
             self.bottomView.hidden = false
         }
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
         return index != NSIndexPath(forItem: 0, inSection: 1)
-    }
-    
-}
-
-extension StackableTableDelegate {
-    
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
-        delay(0.5) {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
-        }
     }
     
 }
@@ -284,6 +298,14 @@ class TitleCell : UITableViewCell {
     
     func decorate(text: String) {
         titleLabel.text = text
+    }
+    
+}
+
+class BackCell : UITableViewCell {
+    
+    @IBAction func backButtonPressed(sender: UIButton) {
+        NSNotificationCenter.defaultCenter().postNotificationName(TSBackNotification, object: nil)
     }
     
 }

@@ -174,11 +174,14 @@ class HttpClient {
     }
     
     static func contentsOfPage(url: String) -> HTMLDocument? {
-        let page = HttpClient(url: url)
-        let text = page.sendGet()
-        //let URL = NSURL(string: url.stringByReplacingOccurrencesOfString("site", withString: "pda"))!
+        //let page = HttpClient(url: url)
+        //let text = page.sendGet()
+        
+        let URL = NSURL(string: url.stringByReplacingOccurrencesOfString("site", withString: "pda"))!
         //let data = NSData(contentsOfURL: URL)!
-        //let text = NSString(data: data, encoding: NSUTF8StringEncoding)!
+        let text = try! NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding)
+        
+        //
         
         return Kanna.HTML(html: text as String, encoding: NSUTF8StringEncoding)
     }

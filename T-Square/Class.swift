@@ -16,6 +16,7 @@ class Class : CustomStringConvertible {
     var name: String
     let link: String
     var classPage: HTMLDocument?
+    var announcements: [Announcement] = []
     
     var description: String {
         return name

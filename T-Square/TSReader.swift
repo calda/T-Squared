@@ -107,6 +107,7 @@ class TSReader {
                 }
             }
             
+            currentClass.announcements = announcements
             return announcements
         }
         

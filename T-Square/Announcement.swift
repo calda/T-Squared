@@ -58,9 +58,15 @@ class Announcement : CustomStringConvertible {
         dispatch_async(TSNetworkQueue, {
             if let page = HttpClient.contentsOfPage(self.link) {
                 
-                let messageTag = page.css("p")[0]
-                self.message = messageTag.text!.cleansed().cleansed()
-                sync() { completion(self.message!) }
+                if !page.toHTML!.containsString("<p>") {
+                    print("reloading message")
+                    self.loadMessage(completion)
+                }
+                else {
+                    let messageTag = page.css("p")[0]
+                    self.message = messageTag.text!.cleansed().cleansed()
+                    sync() { completion(self.message!) }
+                }
                 
             }
             else {

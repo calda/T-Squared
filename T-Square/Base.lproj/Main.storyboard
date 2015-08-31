@@ -346,7 +346,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TjS-JT-ILn" userLabel="bottom view">
                                 <rect key="frame" x="0.0" y="558" width="320" height="10"/>
                                 <animations/>
-                                <color key="backgroundColor" red="0.5" green="0.75" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.50196078431372548" green="0.74901960784313726" blue="1" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="10" id="Vof-vj-04u"/>
                                 </constraints>
@@ -529,8 +529,38 @@
                                             <outlet property="titleLabel" destination="fiz-nM-Fh4" id="Wju-uQ-dwr"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="back" rowHeight="50" id="hGp-PN-xBo" customClass="BackCell" customModule="T_Squared" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="252" width="320" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="hGp-PN-xBo" id="Yri-7X-Prc">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Z6-EC-d4t">
+                                                    <rect key="frame" x="8" y="8" width="33" height="33"/>
+                                                    <animations/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="0Z6-EC-d4t" secondAttribute="height" multiplier="1:1" id="84u-0c-tv5"/>
+                                                    </constraints>
+                                                    <state key="normal" image="button-back"/>
+                                                    <connections>
+                                                        <action selector="backButtonPressed:" destination="hGp-PN-xBo" eventType="touchUpInside" id="vVt-8f-KoW"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <animations/>
+                                            <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="0Z6-EC-d4t" firstAttribute="top" secondItem="Yri-7X-Prc" secondAttribute="topMargin" id="chC-8L-hpK"/>
+                                                <constraint firstItem="0Z6-EC-d4t" firstAttribute="leading" secondItem="Yri-7X-Prc" secondAttribute="leadingMargin" id="e2f-hC-grX"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="0Z6-EC-d4t" secondAttribute="bottom" id="hNf-yW-MH9"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <animations/>
+                                        <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
+                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcementTitle" rowHeight="60" id="ucQ-Pd-FWI" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="252" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="302" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ucQ-Pd-FWI" id="TJm-a0-UXK">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="59"/>
@@ -565,7 +595,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="message-white" rowHeight="40" id="ldi-7Y-Kj8" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="312" width="320" height="40"/>
+                                        <rect key="frame" x="0.0" y="362" width="320" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ldi-7Y-Kj8" id="7EI-pP-bvJ">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
@@ -600,14 +630,14 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcementText" rowHeight="270" id="n6y-kU-iK3" userLabel="announcementText" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="352" width="320" height="270"/>
+                                        <rect key="frame" x="0.0" y="402" width="320" height="270"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="n6y-kU-iK3" id="1Fg-WC-L0H">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="269"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JjR-Oe-bUD">
-                                                    <rect key="frame" x="16" y="20" width="296" height="230"/>
+                                                    <rect key="frame" x="16" y="-27" width="280" height="324"/>
                                                     <animations/>
                                                     <string key="text">Hello!
 
@@ -617,7 +647,7 @@ We're in College of Computing 130 (on the back wall of the Commons area).
 The schedule (which is now available) can be found in the TA/Help Info tab on the CS-1332 T-Square.
 
 – Jonathan</string>
-                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="16"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="18"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -627,7 +657,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                             <constraints>
                                                 <constraint firstItem="JjR-Oe-bUD" firstAttribute="centerY" secondItem="1Fg-WC-L0H" secondAttribute="centerY" id="7Qp-UN-DSY"/>
                                                 <constraint firstItem="JjR-Oe-bUD" firstAttribute="leading" secondItem="1Fg-WC-L0H" secondAttribute="leadingMargin" constant="8" id="KUa-Qg-yZv"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="JjR-Oe-bUD" secondAttribute="trailing" id="THV-lW-Cwj"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="JjR-Oe-bUD" secondAttribute="trailing" constant="16" id="THV-lW-Cwj"/>
                                                 <constraint firstItem="JjR-Oe-bUD" firstAttribute="top" secondItem="1Fg-WC-L0H" secondAttribute="topMargin" id="U3l-gC-6VX"/>
                                             </constraints>
                                             <variation key="default">
@@ -640,6 +670,41 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         <color key="backgroundColor" red="0.5" green="0.75" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                         <connections>
                                             <outlet property="titleLabel" destination="JjR-Oe-bUD" id="jur-f2-CJU"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="blank" rowHeight="30" id="DeP-Si-bjL" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="672" width="320" height="30"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DeP-Si-bjL" id="sMY-ws-4yO">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="29"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LrQ-Le-xPj">
+                                                    <rect key="frame" x="16" y="15" width="296" height="0.0"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="16"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <animations/>
+                                            <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="LrQ-Le-xPj" firstAttribute="leading" secondItem="sMY-ws-4yO" secondAttribute="leadingMargin" constant="8" id="IR3-9b-kQB"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="LrQ-Le-xPj" secondAttribute="trailing" id="dHQ-kn-if2"/>
+                                                <constraint firstItem="LrQ-Le-xPj" firstAttribute="centerY" secondItem="sMY-ws-4yO" secondAttribute="centerY" id="ryF-Ht-jwX"/>
+                                                <constraint firstItem="LrQ-Le-xPj" firstAttribute="top" secondItem="sMY-ws-4yO" secondAttribute="topMargin" id="wvG-Ok-BGg"/>
+                                            </constraints>
+                                            <variation key="default">
+                                                <mask key="constraints">
+                                                    <exclude reference="wvG-Ok-BGg"/>
+                                                </mask>
+                                            </variation>
+                                        </tableViewCellContentView>
+                                        <animations/>
+                                        <color key="backgroundColor" red="0.5" green="0.75" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <outlet property="titleLabel" destination="LrQ-Le-xPj" id="bfW-2L-YOM"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -684,6 +749,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                     <connections>
                         <outlet property="bottomView" destination="TjS-JT-ILn" id="W27-cP-5Ca"/>
                         <outlet property="bottomViewHeight" destination="Vof-vj-04u" id="iCE-Pe-tqR"/>
+                        <outlet property="collectionViewHeight" destination="dkf-9o-VHf" id="eHg-Ux-6KK"/>
                         <outlet property="tableView" destination="51g-sT-9eN" id="LzU-VD-FcW"/>
                         <outlet property="touchRecognizer" destination="V0D-HW-DNa" id="Pbj-6g-2gg"/>
                     </connections>
@@ -700,6 +766,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
         </scene>
     </scenes>
     <resources>
+        <image name="button-back" width="25" height="25"/>
         <image name="login-background" width="750" height="1334"/>
     </resources>
 </document>

@@ -22,7 +22,7 @@
 		2E7C6F881B8E70C200E95183 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F871B8E70C200E95183 /* main.swift */; };
 		2E7C6F8C1B8E70C900E95183 /* HttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */; };
 		2E7C6F8E1B8E94BA00E95183 /* CoreSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */; };
-		2E8AFE071B92DF5700DE7E28 /* StackableTableDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8AFE061B92DF5700DE7E28 /* StackableTableDelegates.swift */; settings = {ASSET_TAGS = (); }; };
+		2E8AFE071B92DF5700DE7E28 /* AnouncementDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8AFE061B92DF5700DE7E28 /* AnouncementDelegate.swift */; settings = {ASSET_TAGS = (); }; };
 		373101B7C0015F93AB0201EE /* Pods_T_Square.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 578C2BFFE673C532D8ADDCF6 /* Pods_T_Square.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -68,7 +68,7 @@
 		2E7C6F851B8E70C200E95183 /* OS X Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "OS X Tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7C6F871B8E70C200E95183 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreSwift.swift; sourceTree = "<group>"; };
-		2E8AFE061B92DF5700DE7E28 /* StackableTableDelegates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackableTableDelegates.swift; sourceTree = "<group>"; };
+		2E8AFE061B92DF5700DE7E28 /* AnouncementDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnouncementDelegate.swift; sourceTree = "<group>"; };
 		50300C8C5BD5B54F8EDFA4E2 /* Pods-T-Square.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-T-Square.release.xcconfig"; path = "Pods/Target Support Files/Pods-T-Square/Pods-T-Square.release.xcconfig"; sourceTree = "<group>"; };
 		578C2BFFE673C532D8ADDCF6 /* Pods_T_Square.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_T_Square.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA8169D999B5C2627FC2CE0 /* Pods-T-Square.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-T-Square.debug.xcconfig"; path = "Pods/Target Support Files/Pods-T-Square/Pods-T-Square.debug.xcconfig"; sourceTree = "<group>"; };
@@ -135,7 +135,7 @@
 				2E7C6F6B1B8E6DDE00E95183 /* Info.plist */,
 				2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */,
 				2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */,
-				2E8AFE061B92DF5700DE7E28 /* StackableTableDelegates.swift */,
+				2E8AFE061B92DF5700DE7E28 /* AnouncementDelegate.swift */,
 				2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */,
 				2E4207BC1B8FBA27002B79E6 /* TSReader.swift */,
 				2E4207BE1B9004F7002B79E6 /* Class.swift */,
@@ -359,7 +359,7 @@
 				2E7C6F601B8E6DDE00E95183 /* AppDelegate.swift in Sources */,
 				2E4207BD1B8FBA27002B79E6 /* TSReader.swift in Sources */,
 				2E4207D61B9009F8002B79E6 /* ClassesViewController.swift in Sources */,
-				2E8AFE071B92DF5700DE7E28 /* StackableTableDelegates.swift in Sources */,
+				2E8AFE071B92DF5700DE7E28 /* AnouncementDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

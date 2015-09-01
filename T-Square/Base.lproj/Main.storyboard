@@ -672,8 +672,61 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                             <outlet property="titleLabel" destination="JjR-Oe-bUD" id="jur-f2-CJU"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="attachment" rowHeight="50" id="She-FH-acS" customClass="AttachmentCell" customModule="T_Squared" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="672" width="320" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="She-FH-acS" id="wYr-cX-bbG">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xaa-ns-GBD">
+                                                    <rect key="frame" x="16" y="4" width="288" height="41"/>
+                                                    <subviews>
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="button-paperclip" translatesAutoresizingMaskIntoConstraints="NO" id="RVS-0Z-BVv">
+                                                            <rect key="frame" x="10" y="10" width="21" height="21"/>
+                                                            <animations/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" secondItem="RVS-0Z-BVv" secondAttribute="height" multiplier="1:1" id="hIu-E5-lce"/>
+                                                            </constraints>
+                                                        </imageView>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Organic tutoring schedule v2_3.pdf" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mDQ-uD-JGZ">
+                                                            <rect key="frame" x="39" y="12" width="241" height="18"/>
+                                                            <animations/>
+                                                            <fontDescription key="fontDescription" type="italicSystem" pointSize="15"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <animations/>
+                                                    <color key="backgroundColor" red="0.5" green="0.50069444444444411" blue="1" alpha="0.25281871448863635" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <constraints>
+                                                        <constraint firstItem="RVS-0Z-BVv" firstAttribute="leading" secondItem="xaa-ns-GBD" secondAttribute="leading" constant="10" id="APQ-hh-uci"/>
+                                                        <constraint firstAttribute="trailing" secondItem="mDQ-uD-JGZ" secondAttribute="trailing" constant="8" id="Bg0-Wx-CrV"/>
+                                                        <constraint firstAttribute="bottom" secondItem="RVS-0Z-BVv" secondAttribute="bottom" constant="10" id="drj-j4-rGd"/>
+                                                        <constraint firstItem="RVS-0Z-BVv" firstAttribute="top" secondItem="xaa-ns-GBD" secondAttribute="top" constant="10" id="f3g-lN-CRS"/>
+                                                        <constraint firstItem="mDQ-uD-JGZ" firstAttribute="centerY" secondItem="xaa-ns-GBD" secondAttribute="centerY" id="i5B-e2-GL9"/>
+                                                        <constraint firstItem="mDQ-uD-JGZ" firstAttribute="leading" secondItem="RVS-0Z-BVv" secondAttribute="trailing" constant="8" id="wkz-0Q-PLX"/>
+                                                    </constraints>
+                                                </view>
+                                            </subviews>
+                                            <animations/>
+                                            <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="xaa-ns-GBD" firstAttribute="top" secondItem="wYr-cX-bbG" secondAttribute="top" constant="4" id="UMj-my-Efi"/>
+                                                <constraint firstItem="xaa-ns-GBD" firstAttribute="leading" secondItem="wYr-cX-bbG" secondAttribute="leading" constant="16" id="Y2N-nV-FGb"/>
+                                                <constraint firstAttribute="trailing" secondItem="xaa-ns-GBD" secondAttribute="trailing" constant="16" id="fLe-Zt-5tX"/>
+                                                <constraint firstAttribute="bottom" secondItem="xaa-ns-GBD" secondAttribute="bottom" constant="4" id="mFT-xw-FHb"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <animations/>
+                                        <color key="backgroundColor" red="0.5" green="0.75" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <outlet property="background" destination="xaa-ns-GBD" id="BkD-77-n0k"/>
+                                            <outlet property="titleLabel" destination="mDQ-uD-JGZ" id="R9D-vA-Amo"/>
+                                        </connections>
+                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="blank" rowHeight="30" id="DeP-Si-bjL" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="672" width="320" height="30"/>
+                                        <rect key="frame" x="0.0" y="722" width="320" height="30"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DeP-Si-bjL" id="sMY-ws-4yO">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="29"/>
@@ -767,6 +820,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
     </scenes>
     <resources>
         <image name="button-back" width="25" height="25"/>
+        <image name="button-paperclip" width="50" height="50"/>
         <image name="login-background" width="750" height="1334"/>
     </resources>
 </document>

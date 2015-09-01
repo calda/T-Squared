@@ -21,6 +21,8 @@ class Announcement : CustomStringConvertible {
     var rawDateString: String
     let link: String
     
+    var attachments: [Attachment]?
+    
     var description: String {
         return name
     }
@@ -65,6 +67,17 @@ class Announcement : CustomStringConvertible {
                 else {
                     let messageTag = page.css("p")[0]
                     self.message = messageTag.text!.cleansed().cleansed()
+                    
+                    //load attachments if present
+                    for link in page.css("a, link") {
+                        let linkURL = link["href"] ?? ""
+                        if linkURL.containsString("/attachment/") {
+                            let attachment = Attachment(link: linkURL, fileName: link.text?.cleansed() ?? "Attached file")
+                            if self.attachments == nil { self.attachments = [] }
+                            self.attachments!.append(attachment)
+                        }
+                    }
+                    
                     sync() { completion(self.message!) }
                 }
                 
@@ -97,6 +110,18 @@ class Announcement : CustomStringConvertible {
         let now = NSDate()
         read.insert(now, atIndex: 0)
         data.setValue(read, forKey: TSReadAnnouncementsKey)
+    }
+    
+}
+
+class Attachment {
+    
+    let link: String
+    let fileName: String
+    
+    init(link: String, fileName: String) {
+        self.link = link
+        self.fileName = fileName
     }
     
 }

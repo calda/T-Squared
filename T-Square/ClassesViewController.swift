@@ -223,9 +223,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     func processSelectedCell(index: NSIndexPath) {
         if index.section == 1 {
             let announcement = announcements[index.item - 1]
-            let delegate = AnnouncementDelegate(announcement: announcement, controller: self)
-            self.pushDelegate(delegate)
-            updateBottomView()
+            AnnouncementCell.presentAnnouncement(announcement, inController: self)
         }
     }
     
@@ -265,11 +263,14 @@ class ClassNameCell : UITableViewCell {
 
 class AnnouncementCell : UITableViewCell {
     
+    var announcement: Announcement!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
     static var originalDescriptionText: NSAttributedString?
     
     func decorate(announcement: Announcement) {
+        self.announcement = announcement
+        
         if AnnouncementCell.originalDescriptionText == nil {
             AnnouncementCell.originalDescriptionText = descriptionLabel.attributedText
         }
@@ -290,6 +291,12 @@ class AnnouncementCell : UITableViewCell {
         descriptionLabel.attributedText = attributed
     }
     
+    static func presentAnnouncement(announcement: Announcement, inController controller: ClassesViewController) {
+        let delegate = AnnouncementDelegate(announcement: announcement, controller: controller)
+        controller.pushDelegate(delegate)
+        controller.updateBottomView()
+    }
+    
 }
 
 class TitleCell : UITableViewCell {
@@ -298,6 +305,23 @@ class TitleCell : UITableViewCell {
     
     func decorate(text: String) {
         titleLabel.text = text
+    }
+    
+}
+
+class AttachmentCell : TitleCell {
+    
+    var attachment: Attachment?
+    @IBOutlet weak var background: UIView!
+    
+    override func decorate(text: String) {
+        super.decorate(text)
+        background.layer.cornerRadius = 5.0
+        background.layer.masksToBounds = true
+    }
+    
+    static func presentAttachment(attachment: Attachment, inController controller: ClassesViewController) {
+        UIApplication.sharedApplication().openURL(NSURL(string: attachment.link)!)
     }
     
 }

@@ -25,14 +25,31 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             }
         }
         self.controller = controller
+        super.init()
         announcement.loadMessage({ _ in
+            
+            if let attachments = announcement.attachments {
+                
+                self.cells.removeLast()
+                
+                for attachment in attachments {
+                    self.cells.insert((identifier: "attachment", onDisplay: { tableCell, announcement in
+                        let cell = tableCell as! AttachmentCell
+                        cell.attachment = attachment
+                        cell.decorate(attachment.fileName)
+                        cell.hideSeparator()
+                    }), atIndex: self.cells.count)
+                }
+                
+            }
+            
             controller.reloadTable()
             announcement.hasBeenRead()
         })
     }
     
     
-    let cells: [(identifier: String, onDisplay: (UITableViewCell, Announcement) -> ())] = [
+    var cells: [(identifier: String, onDisplay: (UITableViewCell, Announcement) -> ())] = [
 
         (identifier: "back", onDisplay: { cell, _ in cell.hideSeparator() }),
         (identifier: "blank", onDisplay: { cell, _ in cell.hideSeparator() }),
@@ -121,6 +138,8 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             let identifier = cells[indexPath.item].identifier
             if identifier == "blank" { return 15.0 }
             if identifier == "back" { return 50.0 }
+            if identifier == "attachment" { return 50.0 }
+            
             let fontSize: CGFloat
             let text: String
             switch(identifier) {
@@ -149,7 +168,16 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
     }
     
     func processSelectedCell(index: NSIndexPath) {
-        if index.section == 0 || index.item == 0 { return }
+        if index.section == 0 {
+            if cells[index.item].identifier == "attachment" {
+                let attachment = announcement.attachments![self.cells.count - 1 - index.item]
+                AttachmentCell.presentAttachment(attachment, inController: self.controller)
+            }
+        }
+        else if index.section == 1 && index.item != 0 {
+            let otherAnnouncement = otherAnnouncements[index.item - 1]
+            AnnouncementCell.presentAnnouncement(otherAnnouncement, inController: self.controller)
+        }
     }
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {

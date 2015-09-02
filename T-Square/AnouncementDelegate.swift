@@ -181,7 +181,18 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
     }
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
-        return
+        if indexPath.section == 1 && indexPath.item != 0 {
+            var background: UIColor
+            
+            if selected {
+                background = UIColor(hue: 0.5833333333, saturation: 1.0, brightness: 1.0, alpha: 0.1)
+            }
+            else {
+                background = UIColor(red: 0.43, green: 0.69, blue: 1.0, alpha: 0.4)
+            }
+            
+            cell.backgroundColor = background
+        }
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {

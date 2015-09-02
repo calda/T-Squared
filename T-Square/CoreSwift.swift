@@ -365,6 +365,7 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
         tableView.delegate = delegate
         tableView.dataSource = delegate
         tableView.reloadData()
+        tableView.contentOffset = offset ?? CGPointZero
         let subtype = isBack ? kCATransitionFromLeft : kCATransitionFromRight
         playTransitionForView(tableView, duration: 0.3, transition: kCATransitionPush, subtype: subtype)
     }
@@ -388,6 +389,8 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
                     
                     if state == .Ended {
                         delegate?.processSelectedCell(index)
+                        delegate?.animateSelection(cell, indexPath: index, selected: false)
+                        return
                     }
                     else {
                         if delegate?.canHighlightCell(index) == true {

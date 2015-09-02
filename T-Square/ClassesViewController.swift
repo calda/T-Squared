@@ -14,7 +14,7 @@ import UIKit
 let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled"
 let TSBackNotification = "edu.gatech.cal.backTriggered"
 
-class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate {
+class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate {
 
     var classes: [Class]?
     var loadingAnnouncements: Bool = true
@@ -28,6 +28,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet var touchRecognizer: UITouchGestureRecognizer!
     @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
+    
+    var documentController: UIDocumentInteractionController?
     
     //MARK: - Table View cell arrangement
     
@@ -78,7 +80,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
             if index == 1 && announcements.count == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("message") as! TitleCell
-                cell.decorate(loadingAnnouncements ? "Loading Announcements..." : "No announcements posted")
+                cell.decorate(loadingAnnouncements ? "Loading Announcements..." : "No announcements posted. Reload?")
                 return cell
             }
             let announcement = announcements[index - announcementIndexOffset]
@@ -143,7 +145,6 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     override func viewDidAppear(animated: Bool) {
         updateBottomView()
-        tableView.contentInset = UIEdgeInsets(top: 25.0, left: 0.0, bottom: 0.0, right: 0.0)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setTouchDelegateEnabled:", name: TSSetTouchDelegateEnabledNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "backTriggered", name: TSBackNotification, object: nil)
     }
@@ -214,7 +215,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         updateBottomView()
     }
     
-    func backTriggered() {
+    @IBAction func backTriggered() {
         popDelegate()
     }
     
@@ -222,6 +223,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     func processSelectedCell(index: NSIndexPath) {
         if index.section == 1 {
+            if index == 0 { return }
+            if index == 1 && announcements.count == 0 {
+                self.dismissViewControllerAnimated(false, completion: nil)
+            }
             let announcement = announcements[index.item - 1]
             AnnouncementCell.presentAnnouncement(announcement, inController: self)
         }
@@ -245,92 +250,35 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         return index != NSIndexPath(forItem: 0, inSection: 1)
     }
     
-}
-
-//MARK: - Table View Cells
-
-class ClassNameCell : UITableViewCell {
+    //MARK: Auxillary Functions
     
-    @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var subjectLabel: UILabel!
+    func presentDocumentFromURL(webURL: NSURL) {
+        dispatch_async(TSNetworkQueue, {
+            let data = NSData(contentsOfURL: webURL)!
+            
+            //get the URL's file extension
+            let splits = webURL.path!.componentsSeparatedByString(".")
+            let fileType = splits.last!
+            
+            //get URL to save to
+            let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
+            let documents = paths[0] as NSString
+            let fileURLpath = documents.stringByAppendingPathComponent("Attachment.\(fileType)")
+            data.writeToFile(fileURLpath, atomically: false)
+            let fileURL = NSURL(fileURLWithPath: fileURLpath)
+            
+            sync() {
+                let controller = UIDocumentInteractionController(URL: fileURL)
+                self.documentController = controller
+                controller.delegate = self
+                controller.presentPreviewAnimated(true)
+            }
+            
+        })
+    }
     
-    func decorate(displayClass: Class) {
-        nameLabel.text = displayClass.name
-        subjectLabel.text = displayClass.subjectName ?? ""
+    func documentInteractionControllerViewControllerForPreview(controller: UIDocumentInteractionController) -> UIViewController {
+        return self
     }
     
 }
-
-class AnnouncementCell : UITableViewCell {
-    
-    var announcement: Announcement!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var descriptionLabel: UILabel!
-    static var originalDescriptionText: NSAttributedString?
-    
-    func decorate(announcement: Announcement) {
-        self.announcement = announcement
-        
-        if AnnouncementCell.originalDescriptionText == nil {
-            AnnouncementCell.originalDescriptionText = descriptionLabel.attributedText
-        }
-        
-        titleLabel.text = announcement.name
-        
-        if !announcement.hasBeenRead() {
-            titleLabel.text = "⭐️ \(titleLabel.text!)"
-        }
-        
-        //decorate label with time
-        let timeAgo = announcement.date?.agoString() ?? announcement.rawDateString
-        let className = announcement.owningClass.name
-        let attributed = AnnouncementCell.originalDescriptionText?.mutableCopy() as? NSMutableAttributedString
-            ?? descriptionLabel.attributedText!.mutableCopy() as! NSMutableAttributedString
-        attributed.replaceCharactersInRange(NSMakeRange(18, 8), withString: className)
-        attributed.replaceCharactersInRange(NSMakeRange(0, 14), withString: timeAgo)
-        descriptionLabel.attributedText = attributed
-    }
-    
-    static func presentAnnouncement(announcement: Announcement, inController controller: ClassesViewController) {
-        let delegate = AnnouncementDelegate(announcement: announcement, controller: controller)
-        controller.pushDelegate(delegate)
-        controller.updateBottomView()
-    }
-    
-}
-
-class TitleCell : UITableViewCell {
-    
-    @IBOutlet weak var titleLabel: UILabel!
-    
-    func decorate(text: String) {
-        titleLabel.text = text
-    }
-    
-}
-
-class AttachmentCell : TitleCell {
-    
-    var attachment: Attachment?
-    @IBOutlet weak var background: UIView!
-    
-    override func decorate(text: String) {
-        super.decorate(text)
-        background.layer.cornerRadius = 5.0
-        background.layer.masksToBounds = true
-    }
-    
-    static func presentAttachment(attachment: Attachment, inController controller: ClassesViewController) {
-        UIApplication.sharedApplication().openURL(NSURL(string: attachment.link)!)
-    }
-    
-}
-
-class BackCell : UITableViewCell {
-    
-    @IBAction func backButtonPressed(sender: UIButton) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSBackNotification, object: nil)
-    }
-    
-}
-

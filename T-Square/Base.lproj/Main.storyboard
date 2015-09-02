@@ -225,7 +225,7 @@
                                 <animations/>
                             </activityIndicatorView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="edV-RZ-61l">
-                                <rect key="frame" x="320" y="0.0" width="0.0" height="568"/>
+                                <rect key="frame" x="320" y="20" width="0.0" height="548"/>
                                 <animations/>
                                 <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
                                 <connections>
@@ -249,7 +249,7 @@
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="edV-RZ-61l" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" id="0du-Vw-hzh"/>
+                            <constraint firstItem="edV-RZ-61l" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" constant="20" id="0du-Vw-hzh"/>
                             <constraint firstItem="4BH-Ta-NeK" firstAttribute="centerX" secondItem="Rgs-6b-9hv" secondAttribute="centerX" id="1WK-hY-EdA"/>
                             <constraint firstItem="e8A-wz-lHq" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="3gG-aM-xeU"/>
                             <constraint firstAttribute="trailingMargin" secondItem="vYZ-N3-Uvn" secondAttribute="trailing" id="7CZ-BE-us7"/>
@@ -332,9 +332,9 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7bg-uP-HRH">
-                                <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="f6R-A4-Thp">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="548"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <animations/>
                                     <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -536,6 +536,16 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6gv-6P-dCD">
+                                                    <rect key="frame" x="0.0" y="0.0" width="103" height="49"/>
+                                                    <animations/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="6gv-6P-dCD" secondAttribute="height" multiplier="101:48" id="u76-j3-XPT"/>
+                                                    </constraints>
+                                                    <connections>
+                                                        <action selector="backButtonPressed:" destination="hGp-PN-xBo" eventType="touchUpInside" id="Mei-5p-Q6o"/>
+                                                    </connections>
+                                                </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Z6-EC-d4t">
                                                     <rect key="frame" x="8" y="8" width="33" height="33"/>
                                                     <animations/>
@@ -551,9 +561,12 @@
                                             <animations/>
                                             <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
                                             <constraints>
+                                                <constraint firstAttribute="bottom" secondItem="6gv-6P-dCD" secondAttribute="bottom" id="Jwl-uB-4VH"/>
                                                 <constraint firstItem="0Z6-EC-d4t" firstAttribute="top" secondItem="Yri-7X-Prc" secondAttribute="topMargin" id="chC-8L-hpK"/>
                                                 <constraint firstItem="0Z6-EC-d4t" firstAttribute="leading" secondItem="Yri-7X-Prc" secondAttribute="leadingMargin" id="e2f-hC-grX"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="0Z6-EC-d4t" secondAttribute="bottom" id="hNf-yW-MH9"/>
+                                                <constraint firstItem="6gv-6P-dCD" firstAttribute="leading" secondItem="Yri-7X-Prc" secondAttribute="leading" id="slI-SQ-aMz"/>
+                                                <constraint firstItem="6gv-6P-dCD" firstAttribute="top" secondItem="Yri-7X-Prc" secondAttribute="top" id="yAm-QY-oln"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <animations/>
@@ -782,7 +795,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                             <constraint firstAttribute="trailing" secondItem="51g-sT-9eN" secondAttribute="trailing" id="btI-8C-iq6"/>
                             <constraint firstItem="51g-sT-9eN" firstAttribute="height" secondItem="dQK-sp-grQ" secondAttribute="height" id="dkf-9o-VHf"/>
                             <constraint firstItem="51g-sT-9eN" firstAttribute="leading" secondItem="dQK-sp-grQ" secondAttribute="leading" id="iZO-xo-ukq"/>
-                            <constraint firstItem="7bg-uP-HRH" firstAttribute="top" secondItem="dQK-sp-grQ" secondAttribute="topMargin" constant="20" id="paP-US-Ph7"/>
+                            <constraint firstItem="7bg-uP-HRH" firstAttribute="top" secondItem="dQK-sp-grQ" secondAttribute="topMargin" id="paP-US-Ph7"/>
                             <constraint firstItem="8tg-3g-bcL" firstAttribute="top" secondItem="7bg-uP-HRH" secondAttribute="bottom" id="pes-9L-Crz"/>
                             <constraint firstAttribute="trailing" secondItem="7bg-uP-HRH" secondAttribute="trailing" id="pwx-WE-m82"/>
                             <constraint firstItem="7bg-uP-HRH" firstAttribute="leading" secondItem="dQK-sp-grQ" secondAttribute="leading" id="xJo-qJ-PFb"/>
@@ -808,6 +821,12 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XTI-aS-DSB" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <screenEdgePanGestureRecognizer minimumNumberOfTouches="1" id="gEj-Bw-ow5">
+                    <connections>
+                        <action selector="backTriggered" destination="wUj-QL-xby" id="pEf-Ry-OBE"/>
+                        <outlet property="delegate" destination="wUj-QL-xby" id="RK6-27-sYj"/>
+                    </connections>
+                </screenEdgePanGestureRecognizer>
                 <tapGestureRecognizer id="V0D-HW-DNa" customClass="UITouchGestureRecognizer" customModule="T_Squared" customModuleProvider="target">
                     <connections>
                         <action selector="touchDown:" destination="wUj-QL-xby" id="2wg-yo-I6R"/>

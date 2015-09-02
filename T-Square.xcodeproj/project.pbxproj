@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2E1A63441B9696A7002D7632 /* TableViewCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E1A63431B9696A7002D7632 /* TableViewCells.swift */; settings = {ASSET_TAGS = (); }; };
 		2E4207A71B8FB828002B79E6 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4207A61B8FB828002B79E6 /* libxml2.2.dylib */; };
 		2E4207BD1B8FBA27002B79E6 /* TSReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4207BC1B8FBA27002B79E6 /* TSReader.swift */; };
 		2E4207BF1B9004F7002B79E6 /* Class.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4207BE1B9004F7002B79E6 /* Class.swift */; };
@@ -49,6 +50,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2E1A63431B9696A7002D7632 /* TableViewCells.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewCells.swift; sourceTree = "<group>"; };
 		2E4207A61B8FB828002B79E6 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = ../../../../../usr/lib/libxml2.2.dylib; sourceTree = "<group>"; };
 		2E4207BC1B8FBA27002B79E6 /* TSReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSReader.swift; sourceTree = "<group>"; };
 		2E4207BE1B9004F7002B79E6 /* Class.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Class.swift; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				2E7C6F6B1B8E6DDE00E95183 /* Info.plist */,
 				2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */,
 				2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */,
+				2E1A63431B9696A7002D7632 /* TableViewCells.swift */,
 				2E8AFE061B92DF5700DE7E28 /* AnouncementDelegate.swift */,
 				2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */,
 				2E4207BC1B8FBA27002B79E6 /* TSReader.swift */,
@@ -354,6 +357,7 @@
 				2E78739D1B90D49900C1F4BE /* Announcement.swift in Sources */,
 				2E4207BF1B9004F7002B79E6 /* Class.swift in Sources */,
 				2E7C6F8E1B8E94BA00E95183 /* CoreSwift.swift in Sources */,
+				2E1A63441B9696A7002D7632 /* TableViewCells.swift in Sources */,
 				2E7C6F621B8E6DDE00E95183 /* LoginViewController.swift in Sources */,
 				2E7C6F801B8E6E5100E95183 /* HttpClient.swift in Sources */,
 				2E7C6F601B8E6DDE00E95183 /* AppDelegate.swift in Sources */,

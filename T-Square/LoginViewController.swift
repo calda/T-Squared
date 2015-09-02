@@ -31,6 +31,7 @@ class LoginViewController: UIViewController {
     
     //MARK: - Preparing the View Controller
     override func viewWillAppear(animated: Bool) {
+        if animated { return }
         
         self.formCenter.constant = self.view.frame.height / 2.0
         self.containerLeading.constant = UIScreen.mainScreen().bounds.width

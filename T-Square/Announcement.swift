@@ -65,8 +65,11 @@ class Announcement : CustomStringConvertible {
                     self.loadMessage(completion)
                 }
                 else {
-                    let messageTag = page.css("p")[0]
-                    self.message = messageTag.text!.cleansed().cleansed()
+                    var message: String = ""
+                    for pTag in page.css("p") {
+                        message += pTag.text!.cleansed().cleansed() + "\n"
+                    }
+                    self.message = message
                     
                     //load attachments if present
                     for link in page.css("a, link") {
@@ -94,21 +97,20 @@ class Announcement : CustomStringConvertible {
         
         //mark as read if the announcement pre-dates the install date of the app
         if let installDate = data.valueForKey(TSInstallDateKey) as? NSDate {
-            let now = NSDate()
-            if installDate.timeIntervalSinceDate(now) < 0 {
+            if installDate.timeIntervalSinceDate(date) > 0 {
                 return true
             }
         }
         
-        guard let read = data.valueForKey(TSReadAnnouncementsKey) as? [NSDate] else { return false }
+        let read = data.valueForKey(TSReadAnnouncementsKey) as? [NSDate] ?? []
         return read.contains(date)
     }
     
     func markRead() {
+        guard let date = self.date else { return }
         let data = NSUserDefaults.standardUserDefaults()
         var read = data.valueForKey(TSReadAnnouncementsKey) as? [NSDate] ?? []
-        let now = NSDate()
-        read.insert(now, atIndex: 0)
+        read.insert(date, atIndex: 0)
         data.setValue(read, forKey: TSReadAnnouncementsKey)
     }
     

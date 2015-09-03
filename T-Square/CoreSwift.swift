@@ -211,6 +211,53 @@ func heightForText(text: String, width: CGFloat, font: UIFont) -> CGFloat {
     return rect.height
 }
 
+///changes the color of all HTTP links to the specified color
+func attributedStringWithHighlightedLinks(string: String, linkColor: UIColor) -> NSAttributedString {
+
+    let attributed = NSMutableAttributedString(string: string)
+    for (_, linkRange) in linksInText(string) {
+        attributed.addAttribute(NSForegroundColorAttributeName, value: linkColor, range: linkRange)
+    }
+    
+    return attributed
+}
+
+///returns a list of all HTTP links in the given string
+func linksInText(string: String) -> [(text: String, range: NSRange)] {
+    
+    var text = string as NSString
+    var links: [(text: String, range: NSRange)] = []
+    
+    while text.containsString("http://") || text.containsString("www.") {
+        var idRange = text.rangeOfString("http://")
+        if idRange.location == NSNotFound { idRange = text.rangeOfString("www.") }
+        
+        if idRange.location != NSNotFound {
+            //find entire word that contains link ID
+            let wordStart = idRange.location
+            var wordEnd = idRange.location + idRange.length
+            
+            while ("\(text.stringAtIndex(wordEnd + 1))" != " ") && (wordEnd != text.length - 2) {
+                wordEnd++;
+            }
+            
+            let linkRange = NSMakeRange(wordStart, wordEnd - wordStart)
+            let link = text.substringWithRange(linkRange)
+            text = text.stringByReplacingCharactersInRange(linkRange, withString: link.uppercaseString)
+            links.append(text: link, range: linkRange)
+        }
+    }
+    
+    return links
+}
+
+///converts "http://www.google.com/search/page/saiojdfghadlsifuhlaisdf" to "google.com"
+func websiteForLink(string: String) -> String {
+    var stripped = (string as NSString).stringByReplacingOccurrencesOfString("http://", withString: "")
+    stripped = (stripped as NSString).stringByReplacingOccurrencesOfString("www.", withString: "")
+    return stripped.componentsSeparatedByString("/")[0]
+}
+
 //MARK: - Classes
 
 ///A touch gesture recognizer that sends events on both .Began (down) and .Ended (up)
@@ -347,6 +394,7 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
     var currentDelegate: StackableTableDelegate!
     
     func popDelegate() {
+        print("super pop")
         if let (newDelegate, offset) = delegateStack.pop() {
             pushDelegate(newDelegate, isBack: true, atOffset: offset)
         }
@@ -488,4 +536,13 @@ extension UITableViewCell {
     func hideSeparator() {
         self.separatorInset = UIEdgeInsetsMake(0, self.frame.size.width * 2.0, 0, 0)
     }
+}
+
+extension NSString {
+    
+    func stringAtIndex(index: Int) -> String {
+        let char = self.characterAtIndex(index)
+        return "\(Character(UnicodeScalar(char)))"
+    }
+    
 }

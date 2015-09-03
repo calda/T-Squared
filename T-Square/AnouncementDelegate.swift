@@ -44,7 +44,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             }
             
             controller.reloadTable()
-            announcement.hasBeenRead()
+            announcement.markRead()
         })
     }
     
@@ -96,7 +96,10 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
         
         (identifier: "announcementText", onDisplay: { tableCell, announcement in
             let cell = tableCell as! TitleCell
-            cell.decorate(announcement.message ?? "Loading message...")
+            let message = announcement.message ?? "Loading message..."
+            let attributed = attributedStringWithHighlightedLinks(message, linkColor: UIColor(hue: 0.58, saturation: 0.84, brightness: 0.53, alpha: 1.0))
+            
+            cell.titleLabel.attributedText = attributed
             cell.hideSeparator()
         }),
         
@@ -151,7 +154,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             let height = heightForText(text, width: tableView.frame.width - 24.0, font: UIFont.systemFontOfSize(fontSize))
             
             if identifier == "announcementText" {
-                return max(100.0, height)
+                return max(100.0, height + 30.0)
             }
             return height
         }
@@ -172,6 +175,19 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             if cells[index.item].identifier == "attachment" {
                 let attachment = announcement.attachments![self.cells.count - 1 - index.item]
                 AttachmentCell.presentAttachment(attachment, inController: self.controller)
+            }
+            if cells[index.item].identifier == "announcementText" {
+                if let message = announcement.message {
+                    let linksAndRanges = linksInText(message)
+                    //build array with only links
+                    if linksAndRanges.count != 0 {
+                        var links: [String] = []
+                        for (link, _) in linksAndRanges {
+                            links.append(link)
+                        }
+                        controller.openFromLinks(links)
+                    }
+                }
             }
         }
         else if index.section == 1 && index.item != 0 {

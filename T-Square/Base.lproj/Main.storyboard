@@ -536,6 +536,14 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Z6-EC-d4t">
+                                                    <rect key="frame" x="8" y="8" width="33" height="33"/>
+                                                    <animations/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="0Z6-EC-d4t" secondAttribute="height" multiplier="1:1" id="84u-0c-tv5"/>
+                                                    </constraints>
+                                                    <state key="normal" image="button-back"/>
+                                                </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6gv-6P-dCD">
                                                     <rect key="frame" x="0.0" y="0.0" width="103" height="49"/>
                                                     <animations/>
@@ -544,17 +552,6 @@
                                                     </constraints>
                                                     <connections>
                                                         <action selector="backButtonPressed:" destination="hGp-PN-xBo" eventType="touchUpInside" id="Mei-5p-Q6o"/>
-                                                    </connections>
-                                                </button>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Z6-EC-d4t">
-                                                    <rect key="frame" x="8" y="8" width="33" height="33"/>
-                                                    <animations/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" secondItem="0Z6-EC-d4t" secondAttribute="height" multiplier="1:1" id="84u-0c-tv5"/>
-                                                    </constraints>
-                                                    <state key="normal" image="button-back"/>
-                                                    <connections>
-                                                        <action selector="backButtonPressed:" destination="hGp-PN-xBo" eventType="touchUpInside" id="vVt-8f-KoW"/>
                                                     </connections>
                                                 </button>
                                             </subviews>

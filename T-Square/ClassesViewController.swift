@@ -216,6 +216,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     @IBAction func backTriggered() {
+        print("IBAction")
         popDelegate()
     }
     
@@ -226,6 +227,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             if index == 0 { return }
             if index == 1 && announcements.count == 0 {
                 self.dismissViewControllerAnimated(false, completion: nil)
+                return
             }
             let announcement = announcements[index.item - 1]
             AnnouncementCell.presentAnnouncement(announcement, inController: self)
@@ -239,6 +241,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     override func popDelegate() {
+        print("pop delegate")
         super.popDelegate()
         let delegate = tableView.delegate!
         if !(delegate is ClassesViewController || delegate is AnnouncementDelegate) {
@@ -279,6 +282,28 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     func documentInteractionControllerViewControllerForPreview(controller: UIDocumentInteractionController) -> UIViewController {
         return self
+    }
+    
+    func openFromLinks(links: [String]) {
+        if links.count == 0 { return }
+        if links.count == 1 {
+            let alert = UIAlertController(title: "Open link in Safari?", message: websiteForLink(links[0]) + "/...", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
+            alert.addAction(UIAlertAction(title: "Open", style: .Default, handler: { _ in
+                UIApplication.sharedApplication().openURL(NSURL(string: links[0])!)
+            }))
+            self.presentViewController(alert, animated: true, completion: nil)
+            return
+        }
+        
+        let alert = UIAlertController(title: "Open link in Safari?", message: "There are multiple links in this message. Which would you like to open?", preferredStyle: .Alert)
+        for link in links {
+            alert.addAction(UIAlertAction(title: websiteForLink(link) + "/...", style: .Default, handler: { _ in
+                UIApplication.sharedApplication().openURL(NSURL(string: link)!)
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
 }

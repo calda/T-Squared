@@ -34,7 +34,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Table View cell arrangement
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 { return (classes?.count ?? 0) }
+        if section == 0 { return (classes?.count ?? 0) + 1 }
         else { return announcements.count + (announcements.count == 0 ? 2 : 1) }
     }
     
@@ -46,6 +46,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if indexPath == nil { return 50.0 }
         
         if indexPath.section == 0 {
+            if indexPath.item == 0 { return 50.0 }
             return 70.0
         }
         if indexPath.section == 1 {
@@ -60,11 +61,16 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         //classes
         if section == 0 {
+            if index == 0 {
+                let cell = tableView.dequeueReusableCellWithIdentifier("settings") as! LogoutSettingsCell
+                cell.hideSeparator()
+                return cell
+            }
             if let classes = classes {
-                let displayClass = classes[index]
+                let displayClass = classes[index - 1]
                 let cell = tableView.dequeueReusableCellWithIdentifier("class") as! ClassNameCell
                 cell.decorate(displayClass)
-                if index == classes.count - 1 {
+                if index == classes.count {
                     cell.hideSeparator()
                 }
                 return cell
@@ -182,6 +188,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
         let background: UIColor
         if indexPath.section == 0 {
+            if indexPath.item == 0 { return }
             background = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
         }
         else { //if section == 1
@@ -216,16 +223,23 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     @IBAction func backTriggered() {
-        print("IBAction")
         popDelegate()
     }
     
     //MARK: - Stackable Table Delegate methods
     
     func processSelectedCell(index: NSIndexPath) {
+        if index.section == 0 {
+            if index.item == 0 { return }
+            guard let classes = classes else { return }
+            let displayClass = classes[index.item - 1]
+            pushDelegate(ClassDelegate(controller: self, displayClass: displayClass))
+        }
+        
         if index.section == 1 {
-            if index == 0 { return }
-            if index == 1 && announcements.count == 0 {
+            if index.item == 0 { return }
+            if index.item == 1 && announcements.count == 0 {
+                //TODO: Actually do a re-login or re-fetch?
                 self.dismissViewControllerAnimated(false, completion: nil)
                 return
             }
@@ -235,13 +249,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     override func pushDelegate(delegate: StackableTableDelegate) {
-        bottomView.hidden = !(delegate is ClassesViewController || delegate is AnnouncementDelegate)
+        bottomView.hidden = !(delegate is ClassesViewController || delegate is AnnouncementDelegate || delegate is ClassDelegate)
         super.pushDelegate(delegate)
         updateBottomView()
     }
     
     override func popDelegate() {
-        print("pop delegate")
         super.popDelegate()
         let delegate = tableView.delegate!
         if !(delegate is ClassesViewController || delegate is AnnouncementDelegate) {
@@ -253,7 +266,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         return index != NSIndexPath(forItem: 0, inSection: 1)
     }
     
-    //MARK: Auxillary Functions
+    //MARK: - Auxillary Functions
     
     func presentDocumentFromURL(webURL: NSURL) {
         dispatch_async(TSNetworkQueue, {

@@ -394,7 +394,6 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
     var currentDelegate: StackableTableDelegate!
     
     func popDelegate() {
-        print("super pop")
         if let (newDelegate, offset) = delegateStack.pop() {
             pushDelegate(newDelegate, isBack: true, atOffset: offset)
         }

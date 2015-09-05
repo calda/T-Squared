@@ -26,6 +26,11 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
         }
         self.controller = controller
         super.init()
+        
+        if announcement.message == nil {
+            controller.setActivityIndicatorVisible(true)
+        }
+        
         announcement.loadMessage({ _ in
             
             if let attachments = announcement.attachments {
@@ -45,6 +50,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             
             controller.reloadTable()
             announcement.markRead()
+            controller.setActivityIndicatorVisible(false)
         })
     }
     

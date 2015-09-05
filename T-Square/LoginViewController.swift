@@ -11,6 +11,7 @@ import Foundation
 
 let TSUsernamePath = "edu.gatech.cal.username"
 let TSPasswordPath = "edu.gatech.cal.password"
+var TSAuthenticatedReader: TSReader!
 
 class LoginViewController: UIViewController {
 
@@ -111,6 +112,7 @@ class LoginViewController: UIViewController {
             TSReader.authenticatedReader(user: self.usernameField.text!, password: self.passwordField.text!, completion: { reader in
                 
                 if let reader = reader {
+                    TSAuthenticatedReader = reader
                     self.animateFormSubviewsWithDuration(0.5, hidden: false)
                     self.animateActivityIndicator(on: false)
                     self.setSavedCredentials(correct: true)
@@ -191,7 +193,10 @@ class LoginViewController: UIViewController {
     
     func presentClassesView(reader: TSReader) {
         tapRecognizer.enabled = false
-        let classes = reader.getClasses()
+        var classes: [Class] = []
+        while classes.count == 0 {
+            classes = reader.getClasses()
+        }
         classesViewController.classes = classes
         classesViewController.reloadTable()
         

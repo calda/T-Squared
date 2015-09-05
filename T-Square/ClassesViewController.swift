@@ -28,6 +28,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet var touchRecognizer: UITouchGestureRecognizer!
     @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var activityIndicator: UIVisualEffectView!
     
     var documentController: UIDocumentInteractionController?
     
@@ -86,7 +87,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
             if index == 1 && announcements.count == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("message") as! TitleCell
-                cell.decorate(loadingAnnouncements ? "Loading Announcements..." : "No announcements posted. Reload?")
+                cell.decorate(loadingAnnouncements ? "Loading Announcements..." : "No announcements posted.")
                 return cell
             }
             let announcement = announcements[index - announcementIndexOffset]
@@ -153,6 +154,15 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         updateBottomView()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setTouchDelegateEnabled:", name: TSSetTouchDelegateEnabledNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "backTriggered", name: TSBackNotification, object: nil)
+        
+        activityIndicator.hidden = false
+        activityIndicator.layer.cornerRadius = 25.0
+        activityIndicator.layer.masksToBounds = true
+        activityIndicator.transform = CGAffineTransformMakeScale(0.0, 0.0)
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {
@@ -179,6 +189,33 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     @IBAction func touchDown(sender: UITapGestureRecognizer) {
         let touch = sender.locationInView(tableView)
         self.processTouchInTableView(touch, state: sender.state)
+    }
+    
+    @IBAction func viewPanned(sender: UIPanGestureRecognizer) {
+        if delegateStack.count == 0 { return }
+        
+        if sender.state == .Ended {
+            tableView.scrollEnabled = true
+            tableView.userInteractionEnabled = true
+            
+            let endPosition = self.tableView.frame.origin.x
+            self.tableView.frame.origin = CGPointZero
+            self.bottomView.frame.origin = CGPointMake(0, bottomView.frame.origin.y)
+            
+            if endPosition > 10.0 {
+                self.popDelegate()
+            }
+            else {
+                self.unhighlightAllCells()
+            }
+            return
+        }
+        
+        tableView.scrollEnabled = false
+        tableView.userInteractionEnabled = false
+        let translation = sender.translationInView(self.view)
+        self.tableView.frame.origin = CGPointMake(max(0.0, translation.x), 0.0)
+        self.bottomView.frame.origin = CGPointMake(max(0.0, translation.x), bottomView.frame.origin.y)
     }
     
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -238,18 +275,20 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         if index.section == 1 {
             if index.item == 0 { return }
-            if index.item == 1 && announcements.count == 0 {
-                //TODO: Actually do a re-login or re-fetch?
-                self.dismissViewControllerAnimated(false, completion: nil)
-                return
-            }
+            if index.item == 1 && announcements.count == 0 { return }
             let announcement = announcements[index.item - 1]
             AnnouncementCell.presentAnnouncement(announcement, inController: self)
         }
     }
     
+    func usesBottomView(delegate: AnyObject) -> Bool {
+        return delegate is ClassesViewController
+            || delegate is AnnouncementDelegate
+            || delegate is ClassDelegate
+    }
+    
     override func pushDelegate(delegate: StackableTableDelegate) {
-        bottomView.hidden = !(delegate is ClassesViewController || delegate is AnnouncementDelegate || delegate is ClassDelegate)
+        bottomView.hidden = !(usesBottomView(delegate))
         super.pushDelegate(delegate)
         updateBottomView()
     }
@@ -257,9 +296,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     override func popDelegate() {
         super.popDelegate()
         let delegate = tableView.delegate!
-        if !(delegate is ClassesViewController || delegate is AnnouncementDelegate) {
-            self.bottomView.hidden = false
-        }
+        bottomView.hidden = !(usesBottomView(delegate))
+        updateBottomView()
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
@@ -269,6 +307,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Auxillary Functions
     
     func presentDocumentFromURL(webURL: NSURL) {
+        self.setActivityIndicatorVisible(true)
+        
         dispatch_async(TSNetworkQueue, {
             let data = NSData(contentsOfURL: webURL)!
             
@@ -288,6 +328,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 self.documentController = controller
                 controller.delegate = self
                 controller.presentPreviewAnimated(true)
+                delay(0.5) {
+                    self.setActivityIndicatorVisible(false)
+                }
             }
             
         })
@@ -317,6 +360,16 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func setActivityIndicatorVisible(visible: Bool) {
+        let scale: CGFloat = visible ? 1.0 : 0.1
+        let transform = CGAffineTransformMakeScale(scale, scale)
+        
+        UIView.animateWithDuration(visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+            self.activityIndicator.transform = transform
+            self.activityIndicator.alpha = visible ? 1.0 : 0.0
+        }, completion: nil)
     }
     
 }

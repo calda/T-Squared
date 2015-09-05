@@ -54,7 +54,6 @@ class AnnouncementCell : UITableViewCell {
     static func presentAnnouncement(announcement: Announcement, inController controller: ClassesViewController) {
         let delegate = AnnouncementDelegate(announcement: announcement, controller: controller)
         controller.pushDelegate(delegate)
-        controller.updateBottomView()
     }
     
 }
@@ -90,18 +89,8 @@ class AttachmentCell : TitleCell {
 
 class BackCell : UITableViewCell {
     
-    //use cooldown to prevent double Delegate pops for single back presses
-    var coolingDown = false
-    
     @IBAction func backButtonPressed(sender: UIButton) {
-        //TODO: the cool down fix didn't actually work. move it to the delegate pop method?
-        if coolingDown { return }
-        
         NSNotificationCenter.defaultCenter().postNotificationName(TSBackNotification, object: nil)
-        coolingDown = true
-        delay(0.5) {
-            self.coolingDown = false
-        }
     }
     
 }

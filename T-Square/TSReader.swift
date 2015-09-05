@@ -71,12 +71,13 @@ class TSReader {
         return classes
     }
     
+    
     func getAnnouncementsForClass(currentClass: Class) -> [Announcement] {
         guard let classPage = currentClass.getClassPage() else { return [] }
         
         var announcements: [Announcement] = []
         
-        //load page for class
+        //load page for class announcements
         for link in classPage.css("a, link") {
             if link.text != "Announcements" { continue }
             guard let announcementsPage = HttpClient.contentsOfPage(link["href"]!) else { return [] }
@@ -114,4 +115,56 @@ class TSReader {
         return announcements
     }
     
+    func getResourcesInRoot(currentClass: Class) -> [Resource] {
+        if let root = getResourceRootForClass(currentClass) {
+            return getResourcesInFolder(root)
+        }
+        return []
+    }
+    
+    func getResourceRootForClass(currentClass: Class) -> Resource? {
+        guard let classPage = currentClass.getClassPage() else { return nil }
+        
+        //load page for resources
+        for link in classPage.css("a, link") {
+            if link.text != "Resources" { continue }
+            return Resource(name: "Resources Folder", link: link["href"]!)
+        }
+        
+        return nil
+    }
+    
+    func getResourcesInFolder(resource: Resource) -> [Resource] {
+        if let resources = resource.resourcesInFolder where resource.isFolder {
+            return resources
+        }
+        
+        var resources: [Resource] = []
+        //load resources if they haven't been already
+        guard let resourcesPage = HttpClient.contentsOfPage(resource.link) else { return resources }
+        
+        for row in resourcesPage.css("h4") {
+            let links = row.css("a")
+            if links.count == 0 { continue }
+            let resourcesLink = links[links.count - 1]
+            
+            let name = resourcesLink.text!.cleansed()
+            var resourceLink = resourcesLink["href"]!
+            
+            if let javascript = resourcesLink["onclick"] where resourceLink == "#" {
+                let splits = javascript.componentsSeparatedByString("'")
+                let linkID = splits[7]
+                print(linkID)
+            }
+            
+            let resource = Resource(name: name, link: resourceLink)
+            resources.append(resource)
+            print(resource.name)
+        }
+        
+        return resources
+    }
+    
 }
+
+

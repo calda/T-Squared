@@ -36,22 +36,41 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         }
     }
     
-    var cells: [(identifier: String, onDisplay: (UITableViewCell, Class) -> () )] = [
+    var cells: [(identifier: String, onDisplay: (UITableViewCell, Class) -> (), onTap: ((ClassesViewController, Class) -> ())? )] = [
     
-        (identifier: "back", onDisplay: hideSeparator),
+        (identifier: "back", onDisplay: hideSeparator, onTap: nil),
         (identifier: "classTitle", onDisplay: { cell, displayClass in
             if let cell = cell as? ClassNameCell {
                 cell.decorate(displayClass)
                 cell.hideSeparator()
             }
-        }),
+        }, onTap: nil),
         
-        (identifier: "blank", onDisplay: hideSeparator),
-        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Assignments")),
-        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Resources")),
-        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Gradebook")),
-        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Syllabus", hideSeparator: true)),
-        (identifier: "blank", onDisplay: hideSeparator)
+        (identifier: "blank", onDisplay: hideSeparator, onTap: nil),
+        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Assignments"), onTap: nil),
+        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Resources"), onTap: { controller, displayClass in
+        
+            controller.setActivityIndicatorVisible(true)
+            //load root resources
+            dispatch_async(TSNetworkQueue, {
+                let resources = TSAuthenticatedReader.getResourcesInRoot(displayClass)
+                let delegate = ResourcesDelegate(controller: controller, resources: resources, inClass: displayClass)
+                sync() {
+                    controller.setActivityIndicatorVisible(false)
+                    controller.pushDelegate(delegate)
+                }
+            })
+            
+        }),
+        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Gradebook"), onTap: nil),
+        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Open in Safari", hideSeparator: true), onTap: { controller, displayClass in
+            
+            let link = displayClass.link
+            let url = NSURL(string: link)!
+            UIApplication.sharedApplication().openURL(url)
+            
+        }),
+        (identifier: "blank", onDisplay: hideSeparator, onTap: nil)
         
     ]
     
@@ -71,7 +90,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
-            let (identifier, onDisplay) = cells[indexPath.item]
+            let (identifier, onDisplay, _) = cells[indexPath.item]
             let cell = tableView.dequeueReusableCellWithIdentifier(identifier)!
             onDisplay(cell, displayClass)
             return cell
@@ -117,7 +136,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
         return index.section == 0
-               ? index.item >= 3
+               ? cells[index.item].onTap != nil
                : index.item != 0
     }
     
@@ -127,6 +146,12 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             if index.item == 1 && displayClass.announcements.count == 0 { return }
             let announcement = displayClass.announcements[index.item - 1]
             controller.pushDelegate(AnnouncementDelegate(announcement: announcement, controller: controller))
+        }
+        
+        if index.section == 0 {
+            if let onTap = cells[index.item].onTap {
+                onTap(controller, displayClass)
+            }
         }
     }
     

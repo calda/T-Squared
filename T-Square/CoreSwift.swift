@@ -413,6 +413,8 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
         tableView.dataSource = delegate
         tableView.reloadData()
         tableView.contentOffset = offset ?? CGPointZero
+        unhighlightAllCells()
+        
         let subtype = isBack ? kCATransitionFromLeft : kCATransitionFromRight
         playTransitionForView(tableView, duration: 0.3, transition: kCATransitionPush, subtype: subtype)
     }
@@ -450,6 +452,16 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
                 if delegate?.canHighlightCell(index) == true {
                     delegate?.animateSelection(cell, indexPath: index, selected: false)
                 }
+            }
+        }
+    }
+    
+    func unhighlightAllCells() {
+        guard let delegate = tableView.delegate as? StackableTableDelegate else { return }
+        for cell in tableView.visibleCells {
+            let indexPath = tableView.indexPathForCell(cell)!
+            if delegate.canHighlightCell(indexPath) {
+                delegate.animateSelection(cell, indexPath: tableView.indexPathForCell(cell)!, selected: false)
             }
         }
     }

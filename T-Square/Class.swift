@@ -17,6 +17,7 @@ class Class : CustomStringConvertible {
     let link: String
     var classPage: HTMLDocument?
     var announcements: [Announcement] = []
+    var rootResource: Resource?
     
     var description: String {
         return name
@@ -38,7 +39,8 @@ class Class : CustomStringConvertible {
     
     func getClassPage() ->  HTMLDocument? {
         if let classPage = self.classPage { return classPage }
-        return HttpClient.contentsOfPage(self.link)
+        classPage = HttpClient.contentsOfPage(self.link)
+        return classPage!
     }
     
 }

@@ -180,9 +180,6 @@ class HttpClient {
         let URL = NSURL(string: url.stringByReplacingOccurrencesOfString("site", withString: "pda"))!
         //let data = NSData(contentsOfURL: URL)!
         let text = try! NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding)
-        
-        //
-        
         return Kanna.HTML(html: text as String, encoding: NSUTF8StringEncoding)
     }
     
@@ -196,6 +193,7 @@ extension String {
         //tabs and newlines
         text = (text as NSString).stringByReplacingOccurrencesOfString("\n", withString: "")
         text = (text as NSString).stringByReplacingOccurrencesOfString("\t", withString: "")
+        text = (text as NSString).stringByReplacingOccurrencesOfString("\r", withString: "")
         
         //leading spaces
         while text.hasPrefix(" ") {

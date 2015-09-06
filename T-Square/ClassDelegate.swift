@@ -53,11 +53,18 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             controller.setActivityIndicatorVisible(true)
             //load root resources
             dispatch_async(TSNetworkQueue, {
-                let resources = TSAuthenticatedReader.getResourcesInRoot(displayClass)
-                let delegate = ResourcesDelegate(controller: controller, resources: resources, inClass: displayClass)
-                sync() {
-                    controller.setActivityIndicatorVisible(false)
-                    controller.pushDelegate(delegate)
+                if let rootFolder = TSAuthenticatedReader.getResourceRootForClass(displayClass) {
+                    let resources = TSAuthenticatedReader.getResourcesInFolder(rootFolder)
+                    let delegate = ResourcesDelegate(controller: controller, resources: resources, inFolder: rootFolder)
+                    sync() {
+                        controller.setActivityIndicatorVisible(false)
+                        controller.pushDelegate(delegate)
+                    }
+                }
+                else {
+                    let alert = UIAlertController(title: "No Resources Folder", message: "This class does not have a Resources folder.", preferredStyle: .Alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                    controller.presentViewController(alert, animated: true, completion: nil)
                 }
             })
             

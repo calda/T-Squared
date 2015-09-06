@@ -211,6 +211,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             return
         }
         
+        //do nothing for vertical scrolling
+        let velocity = sender.velocityInView(self.tableView)
+        if 2 * abs(velocity.y) > abs(velocity.x) { return }
+        
         tableView.scrollEnabled = false
         tableView.userInteractionEnabled = false
         let translation = sender.translationInView(self.view)

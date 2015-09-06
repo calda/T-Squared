@@ -183,6 +183,16 @@ class HttpClient {
         return Kanna.HTML(html: text as String, encoding: NSUTF8StringEncoding)
     }
     
+    static func getPageForResourceFolder(resource: ResourceFolder) -> HTMLDocument? {
+        if resource.collectionID == "" && resource.navRoot == "" {
+            return contentsOfPage(resource.link)
+        }
+        let postString = "source=0&criteria=title&sakai_action=doNavigate&collectionId=\(resource.collectionID)&navRoot=\(resource.navRoot)"
+        let client = HttpClient(url: resource.link)
+        let pageText = client.sendPost(postString)
+        return Kanna.HTML(html: pageText, encoding: NSUTF8StringEncoding)
+    }
+    
 }
 
 extension String {

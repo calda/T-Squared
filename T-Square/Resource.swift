@@ -12,13 +12,24 @@ class Resource {
     
     let name: String
     let link: String
-    let isFolder: Bool
-    var resourcesInFolder: [Resource]? = nil
     
     init(name: String, link: String) {
         self.name = name
         self.link = link
-        self.isFolder = link.containsString("/portal/pda") || link == "#"
+    }
+    
+}
+
+class ResourceFolder : Resource {
+    
+    let collectionID: String
+    let navRoot: String
+    var resourcesInFolder: [Resource]? = nil
+    
+    init(name: String, link: String, collectionID: String, navRoot: String) {
+        self.collectionID = collectionID
+        self.navRoot = navRoot
+        super.init(name: name, link: link)
     }
     
 }

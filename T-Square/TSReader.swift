@@ -122,44 +122,55 @@ class TSReader {
         return []
     }
     
-    func getResourceRootForClass(currentClass: Class) -> Resource? {
+    func getResourceRootForClass(currentClass: Class) -> ResourceFolder? {
         guard let classPage = currentClass.getClassPage() else { return nil }
         
         //load page for resources
         for link in classPage.css("a, link") {
             if link.text != "Resources" { continue }
-            return Resource(name: "Resources Folder", link: link["href"]!)
+            return ResourceFolder(name: "Resources in \(currentClass.name)", link: link["href"]!, collectionID: "", navRoot: "")
         }
         
         return nil
     }
     
-    func getResourcesInFolder(resource: Resource) -> [Resource] {
-        if let resources = resource.resourcesInFolder where resource.isFolder {
+    func getResourcesInFolder(folder: ResourceFolder) -> [Resource] {
+        if let resources = folder.resourcesInFolder {
             return resources
         }
         
         var resources: [Resource] = []
         //load resources if they haven't been already
-        guard let resourcesPage = HttpClient.contentsOfPage(resource.link) else { return resources }
+        guard let resourcesPage = HttpClient.getPageForResourceFolder(folder) else { return resources }
         
         for row in resourcesPage.css("h4") {
             let links = row.css("a")
             if links.count == 0 { continue }
-            let resourcesLink = links[links.count - 1]
+            var resourcesLink = links[links.count - 1]
             
-            let name = resourcesLink.text!.cleansed()
-            var resourceLink = resourcesLink["href"]!
-            
-            if let javascript = resourcesLink["onclick"] where resourceLink == "#" {
-                let splits = javascript.componentsSeparatedByString("'")
-                let linkID = splits[7]
-                print(linkID)
+            if let javascript = resourcesLink["onclick"] {
+                let collectionID = HttpClient.getInfoFromPage(javascript as NSString, infoSearch: "'collectionId').value='", terminator: "'")!
+                let navRoot = HttpClient.getInfoFromPage(javascript as NSString, infoSearch: "'navRoot').value='", terminator: "'")!
+                let name = resourcesLink.text!.cleansed()
+                let folder = ResourceFolder(name: name, link: folder.link, collectionID: collectionID, navRoot: navRoot)
+                resources.append(folder)
+            }
+            else {
+                //find a link with actual content
+                var linkOffset = 2
+                while resourcesLink["href"]! == "#" && linkOffset < (links.count + 1) {
+                    resourcesLink = links[max(0, links.count - linkOffset)]
+                    linkOffset++
+                }
+                
+                //we didn't find anything useful. bail out.
+                if resourcesLink["href"]! == "#" { continue }
+                
+                let resource = Resource(name: resourcesLink.text!.cleansed(), link: resourcesLink["href"]!)
+                resources.append(resource)
+                print(resource.name)
             }
             
-            let resource = Resource(name: name, link: resourceLink)
-            resources.append(resource)
-            print(resource.name)
         }
         
         return resources

@@ -85,6 +85,12 @@ class AttachmentCell : TitleCell {
         }
     }
     
+    static func presentResource(resource: Resource, inController controller: ClassesViewController) {
+        if let url = NSURL(string: resource.link) {
+            controller.presentDocumentFromURL(url)
+        }
+    }
+    
 }
 
 class BackCell : UITableViewCell {

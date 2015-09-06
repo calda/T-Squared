@@ -11,20 +11,20 @@ import UIKit
 
 class ResourcesDelegate : NSObject, StackableTableDelegate {
     
-    let owningClass: Class
+    let openFolder: ResourceFolder
     let controller: ClassesViewController
     
     let allResources: [Resource]
-    var folders: [Resource] = []
+    var folders: [ResourceFolder] = []
     var files: [Resource] = []
 
-    init(controller: ClassesViewController, resources: [Resource], inClass owningClass: Class) {
-        self.owningClass = owningClass
+    init(controller: ClassesViewController, resources: [Resource], inFolder folder: ResourceFolder) {
+        self.openFolder = folder
         self.controller = controller
         self.allResources = resources
         
         for resource in resources {
-            if resource.isFolder {
+            if let resource = resource as? ResourceFolder {
                 folders.append(resource)
             }
             else {
@@ -37,7 +37,7 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return (allResources.count == 0 ? 2 : 1)
+            return (allResources.count == 0 ? 3 : 2)
         }
         if section == 1 { return folders.count }
         else { return files.count } //section == 2
@@ -53,7 +53,12 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
             if indexPath.item == 0 {
                 return tableView.dequeueReusableCellWithIdentifier("back")!
             }
-            if indexPath.item == 0 && allResources.count == 0 {
+            if indexPath.item == 1 {
+                let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle")! as! TitleCell
+                cell.decorate(openFolder.name)
+                return cell
+            }
+            if indexPath.item == 2 && allResources.count == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("message-white")! as! TitleCell
                 cell.decorate("Nothing here yet.")
                 return cell
@@ -62,7 +67,7 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
         
         //folder cells
         if indexPath.section == 1 {
-            let cell = tableView.dequeueReusableCellWithIdentifier("standardTitle")! as! TitleCell
+            let cell = tableView.dequeueReusableCellWithIdentifier("subtitle")! as! TitleCell
             let folder = folders[indexPath.item]
             cell.decorate(folder.name)
             return cell
@@ -73,11 +78,17 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
             let cell = tableView.dequeueReusableCellWithIdentifier("attachment") as! AttachmentCell
             let file = files[indexPath.item]
             cell.decorate(file.name)
+            cell.hideSeparator()
             return cell
         }
         
         return tableView.dequeueReusableCellWithIdentifier("blank")!
         
+    }
+    
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if indexPath.section == 1 { return 40.0 }
+        else { return 50.0 }
     }
     
     //MARK: - Stackable Table Delegate Methods
@@ -87,7 +98,16 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
     }
     
     func processSelectedCell(index: NSIndexPath) {
-        return
+        if index.section == 1 {
+            let folder = folders[index.item]
+            let resources = TSAuthenticatedReader.getResourcesInFolder(folder)
+            let delegate = ResourcesDelegate(controller: controller, resources: resources, inFolder: folder)
+            controller.pushDelegate(delegate)
+        }
+        if index.section == 2 {
+            let file = files[index.item]
+            AttachmentCell.presentResource(file, inController: controller)
+        }
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {

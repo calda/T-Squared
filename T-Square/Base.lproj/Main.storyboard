@@ -520,8 +520,78 @@
                                             <outlet property="titleLabel" destination="QUd-DR-MCj" id="Tmy-2i-u7f"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="boldTitle" rowHeight="50" id="FHQ-wu-1L6" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="272" width="320" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="FHQ-wu-1L6" id="7uO-Cv-Fg7">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000001192092896" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" misplaced="YES" text="Assignments" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="7lD-SM-gH2">
+                                                    <rect key="frame" x="16" y="10" width="263" height="30"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <animations/>
+                                            <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="7lD-SM-gH2" firstAttribute="leading" secondItem="7uO-Cv-Fg7" secondAttribute="leadingMargin" constant="8" id="7Ve-me-5U7"/>
+                                                <constraint firstItem="7lD-SM-gH2" firstAttribute="centerY" secondItem="7uO-Cv-Fg7" secondAttribute="centerY" id="PzV-iQ-gu3"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="7lD-SM-gH2" secondAttribute="trailing" id="bQa-tn-5VM"/>
+                                                <constraint firstItem="7lD-SM-gH2" firstAttribute="top" secondItem="7uO-Cv-Fg7" secondAttribute="topMargin" id="nIa-SN-nrC"/>
+                                            </constraints>
+                                            <variation key="default">
+                                                <mask key="constraints">
+                                                    <exclude reference="nIa-SN-nrC"/>
+                                                </mask>
+                                            </variation>
+                                        </tableViewCellContentView>
+                                        <animations/>
+                                        <color key="backgroundColor" red="0.5" green="0.75" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <outlet property="titleLabel" destination="7lD-SM-gH2" id="h5W-gv-1lL"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="subtitle" rowHeight="50" id="aFQ-MD-N9S" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="322" width="320" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="aFQ-MD-N9S" id="E7Z-bI-3KT">
+                                            <rect key="frame" x="0.0" y="0.0" width="287" height="49"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000001192092896" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Assignments" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="gjG-7q-ENl">
+                                                    <rect key="frame" x="16" y="12" width="263" height="26"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="21"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <animations/>
+                                            <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="trailingMargin" secondItem="gjG-7q-ENl" secondAttribute="trailing" id="Z6F-Ys-Cns"/>
+                                                <constraint firstItem="gjG-7q-ENl" firstAttribute="centerY" secondItem="E7Z-bI-3KT" secondAttribute="centerY" id="dik-Pp-Mxy"/>
+                                                <constraint firstItem="gjG-7q-ENl" firstAttribute="top" secondItem="E7Z-bI-3KT" secondAttribute="topMargin" id="gTX-wD-G0r"/>
+                                                <constraint firstItem="gjG-7q-ENl" firstAttribute="leading" secondItem="E7Z-bI-3KT" secondAttribute="leadingMargin" constant="8" id="zpq-do-ixq"/>
+                                            </constraints>
+                                            <variation key="default">
+                                                <mask key="constraints">
+                                                    <exclude reference="gTX-wD-G0r"/>
+                                                </mask>
+                                            </variation>
+                                        </tableViewCellContentView>
+                                        <animations/>
+                                        <color key="backgroundColor" red="0.5" green="0.75" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <outlet property="titleLabel" destination="gjG-7q-ENl" id="tWU-gX-W8q"/>
+                                        </connections>
+                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="title" rowHeight="40" id="AoE-36-0WK" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="272" width="320" height="40"/>
+                                        <rect key="frame" x="0.0" y="372" width="320" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AoE-36-0WK" id="jtU-nB-0Is">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
@@ -560,7 +630,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcement" rowHeight="60" id="R9C-Py-pts" customClass="AnnouncementCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="312" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="412" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="R9C-Py-pts" id="Aph-uo-GPe">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="59"/>
@@ -615,7 +685,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="message" rowHeight="60" id="SV0-7S-hTL" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="372" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="472" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="SV0-7S-hTL" id="Ayp-Mc-aVH">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="59"/>
@@ -650,7 +720,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="back" rowHeight="50" id="hGp-PN-xBo" customClass="BackCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="432" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="532" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="hGp-PN-xBo" id="Yri-7X-Prc">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
@@ -690,7 +760,7 @@
                                         <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcementTitle" rowHeight="60" id="ucQ-Pd-FWI" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="482" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="582" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ucQ-Pd-FWI" id="TJm-a0-UXK">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="59"/>
@@ -725,7 +795,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="message-white" rowHeight="40" id="ldi-7Y-Kj8" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="542" width="320" height="40"/>
+                                        <rect key="frame" x="0.0" y="642" width="320" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ldi-7Y-Kj8" id="7EI-pP-bvJ">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
@@ -760,7 +830,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcementText" rowHeight="270" id="n6y-kU-iK3" userLabel="announcementText" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="582" width="320" height="270"/>
+                                        <rect key="frame" x="0.0" y="682" width="320" height="270"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="n6y-kU-iK3" id="1Fg-WC-L0H">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="269"/>
@@ -803,7 +873,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="attachment" rowHeight="50" id="She-FH-acS" customClass="AttachmentCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="852" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="952" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="She-FH-acS" id="wYr-cX-bbG">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
@@ -856,7 +926,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="blank" rowHeight="30" id="DeP-Si-bjL" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="902" width="320" height="30"/>
+                                        <rect key="frame" x="0.0" y="1002" width="320" height="30"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DeP-Si-bjL" id="sMY-ws-4yO">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="29"/>
@@ -968,7 +1038,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XTI-aS-DSB" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <panGestureRecognizer minimumNumberOfTouches="1" id="M97-ac-8oD">
+                <panGestureRecognizer cancelsTouchesInView="NO" minimumNumberOfTouches="1" id="M97-ac-8oD">
                     <connections>
                         <action selector="viewPanned:" destination="wUj-QL-xby" id="dPC-ki-lsW"/>
                         <outlet property="delegate" destination="wUj-QL-xby" id="ZxV-8X-Liy"/>

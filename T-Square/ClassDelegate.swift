@@ -50,7 +50,10 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Assignments"), onTap: nil),
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Resources"), onTap: { controller, displayClass in
         
-            controller.setActivityIndicatorVisible(true)
+            if displayClass.rootResource == nil {
+                controller.setActivityIndicatorVisible(true)
+            }
+            
             //load root resources
             dispatch_async(TSNetworkQueue, {
                 if let rootFolder = TSAuthenticatedReader.getResourceRootForClass(displayClass) {

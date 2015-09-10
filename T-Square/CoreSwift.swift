@@ -468,6 +468,17 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
     
 }
 
+///This class fixes the weird bug where iPad Table View Cells always default to a white background
+class TransparentTableView : UITableView {
+    
+    override func dequeueReusableCellWithIdentifier(identifier: String) -> UITableViewCell? {
+        let cell = super.dequeueReusableCellWithIdentifier(identifier)
+        cell?.backgroundColor = cell?.backgroundColor
+        return cell
+    }
+    
+}
+
 @objc protocol StackableTableDelegate : UITableViewDelegate, UITableViewDataSource {
     
     func processSelectedCell(index: NSIndexPath)

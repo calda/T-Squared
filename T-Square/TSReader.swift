@@ -123,12 +123,17 @@ class TSReader {
     }
     
     func getResourceRootForClass(currentClass: Class) -> ResourceFolder? {
-        guard let classPage = currentClass.getClassPage() else { return nil }
+        if let root = currentClass.rootResource {
+            return root
+        }
         
+        guard let classPage = currentClass.getClassPage() else { return nil }
         //load page for resources
         for link in classPage.css("a, link") {
             if link.text != "Resources" { continue }
-            return ResourceFolder(name: "Resources in \(currentClass.name)", link: link["href"]!, collectionID: "", navRoot: "")
+            let root = ResourceFolder(name: "Resources in \(currentClass.name)", link: link["href"]!, collectionID: "", navRoot: "")
+            currentClass.rootResource = root
+            return root
         }
         
         return nil
@@ -168,11 +173,11 @@ class TSReader {
                 
                 let resource = Resource(name: resourcesLink.text!.cleansed(), link: resourcesLink["href"]!)
                 resources.append(resource)
-                print(resource.name)
             }
             
         }
         
+        folder.resourcesInFolder = resources
         return resources
     }
     

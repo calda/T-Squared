@@ -351,7 +351,7 @@
                                     <constraint firstAttribute="height" constant="10" id="Vof-vj-04u"/>
                                 </constraints>
                             </view>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="51g-sT-9eN">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="51g-sT-9eN" customClass="TransparentTableView" customModule="T_Squared" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <animations/>
                                 <color key="backgroundColor" red="1" green="0.99997437000274658" blue="0.99999129772186279" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -999,9 +999,15 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                             <constraint firstItem="8tg-3g-bcL" firstAttribute="top" secondItem="51g-sT-9eN" secondAttribute="bottom" id="4zT-ie-FI2"/>
                             <constraint firstItem="TjS-JT-ILn" firstAttribute="leading" secondItem="dQK-sp-grQ" secondAttribute="leading" id="DJ7-0d-2PG"/>
                             <constraint firstItem="7bg-uP-HRH" firstAttribute="top" secondItem="inq-AA-zwf" secondAttribute="bottom" id="E8b-bY-GIK"/>
-                            <constraint firstItem="51g-sT-9eN" firstAttribute="width" secondItem="dQK-sp-grQ" secondAttribute="width" id="IMM-xd-UR4"/>
+                            <constraint firstItem="51g-sT-9eN" firstAttribute="width" secondItem="dQK-sp-grQ" secondAttribute="width" id="IMM-xd-UR4">
+                                <variation key="heightClass=regular-widthClass=regular" constant="-250"/>
+                            </constraint>
                             <constraint firstItem="51g-sT-9eN" firstAttribute="top" secondItem="inq-AA-zwf" secondAttribute="bottom" id="Q5V-NW-O8C"/>
+                            <constraint firstItem="TjS-JT-ILn" firstAttribute="width" secondItem="dQK-sp-grQ" secondAttribute="width" id="Vfx-dp-t8W">
+                                <variation key="heightClass=regular-widthClass=regular" constant="-250"/>
+                            </constraint>
                             <constraint firstAttribute="trailing" secondItem="TjS-JT-ILn" secondAttribute="trailing" id="WS6-Yq-crQ"/>
+                            <constraint firstItem="TjS-JT-ILn" firstAttribute="centerX" secondItem="dQK-sp-grQ" secondAttribute="centerX" id="X3u-5i-Qdw"/>
                             <constraint firstItem="8tg-3g-bcL" firstAttribute="top" secondItem="TjS-JT-ILn" secondAttribute="bottom" id="XLL-ph-ORV"/>
                             <constraint firstItem="51g-sT-9eN" firstAttribute="centerY" secondItem="dQK-sp-grQ" secondAttribute="centerY" id="bpp-AA-Shb"/>
                             <constraint firstAttribute="trailing" secondItem="51g-sT-9eN" secondAttribute="trailing" id="btI-8C-iq6"/>
@@ -1020,6 +1026,8 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                 <exclude reference="btI-8C-iq6"/>
                                 <exclude reference="iZO-xo-ukq"/>
                                 <exclude reference="E8b-bY-GIK"/>
+                                <exclude reference="DJ7-0d-2PG"/>
+                                <exclude reference="WS6-Yq-crQ"/>
                                 <exclude reference="4zT-ie-FI2"/>
                             </mask>
                         </variation>

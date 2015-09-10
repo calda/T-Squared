@@ -260,6 +260,11 @@
 					2E7C6F5B1B8E6DDE00E95183 = {
 						CreatedOnToolsVersion = 7.0;
 						DevelopmentTeam = FZ89A5SZ7C;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					2E7C6F6F1B8E6DDE00E95183 = {
 						CreatedOnToolsVersion = 7.0;

@@ -17,7 +17,7 @@ class Class : CustomStringConvertible {
     let link: String
     var classPage: HTMLDocument?
     var announcements: [Announcement] = []
-    var rootResource: Resource?
+    var rootResource: ResourceFolder?
     
     var description: String {
         return name

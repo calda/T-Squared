@@ -24,6 +24,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             return (announcements.count == 0 ? 2 : 1)
         }
     }
+    var tableViewRestingPosition: CGPoint!
     @IBOutlet weak var bottomView: UIView!
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet var touchRecognizer: UITouchGestureRecognizer!
@@ -151,6 +152,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Customization of the view
     
     override func viewDidAppear(animated: Bool) {
+        tableViewRestingPosition = tableView.frame.origin
         updateBottomView()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setTouchDelegateEnabled:", name: TSSetTouchDelegateEnabledNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "backTriggered", name: TSBackNotification, object: nil)
@@ -194,15 +196,31 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     @IBAction func viewPanned(sender: UIPanGestureRecognizer) {
         if delegateStack.count == 0 { return }
         
+        if sender.state == .Began {
+            tableViewRestingPosition = tableView.frame.origin
+        }
+        
         if sender.state == .Ended {
             tableView.scrollEnabled = true
             tableView.userInteractionEnabled = true
             
-            let endPosition = self.tableView.frame.origin.x
-            self.tableView.frame.origin = CGPointZero
-            self.bottomView.frame.origin = CGPointMake(0, bottomView.frame.origin.y)
+            let newTablePosition = tableViewRestingPosition
+            let newBottomPosition = CGPointMake(tableViewRestingPosition.x, bottomView.frame.origin.y)
             
-            if endPosition > 10.0 {
+            if sender.velocityInView(self.tableView).x < 0 {
+                //if they were swiping back towards the left, do nothing
+                UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
+                    self.tableView.frame.origin = newTablePosition
+                    self.bottomView.frame.origin = newBottomPosition
+                }, completion: nil)
+                return
+            }
+            
+            let endPosition = self.tableView.frame.origin.x
+            self.tableView.frame.origin = newTablePosition
+            self.bottomView.frame.origin = newBottomPosition
+            
+            if endPosition > tableViewRestingPosition.x + 10.0 {
                 self.popDelegate()
             }
             else {
@@ -218,8 +236,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         tableView.scrollEnabled = false
         tableView.userInteractionEnabled = false
         let translation = sender.translationInView(self.view)
-        self.tableView.frame.origin = CGPointMake(max(0.0, translation.x), 0.0)
-        self.bottomView.frame.origin = CGPointMake(max(0.0, translation.x), bottomView.frame.origin.y)
+        self.tableView.frame.origin = CGPointMake(max(tableViewRestingPosition.x, tableViewRestingPosition.x + translation.x), 0.0)
+        self.bottomView.frame.origin = CGPointMake(max(tableViewRestingPosition.x, tableViewRestingPosition.x + translation.x), bottomView.frame.origin.y)
     }
     
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -253,8 +271,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             if !enabled {
                 for cell in tableView.visibleCells {
                     let index = tableView.indexPathForCell(cell)!
-                    if (tableView.delegate as? StackableTableDelegate)?.canHighlightCell(index) == true {
-                        animateSelection(cell, indexPath: index, selected: false)
+                    if let delegate = tableView.delegate as? StackableTableDelegate where delegate.canHighlightCell(index) == true {
+                        delegate.animateSelection(cell, indexPath: index, selected: false)
                     }
                 }
             }
@@ -295,6 +313,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         bottomView.hidden = !(usesBottomView(delegate))
         super.pushDelegate(delegate)
         updateBottomView()
+        playTransitionForView(bottomView, duration: 0.3, transition: kCATransitionPush, subtype: kCATransitionFromRight)
     }
     
     override func popDelegate() {
@@ -302,6 +321,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let delegate = tableView.delegate!
         bottomView.hidden = !(usesBottomView(delegate))
         updateBottomView()
+        playTransitionForView(bottomView, duration: 0.3, transition: kCATransitionPush, subtype: kCATransitionFromLeft)
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {

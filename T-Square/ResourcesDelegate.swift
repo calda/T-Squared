@@ -100,9 +100,17 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
     func processSelectedCell(index: NSIndexPath) {
         if index.section == 1 {
             let folder = folders[index.item]
-            let resources = TSAuthenticatedReader.getResourcesInFolder(folder)
-            let delegate = ResourcesDelegate(controller: controller, resources: resources, inFolder: folder)
-            controller.pushDelegate(delegate)
+            if folder.resourcesInFolder == nil {
+                controller.setActivityIndicatorVisible(true)
+            }
+            dispatch_async(TSNetworkQueue, {
+                let resources = TSAuthenticatedReader.getResourcesInFolder(folder)
+                let delegate = ResourcesDelegate(controller: self.controller, resources: resources, inFolder: folder)
+                sync {
+                    self.controller.pushDelegate(delegate)
+                    self.controller.setActivityIndicatorVisible(false)
+                }
+            })
         }
         if index.section == 2 {
             let file = files[index.item]

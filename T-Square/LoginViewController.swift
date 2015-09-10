@@ -63,6 +63,7 @@ class LoginViewController: UIViewController {
     
     override func viewDidAppear(animated: Bool) {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardHeightChanged:", name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "centerForm", name: UIKeyboardWillHideNotification, object: nil)
     }
     
     //MARK: - Animating and processing form input

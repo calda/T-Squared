@@ -82,8 +82,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         //announcements
         if section == 1 {
             if index == 0 {
-                let cell = tableView.dequeueReusableCellWithIdentifier("title") as! TitleCell
-                cell.decorate("Recent Announcements")
+                let cell = tableView.dequeueReusableCellWithIdentifier("titleWithButton") as! TitleWithButtonCell
+                cell.decorate("Recent Announcements", buttonText: "mark all read")
                 return cell
             }
             if index == 1 && announcements.count == 0 {
@@ -251,6 +251,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             background = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
         }
         else { //if section == 1
+            if indexPath.item == 0 { return }
             if selected {
                 background = UIColor(hue: 0.5833333333, saturation: 1.0, brightness: 1.0, alpha: 0.1)
             }
@@ -296,7 +297,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
         
         if index.section == 1 {
-            if index.item == 0 { return }
+            if index.item == 0 {
+                markAllAnnouncementsRead()
+                return
+            }
             if index.item == 1 && announcements.count == 0 { return }
             let announcement = announcements[index.item - 1]
             AnnouncementCell.presentAnnouncement(announcement, inController: self)
@@ -313,7 +317,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         bottomView.hidden = !(usesBottomView(delegate))
         super.pushDelegate(delegate)
         updateBottomView()
-        playTransitionForView(bottomView, duration: 0.3, transition: kCATransitionPush, subtype: kCATransitionFromRight)
+        let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)
+        playTransitionForView(bottomView, duration: 0.4, transition: kCATransitionPush, subtype: kCATransitionFromRight, timingFunction: timingFunction)
     }
     
     override func popDelegate() {
@@ -321,7 +326,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let delegate = tableView.delegate!
         bottomView.hidden = !(usesBottomView(delegate))
         updateBottomView()
-        playTransitionForView(bottomView, duration: 0.3, transition: kCATransitionPush, subtype: kCATransitionFromLeft)
+        let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)
+        playTransitionForView(bottomView, duration: 0.4, transition: kCATransitionPush, subtype: kCATransitionFromLeft, timingFunction: timingFunction)
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
@@ -329,6 +335,18 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     //MARK: - Auxillary Functions
+    
+    func markAllAnnouncementsRead() {
+        guard let classes = classes else { return }
+        for currentClass in classes {
+            for announcement in currentClass.announcements {
+                if !announcement.hasBeenRead() {
+                    announcement.markRead()
+                }
+            }
+        }
+        self.reloadTable()
+    }
     
     func presentDocumentFromURL(webURL: NSURL) {
         self.setActivityIndicatorVisible(true)

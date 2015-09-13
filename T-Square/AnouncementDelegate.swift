@@ -68,6 +68,13 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
         
         (identifier: "message-white", onDisplay: { tableCell, announcement in
             let cell = tableCell as! TitleCell
+            cell.decorate("posted in \(announcement.owningClass.name)")
+            cell.hideSeparator()
+        }),
+        
+        (identifier: "message-white", onDisplay: { tableCell, announcement in
+            let cell = tableCell as! TitleCell
+            
             var authorName = announcement.author
             //correct to FIRST LAST instead of LAST, FIRST
             let splits = authorName.componentsSeparatedByString(",")
@@ -79,22 +86,9 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
                     authorName = nameParts[0] + " " + nameParts[2]
                 }
             }
-            cell.decorate("posted by \(authorName)")
-            cell.hideSeparator()
-        }),
-        
-        (identifier: "message-white", onDisplay: { tableCell, announcement in
-            let cell = tableCell as! TitleCell
-            if let date = announcement.date {
-                let longDateString = NSDateFormatter.localizedStringFromDate(date, dateStyle: .LongStyle, timeStyle: .NoStyle)
-                let dateString = longDateString.componentsSeparatedByString(",")[0]
-                let timeString = NSDateFormatter.localizedStringFromDate(date, dateStyle: .NoStyle, timeStyle: NSDateFormatterStyle.ShortStyle).lowercaseString
-                let combinedString = "\(timeString) on \(dateString)"
-                cell.decorate(combinedString)
-            }
-            else {
-                cell.decorate(announcement.rawDateString)
-            }
+            
+            let dateString = announcement.date?.agoString() ?? announcement.rawDateString
+            cell.decorate("\(dateString) by \(authorName)")
             cell.hideSeparator()
         }),
         

@@ -47,7 +47,24 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         }, onTap: nil),
         
         (identifier: "blank", onDisplay: hideSeparator, onTap: nil),
-        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Assignments"), onTap: nil),
+        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Assignments"), onTap: { controller, displayClass in
+            
+            if displayClass.assignments == nil {
+                controller.setActivityIndicatorVisible(true)
+            }
+            
+            //load assignments
+            dispatch_async(TSNetworkQueue, {
+                let assignments = TSAuthenticatedReader.getAssignmentsForClass(displayClass)
+                let delegate = AssignmentsDelegate(assignments: assignments, controller: controller)
+                sync() {
+                    controller.setActivityIndicatorVisible(false)
+                    controller.pushDelegate(delegate)
+                }
+            })
+        }),
+        
+        
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Resources"), onTap: { controller, displayClass in
         
             if displayClass.rootResource == nil {

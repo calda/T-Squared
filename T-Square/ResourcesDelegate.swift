@@ -67,7 +67,7 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
         
         //folder cells
         if indexPath.section == 1 {
-            let cell = tableView.dequeueReusableCellWithIdentifier("subtitle")! as! TitleCell
+            let cell = tableView.dequeueReusableCellWithIdentifier("folder")! as! TitleCell
             let folder = folders[indexPath.item]
             cell.decorate(folder.name)
             return cell

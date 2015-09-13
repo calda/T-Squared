@@ -14,36 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
-        application.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
-        
-        //TODO: Move this to after a successful login
-        let types: UIUserNotificationType = [.Alert, .Sound, .Badge]
-        UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: types, categories: nil))
-    
         return true
-    }
-    
-    func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
-        print("LOADING NEW DATA")
-        fireNotification(application, message: "Loading T-Square Data", delay: 0.0)
-        completionHandler(UIBackgroundFetchResult.NewData)
-    }
-    
-    func fireNotification(application: UIApplication, message: String, delay: NSTimeInterval) {
-        print("fired notification")
-        let notification = UILocalNotification()
-        notification.fireDate = NSDate(timeIntervalSinceNow: delay)
-        notification.alertBody = message
-        notification.alertAction = "View"
-        notification.soundName = UILocalNotificationDefaultSoundName
-        notification.hasAction = true
-        notification.timeZone = NSTimeZone.defaultTimeZone()
-        application.scheduleLocalNotification(notification)
-    }
-    
-    func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
-        print(notification.alertBody!)
     }
 
     func applicationWillResignActive(application: UIApplication) {

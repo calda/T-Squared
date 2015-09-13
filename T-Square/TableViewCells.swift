@@ -68,6 +68,17 @@ class TitleCell : UITableViewCell {
     
 }
 
+class TitleWithButtonCell : TitleCell {
+    
+    @IBOutlet weak var button: UILabel!
+    
+    func decorate(text: String, buttonText: String) {
+        decorate(text)
+        button.text = buttonText
+    }
+    
+}
+
 class AttachmentCell : TitleCell {
     
     var attachment: Attachment?
@@ -93,6 +104,36 @@ class AttachmentCell : TitleCell {
     
 }
 
+class AssignmentCell : UITableViewCell {
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var dueLabel: UILabel!
+    
+    func decorate(assignment: Assignment) {
+        titleLabel.text = assignment.name
+        
+        dueLabel.textColor = UIColor.blackColor()
+        dueLabel.alpha = 0.5
+        if assignment.completed {
+            dueLabel.text = "✔︎ Completed"
+            return
+        }
+        
+        if let date = assignment.dueDate {
+            dueLabel.text = "Due \(date.agoString())"
+            if (dueLabel.text!.containsString("hour") || dueLabel.text!.containsString("minute")) || date.timeIntervalSinceNow < 0 {
+                titleLabel.text = "⚠️ \(assignment.name)"
+                dueLabel.alpha = 0.7
+                dueLabel.textColor = UIColor(red: 0.5, green: 0.0, blue: 0.0, alpha: 1.0)
+            }
+        }
+        else {
+            dueLabel.text = "Due \(assignment.rawDueDateString)"
+        }
+    }
+    
+}
+
 class BackCell : UITableViewCell {
     
     @IBAction func backButtonPressed(sender: UIButton) {
@@ -108,4 +149,3 @@ class LogoutSettingsCell : UITableViewCell {
     }
     
 }
-

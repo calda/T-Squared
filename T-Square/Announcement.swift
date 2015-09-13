@@ -33,20 +33,7 @@ class Announcement : CustomStringConvertible {
         self.author = author
         self.link = link
         self.rawDateString = date
-        
-        //convert date string to NSDate
-        let formatter = NSDateFormatter()
-        formatter.dateStyle = .MediumStyle
-        formatter.timeStyle = .ShortStyle
-        //correct formatting to match required style
-        //(Aug 27, 2015 11:27 am) -> (Aug 27, 2015, 11:27 AM)
-        var dateString = date.stringByReplacingOccurrencesOfString("pm", withString: "PM")
-        dateString = dateString.stringByReplacingOccurrencesOfString("am", withString: "AM")
-        
-        for year in 1990...2040 { //add comma after years
-            dateString = dateString.stringByReplacingOccurrencesOfString("\(year) ", withString: "\(year), ")
-        }
-        self.date = formatter.dateFromString(dateString)
+        self.date = date.dateWithTSquareFormat()
     }
     
     func loadMessage(completion: (String) -> ()) {
@@ -67,9 +54,13 @@ class Announcement : CustomStringConvertible {
                 else {
                     var message: String = ""
                     for pTag in page.css("p") {
-                        message += pTag.text!.cleansed().cleansed() + "\n"
+                        message += pTag.textWithLineBreaks
+                        for div in pTag.css("div") {
+                            message += div.textWithLineBreaks
+                        }
                     }
-                    self.message = message
+                    
+                    self.message = message.withNoTrailingWhitespace()
                     
                     //load attachments if present
                     for link in page.css("a, link") {

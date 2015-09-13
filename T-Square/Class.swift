@@ -18,6 +18,7 @@ class Class : CustomStringConvertible {
     var classPage: HTMLDocument?
     var announcements: [Announcement] = []
     var rootResource: ResourceFolder?
+    var assignments: [Assignment]?
     
     var description: String {
         return name

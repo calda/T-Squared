@@ -181,6 +181,72 @@ class TSReader {
         return resources
     }
     
+    func getAssignmentsForClass(currentClass: Class) -> [Assignment] {
+        if let assignments = currentClass.assignments {
+            return assignments
+        }
+        
+        guard let classPage = currentClass.getClassPage() else { return [] }
+        
+        var assignments: [Assignment] = []
+        
+        //load page for class announcements
+        for link in classPage.css("a, link") {
+            if link.text != "Assignments" { continue }
+            guard let assignmentsPage = HttpClient.contentsOfPage(link["href"]!) else { return [] }
+            
+            //load announcements
+            for row in assignmentsPage.css("tr") {
+                let links = row.css("a")
+                if links.count == 1 {
+                    
+                    let link = links[0]["href"]!
+                    let name = links[0].text!.cleansed()
+                    var statusString: String = ""
+                    var dueDateString: String = ""
+                    
+                    for col in row.css("td") {
+                        if let header = col["headers"] {
+                            let text = col.text!.cleansed()
+                            switch(header) {
+                            case "dueDate": dueDateString = text; break;
+                            case "status": statusString = text; break;
+                            default: break;
+                            }
+                        }
+                    }
+                    
+                    let complete = statusString != "Not Started" && statusString != ""
+                    let assignment = Assignment(name: name, link: link, dueDate: dueDateString, completed: complete)
+                    assignments.append(assignment)
+                }
+            }
+            currentClass.assignments = assignments
+            return assignments
+        }
+        
+        return assignments
+    }
+    
 }
 
+extension String {
+    
+    func dateWithTSquareFormat() -> NSDate? {
+        //convert date string to NSDate
+        let formatter = NSDateFormatter()
+        formatter.dateStyle = .MediumStyle
+        formatter.timeStyle = .ShortStyle
+        //correct formatting to match required style
+        //(Aug 27, 2015 11:27 am) -> (Aug 27, 2015, 11:27 AM)
+        var dateString = self.stringByReplacingOccurrencesOfString("pm", withString: "PM")
+        dateString = dateString.stringByReplacingOccurrencesOfString("am", withString: "AM")
+        
+        for year in 1990...2040 { //add comma after years
+            dateString = dateString.stringByReplacingOccurrencesOfString("\(year) ", withString: "\(year), ")
+        }
+        return formatter.dateFromString(dateString)
+    }
+    
+}
 

@@ -17,14 +17,8 @@ func delay(delay: Double, closure: ()->()) {
     dispatch_after(time, dispatch_get_main_queue(), closure)
 }
 
-
 ///play a CATransition for a UIView
-func playTransitionForView(view: UIView, duration: Double, transition transitionName: String) {
-    playTransitionForView(view, duration: duration, transition: transitionName, subtype: nil)
-}
-
-///play a CATransition for a UIView
-func playTransitionForView(view: UIView, duration: Double, transition transitionName: String, subtype: String? = nil) {
+func playTransitionForView(view: UIView, duration: Double, transition transitionName: String, subtype: String? = nil, timingFunction: CAMediaTimingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)) {
     let transition = CATransition()
     transition.duration = duration
     transition.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
@@ -41,6 +35,7 @@ func playTransitionForView(view: UIView, duration: Double, transition transition
     //}
     
     transition.subtype = subtype
+    transition.timingFunction = timingFunction
     view.layer.addAnimation(transition, forKey: nil)
 }
 
@@ -228,8 +223,9 @@ func linksInText(string: String) -> [(text: String, range: NSRange)] {
     var text = string as NSString
     var links: [(text: String, range: NSRange)] = []
     
-    while text.containsString("http://") || text.containsString("www.") {
+    while text.containsString("http://") || text.containsString("www.") || text.containsString("https://") {
         var idRange = text.rangeOfString("http://")
+        if idRange.location == NSNotFound { idRange = text.rangeOfString("https://") }
         if idRange.location == NSNotFound { idRange = text.rangeOfString("www.") }
         
         if idRange.location != NSNotFound {
@@ -237,7 +233,8 @@ func linksInText(string: String) -> [(text: String, range: NSRange)] {
             let wordStart = idRange.location
             var wordEnd = idRange.location + idRange.length
             
-            while ("\(text.stringAtIndex(wordEnd + 1))" != " ") && (wordEnd != text.length - 2) {
+            while ("\(text.stringAtIndex(wordEnd))" != " ") && (wordEnd != text.length - 2) {
+                print(text.stringAtIndex(wordEnd))
                 wordEnd++;
             }
             
@@ -254,6 +251,7 @@ func linksInText(string: String) -> [(text: String, range: NSRange)] {
 ///converts "http://www.google.com/search/page/saiojdfghadlsifuhlaisdf" to "google.com"
 func websiteForLink(string: String) -> String {
     var stripped = (string as NSString).stringByReplacingOccurrencesOfString("http://", withString: "")
+    stripped = (stripped as NSString).stringByReplacingOccurrencesOfString("https://", withString: "")
     stripped = (stripped as NSString).stringByReplacingOccurrencesOfString("www.", withString: "")
     return stripped.componentsSeparatedByString("/")[0]
 }
@@ -416,7 +414,8 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
         unhighlightAllCells()
         
         let subtype = isBack ? kCATransitionFromLeft : kCATransitionFromRight
-        playTransitionForView(tableView, duration: 0.3, transition: kCATransitionPush, subtype: subtype)
+        let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)
+        playTransitionForView(tableView, duration: 0.4, transition: kCATransitionPush, subtype: subtype, timingFunction: timingFunction)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -468,17 +467,6 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
     
 }
 
-///This class fixes the weird bug where iPad Table View Cells always default to a white background
-class TransparentTableView : UITableView {
-    
-    override func dequeueReusableCellWithIdentifier(identifier: String) -> UITableViewCell? {
-        let cell = super.dequeueReusableCellWithIdentifier(identifier)
-        cell?.backgroundColor = cell?.backgroundColor
-        return cell
-    }
-    
-}
-
 @objc protocol StackableTableDelegate : UITableViewDelegate, UITableViewDataSource {
     
     func processSelectedCell(index: NSIndexPath)
@@ -487,6 +475,17 @@ class TransparentTableView : UITableView {
     optional func getTitle() -> String
     optional func getBackButtonImage() -> UIImage
     optional func scrollViewDidScroll(scrollView: UIScrollView)
+    
+}
+
+///This class fixes the weird bug where iPad Table View Cells always default to a white background
+class TransparentTableView : UITableView {
+    
+    override func dequeueReusableCellWithIdentifier(identifier: String) -> UITableViewCell? {
+        let cell = super.dequeueReusableCellWithIdentifier(identifier)
+        cell?.backgroundColor = cell?.backgroundColor
+        return cell
+    }
     
 }
 
@@ -527,28 +526,59 @@ extension NSDate {
     func agoString() -> String {
         let deltaTime = -self.timeIntervalSinceNow
         
-        if deltaTime < 3600 { //less than an hour
-            let amount = Int(deltaTime/60.0)
-            let plural = amount == 1 ? "" : "s"
-            return "\(amount) minute\(plural) ago"
-        }
-        else if deltaTime < 86400 { //less than a day
-            let amount = Int(deltaTime/3600.0)
-            let plural = amount == 1 ? "" : "s"
-            return "\(amount) hour\(plural) ago"
-        }
-        else if deltaTime < 432000 { //less than five days
-            let amount = Int(deltaTime/86400.0)
-            let plural = amount == 1 ? "" : "s"
-            if amount == 1 {
-                return "Yesterday"
+        //in the past
+        if deltaTime > 0 {
+            if deltaTime < 60 {
+                return "just now"
             }
-            return "\(amount) day\(plural) ago"
+            if deltaTime < 3600 { //less than an hour
+                let amount = Int(deltaTime/60.0)
+                let plural = amount == 1 ? "" : "s"
+                return "\(amount) minute\(plural) ago"
+            }
+            else if deltaTime < 86400 { //less than a day
+                let amount = Int(deltaTime/3600.0)
+                let plural = amount == 1 ? "" : "s"
+                return "\(amount) hour\(plural) ago"
+            }
+            else if deltaTime < 432000 { //less than five days
+                let amount = Int(deltaTime/86400.0)
+                let plural = amount == 1 ? "" : "s"
+                if amount == 1 {
+                    return "Yesterday"
+                }
+                return "\(amount) day\(plural) ago"
+            }
         }
-        else {
-            let dateString = NSDateFormatter.localizedStringFromDate(self, dateStyle: .MediumStyle, timeStyle: .NoStyle)
-            return dateString
+        
+        //in the future
+        if deltaTime < 0 {
+            if deltaTime > -60 {
+                return "just now"
+            }
+            if deltaTime > -3600 { //in less than an hour
+                let amount = -Int(deltaTime/60.0)
+                let plural = amount == 1 ? "" : "s"
+                return "in \(amount) minute\(plural)"
+            }
+            else if deltaTime > -86400 { //in less than a day
+                let amount = -Int(deltaTime/3600.0)
+                let plural = amount == 1 ? "" : "s"
+                return "in \(amount) hour\(plural)"
+            }
+            else if deltaTime > -432000 { //in less than five days
+                let amount = -Int(deltaTime/86400.0)
+                let plural = amount == 1 ? "" : "s"
+                if amount == 1 {
+                    return "Tomorrow"
+                }
+                return "in \(amount) day\(plural)"
+            }
         }
+        
+        let dateString = NSDateFormatter.localizedStringFromDate(self, dateStyle: .MediumStyle, timeStyle: .NoStyle)
+        return "on \(dateString)"
+        
     }
     
 }

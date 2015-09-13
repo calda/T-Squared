@@ -212,10 +212,36 @@ extension String {
         
         //trailing spaces
         while text.hasSuffix(" ") {
-            text = text.substringToIndex(text.length - 2)
+            text = text.substringToIndex(text.length - 1)
         }
         
         return text as String
+    }
+    
+    func withNoTrailingWhitespace() -> String {
+        var text = self as NSString
+        while text.hasSuffix("\n") || text.hasSuffix("\r") || text.hasSuffix("\t") {
+            text = text.substringToIndex(text.length - 1)
+        }
+        return text as String
+    }
+    
+}
+
+extension XMLElement {
+    
+    var textWithLineBreaks: String {
+        //do a switch-up to preserve <br>s
+        var html = self.toHTML!
+        html = html.stringByReplacingOccurrencesOfString("&nbsp;", withString: "")
+        html = html.stringByReplacingOccurrencesOfString("\r", withString: "")
+        html = html.stringByReplacingOccurrencesOfString("\n", withString: "")
+        html = html.stringByReplacingOccurrencesOfString("<br>", withString: "~!@!~")
+        html = html.stringByReplacingOccurrencesOfString("</br>", withString: "~!@!~")
+        html = html.stringByReplacingOccurrencesOfString("<br/>", withString: "~!@!~")
+        
+        let element = HTML(html: html, encoding: NSUTF8StringEncoding)!
+        return element.text!.stringByReplacingOccurrencesOfString("~!@!~", withString: "\n")
     }
     
 }

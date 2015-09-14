@@ -81,7 +81,6 @@ class TitleWithButtonCell : TitleCell {
 
 class AttachmentCell : TitleCell {
     
-    var attachment: Attachment?
     @IBOutlet weak var background: UIView!
     
     override func decorate(text: String) {

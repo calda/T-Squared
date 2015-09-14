@@ -40,7 +40,6 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
                 for attachment in attachments {
                     self.cells.insert((identifier: "attachment", onDisplay: { tableCell, announcement in
                         let cell = tableCell as! AttachmentCell
-                        cell.attachment = attachment
                         cell.decorate(attachment.fileName)
                         cell.hideSeparator()
                     }), atIndex: self.cells.count)
@@ -147,7 +146,6 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             let text: String
             switch(identifier) {
                 case "announcementTitle": fontSize = 22.0; text = announcement.name; break;
-                case "announcementTitle": fontSize = 17.0; text = "posted by \(announcement.author)"; break;
                 case "announcementText": fontSize = 18.0; text = announcement.message ?? "Loading message..."; break;
                 default: fontSize = 19.0; text = "";
             }
@@ -197,18 +195,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
     }
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
-        if indexPath.section == 1 && indexPath.item != 0 {
-            var background: UIColor
-            
-            if selected {
-                background = UIColor(hue: 0.5833333333, saturation: 1.0, brightness: 1.0, alpha: 0.1)
-            }
-            else {
-                background = UIColor(red: 0.43, green: 0.69, blue: 1.0, alpha: 0.4)
-            }
-            
-            cell.backgroundColor = background
-        }
+        return
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {

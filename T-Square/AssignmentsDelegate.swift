@@ -47,7 +47,21 @@ class AssignmentsDelegate : NSObject, StackableTableDelegate {
     //MARK: - Stackable Table Delegate Methods
     
     func processSelectedCell(index: NSIndexPath) {
-        return
+        if index.item == 0 || (index.item == 1 && assignments.count == 0) { return }
+        
+        let assignment = assignments[index.item - 1]
+        if assignment.message == nil {
+            controller.setActivityIndicatorVisible(true)
+        }
+        
+        dispatch_async(TSNetworkQueue) {
+            assignment.loadMessage()
+            let delegate = AssignmentDelegate(assignment: assignment, controller: self.controller)
+            sync {
+                self.controller.pushDelegate(delegate)
+                self.controller.setActivityIndicatorVisible(false)
+            }
+        }
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {

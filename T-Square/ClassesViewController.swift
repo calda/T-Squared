@@ -286,6 +286,13 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         popDelegate()
     }
     
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        delay(0.01) {
+            self.reloadTable()
+        }
+    }
+    
     //MARK: - Stackable Table Delegate methods
     
     func processSelectedCell(index: NSIndexPath) {

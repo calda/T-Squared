@@ -209,15 +209,15 @@ class TSReader {
                         if let header = col["headers"] {
                             let text = col.text!.cleansed()
                             switch(header) {
-                            case "dueDate": dueDateString = text; break;
-                            case "status": statusString = text; break;
-                            default: break;
+                                case "dueDate": dueDateString = text; break;
+                                case "status": statusString = text; break;
+                                default: break;
                             }
                         }
                     }
                     
                     let complete = statusString != "Not Started" && statusString != ""
-                    let assignment = Assignment(name: name, link: link, dueDate: dueDateString, completed: complete)
+                    let assignment = Assignment(name: name, link: link, dueDate: dueDateString, completed: complete, inClass: currentClass)
                     assignments.append(assignment)
                 }
             }

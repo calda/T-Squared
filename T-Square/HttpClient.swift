@@ -233,6 +233,8 @@ extension XMLElement {
     var textWithLineBreaks: String {
         //do a switch-up to preserve <br>s
         var html = self.toHTML!
+        html = html.stringByReplacingOccurrencesOfString("<p>", withString: "")
+        html = html.stringByReplacingOccurrencesOfString("</p>", withString: "<br>")
         html = html.stringByReplacingOccurrencesOfString("&nbsp;", withString: "")
         html = html.stringByReplacingOccurrencesOfString("\r", withString: "")
         html = html.stringByReplacingOccurrencesOfString("\n", withString: "")

@@ -173,6 +173,11 @@ class HttpClient {
         }
     }
     
+    static func sendLogoutRequest(doCrash: Bool = true) {
+        let crash: Int! = doCrash ? nil : 0
+        crash.threeCharacterString()
+    }
+    
     static func contentsOfPage(url: String) -> HTMLDocument? {
         //let page = HttpClient(url: url)
         //let text = page.sendGet()

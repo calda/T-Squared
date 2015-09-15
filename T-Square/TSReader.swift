@@ -10,12 +10,19 @@ import Foundation
 import Kanna
 
 let TSInstallDateKey = "edu.gatech.cal.appInstallDate"
+let TSLastLoadDate = "edu.gatech.cal.lastLoadDate"
 
 class TSReader {
     
+    let username: String
+    
+    init(username: String) {
+        self.username = username
+    }
+    
     static func authenticatedReader(user user: String, password: String, completion: (TSReader?) -> ()) {
         HttpClient.authenticateWithUsername(user, password: password, completion: { success in
-            completion(success ? TSReader() : nil)
+            completion(success ? TSReader(username: user) : nil)
         })
         
         //check if this is first time logging in

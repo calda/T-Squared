@@ -12,6 +12,7 @@ import Foundation
 let TSUsernamePath = "edu.gatech.cal.username"
 let TSPasswordPath = "edu.gatech.cal.password"
 var TSAuthenticatedReader: TSReader!
+let TSLogoutNotification = "edu.gatech.cal.logout"
 
 class LoginViewController: UIViewController {
 
@@ -52,6 +53,8 @@ class LoginViewController: UIViewController {
             self.formCenter.constant = 10.0
             self.view.layoutIfNeeded()
         }, completion: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "logout", name: TSLogoutNotification, object: nil)
         
     }
     
@@ -103,6 +106,15 @@ class LoginViewController: UIViewController {
         self.passwordField.resignFirstResponder()
         self.usernameField.resignFirstResponder()
         centerForm()
+        
+        //easter-egg
+        if self.usernameField.text! == "gburdell1927" {
+            self.passwordField.text = ""
+            let alert = UIAlertController(title: "Nice Try, you trickster", message: "George Burdell, is that you???", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "You found me out", style: .Default, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+            return
+        }
         
         //animate the activity indicator
         animateFormSubviewsWithDuration(0.5, hidden: true)
@@ -217,6 +229,41 @@ class LoginViewController: UIViewController {
             }
             sync() { self.classesViewController.doneLoadingAnnoucements() }
         })
+    }
+    
+    //logout from gatech login service and trash saved passwords
+    func logout() {
+        logout(false)
+    }
+    
+    func logout(confirmed: Bool) {
+        
+        if confirmed {
+            let alert = UIAlertController(title: "You have been logged out.", message: "T-Squared will now exit. Open the app again to log in with a different account.", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: { _ in
+                self.usernameField.text = ""
+                self.passwordField.text = ""
+                self.setSavedCredentials(correct: false)
+                HttpClient.sendLogoutRequest()
+            }))
+            self.presentViewController(alert, animated: true, completion: nil)
+            return
+        }
+        
+        let alert = UIAlertController(title: "Logout from T-Squared?", message: "Your username and password will be forgotten.", preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Logout", style: .Default, handler: { _ in self.logout(true) }))
+        self.presentViewController(alert, animated: true, completion: nil)
+        
+    }
+    
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        if self.containerLeading.constant == 0 { return }
+        delay(0.01) {
+            self.containerLeading.constant = self.view.frame.width
+            self.view.layoutIfNeeded()
+        }
     }
     
     

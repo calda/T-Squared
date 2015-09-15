@@ -69,7 +69,11 @@ class AssignmentsDelegate : NSObject, StackableTableDelegate {
     }
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
-        return
+        let background: UIColor = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
+        
+        UIView.animateWithDuration(0.3, animations: {
+            cell.backgroundColor = background
+        })
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {

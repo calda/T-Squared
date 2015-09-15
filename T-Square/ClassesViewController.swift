@@ -65,6 +65,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if section == 0 {
             if index == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("settings") as! LogoutSettingsCell
+                cell.decorate(TSAuthenticatedReader.username)
                 cell.hideSeparator()
                 return cell
             }
@@ -121,6 +122,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Handle announcements as they're loaded
     
     func addAnnouncements(newAnnouncements: [Announcement]) {
+        let previous = self.announcements
+        
         for ann in newAnnouncements {
             announcements.append(ann)
             ann.date!.timeIntervalSinceDate(ann.date!)
@@ -134,14 +137,39 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             return false
         })
         
-        //trim to most recent 5
-        if announcements.count > 5 {
+        //trim to most recent
+        let recentCount = iPad() ? 9 : 5
+        
+        if announcements.count > recentCount {
             let first = announcements.indices.first!
             let last = announcements.indices.last!
-            announcements.removeRange(first.advancedBy(5)...last)
+            announcements.removeRange(first.advancedBy(recentCount)...last)
         }
         
-        self.reloadTable()
+        tableView.beginUpdates()
+        
+        if previous.count == 0 && announcements.count != 0 {
+            //remove "Loading Announcements..."
+            tableView.deleteRowsAtIndexPaths([NSIndexPath(forItem: 1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Left)
+        }
+        
+        //animate
+        for i in 0 ..< recentCount {
+            if previous.count > i && !(announcements as NSArray).containsObject(previous[i]) {
+                tableView.deleteRowsAtIndexPaths([NSIndexPath(forItem: i + 1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Top)
+            }
+            
+            if announcements.count > i && !(previous as NSArray).containsObject(announcements[i]) {
+                tableView.insertRowsAtIndexPaths([NSIndexPath(forItem: i + 1, inSection: 1)], withRowAnimation:  UITableViewRowAnimation.Middle)
+            }
+        }
+
+        tableView.endUpdates()
+        let countBefore = previous.count == 0 ? 1 : previous.count
+        let countAfter = announcements.count
+        let cellHeight: CGFloat = 60.0
+        updateBottomView(offset: CGFloat(countAfter - countBefore) * cellHeight)
+        
     }
     
     func doneLoadingAnnoucements() {
@@ -176,14 +204,21 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
     }
     
-    func updateBottomView() {
-        let contentHeight = tableView.contentSize.height
+    func updateBottomView(offset offset: CGFloat = 0) {
+        let contentHeight = tableView.contentSize.height + offset
         let scroll = tableView.contentOffset.y
         let height = tableView.frame.height
         
         let viewHeight = max(0, height - (contentHeight - scroll))
         bottomViewHeight.constant = viewHeight
-        self.view.layoutIfNeeded()
+        if offset == 0 {
+            self.view.layoutIfNeeded()
+        }
+        else {
+            UIView.animateWithDuration(0.35, animations: {
+                self.view.layoutIfNeeded()
+            })
+        }
     }
     
     //MARK: - User Interaction

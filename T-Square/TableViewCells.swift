@@ -141,10 +141,10 @@ class BackCell : UITableViewCell {
     
 }
 
-class LogoutSettingsCell : UITableViewCell {
+class LogoutSettingsCell : TitleCell {
     
     @IBAction func settingsButtonPressed(sender: UIButton) {
-        print("settings")
+        NSNotificationCenter.defaultCenter().postNotificationName(TSLogoutNotification, object: nil)
     }
     
 }

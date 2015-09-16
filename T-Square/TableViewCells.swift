@@ -115,6 +115,7 @@ class AssignmentCell : UITableViewCell {
         dueLabel.alpha = 0.5
         if assignment.completed {
             dueLabel.text = "✔︎ Completed"
+            dueLabel.textColor = UIColor(red: 0.0, green: 0.3, blue: 0.0, alpha: 1.0)
             return
         }
         

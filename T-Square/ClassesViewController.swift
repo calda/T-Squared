@@ -36,7 +36,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Table View cell arrangement
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 { return (classes?.count ?? 0) + 1 }
+        if section == 0 { return (classes?.count ?? 0) + 2 }
         else { return announcements.count + (announcements.count == 0 ? 2 : 1) }
     }
     
@@ -49,6 +49,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         if indexPath.section == 0 {
             if indexPath.item == 0 { return 50.0 }
+            if indexPath.item == (classes?.count ?? 0) + 1 {
+                return 40.0
+            }
             return 70.0
         }
         if indexPath.section == 1 {
@@ -69,13 +72,19 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 cell.hideSeparator()
                 return cell
             }
+            if index == (classes?.count ?? 0) + 1 {
+                let cell = tableView.dequeueReusableCellWithIdentifier("subtitle") as! TitleCell
+                cell.decorate("View all classes")
+                cell.hideSeparator()
+                return cell
+            }
             if let classes = classes {
                 let displayClass = classes[index - 1]
                 let cell = tableView.dequeueReusableCellWithIdentifier("class") as! ClassNameCell
                 cell.decorate(displayClass)
-                if index == classes.count {
-                    cell.hideSeparator()
-                }
+                //if index == classes.count {
+                //    cell.hideSeparator()
+                //}
                 return cell
             }
         }
@@ -145,6 +154,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             let last = announcements.indices.last!
             announcements.removeRange(first.advancedBy(recentCount)...last)
         }
+        
+        //don't animate if this delegate isn't visible anymore
+        if delegateStack.count != 0 { return }
         
         tableView.beginUpdates()
         
@@ -333,6 +345,25 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     func processSelectedCell(index: NSIndexPath) {
         if index.section == 0 {
             if index.item == 0 { return }
+            if index.item == (classes?.count ?? 0) + 1 {
+                //load extra classes
+                if TSAuthenticatedReader.allClasses == nil {
+                    setActivityIndicatorVisible(true)
+                }
+                
+                dispatch_async(TSNetworkQueue) {
+                    let allClasses = TSAuthenticatedReader.getAllClasses()
+                    let delegate = AllClassesDelegate(allClasses: allClasses, controller: self)
+                    sync() {
+                        self.pushDelegate(delegate)
+                        self.setActivityIndicatorVisible(false)
+                    }
+                }
+                
+                return
+            }
+            
+            //show class
             guard let classes = classes else { return }
             let displayClass = classes[index.item - 1]
             pushDelegate(ClassDelegate(controller: self, displayClass: displayClass))

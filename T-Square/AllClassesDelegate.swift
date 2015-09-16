@@ -1,5 +1,5 @@
 //
-//  AssignmentsDelegate.swift
+//  allClassesDelegate.swift
 //  T-Square
 //
 //  Created by Cal on 9/12/15.
@@ -9,27 +9,20 @@
 import Foundation
 import UIKit
 
-class AssignmentsDelegate : NSObject, StackableTableDelegate {
+class AllClassesDelegate : NSObject, StackableTableDelegate {
     
     let controller: ClassesViewController
-    let owningClass: Class
-    let assignments: [Assignment]
+    let allClasses: [Class]
     
-    init(assignments: [Assignment], owningClass: Class, controller: ClassesViewController) {
-        self.owningClass = owningClass
+    init(allClasses: [Class], controller: ClassesViewController) {
         self.controller = controller
-        self.assignments = assignments.sort({ item1, item2 in
-            if let date1 = item1.dueDate, let date2 = item2.dueDate {
-                return date1.timeIntervalSinceDate(date2) > 0
-            }
-            return false
-        })
+        self.allClasses = allClasses
     }
     
     //MARK: - Table View Delegate
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (assignments.count == 0 ? 1 : assignments.count) + 2
+        return (allClasses.count == 0 ? 1 : allClasses.count) + 2
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -40,17 +33,17 @@ class AssignmentsDelegate : NSObject, StackableTableDelegate {
         }
         if indexPath.item == 1 {
             let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle")! as! TitleCell
-            cell.decorate("Assignments in \(owningClass.name)")
+            cell.decorate("All Classes (Active and Hidden)")
             return cell
         }
-        if indexPath.item == 2 && assignments.count == 0 {
+        if indexPath.item == 2 && allClasses.count == 0 {
             let cell = tableView.dequeueReusableCellWithIdentifier("subtitle")! as! TitleCell
-            cell.decorate("Nothing here yet.")
+            cell.decorate("You aren't in any classes yet. Welcome to Tech.")
             return cell
         }
-        let assignment = assignments[indexPath.item - 2]
-        let cell = tableView.dequeueReusableCellWithIdentifier("assignment") as! AssignmentCell
-        cell.decorate(assignment)
+        let displayClass = allClasses[indexPath.item - 2]
+        let cell = tableView.dequeueReusableCellWithIdentifier("class") as! ClassNameCell
+        cell.decorate(displayClass)
         return cell
     }
     
@@ -61,25 +54,15 @@ class AssignmentsDelegate : NSObject, StackableTableDelegate {
     //MARK: - Stackable Table Delegate Methods
     
     func processSelectedCell(index: NSIndexPath) {
-        if index.item == 0 || (index.item == 1) || (index.item == 2 && assignments.count == 0) { return }
+        if index.item == 0 || (index.item == 1) || (index.item == 2 && allClasses.count == 0) { return }
         
-        let assignment = assignments[index.item - 2]
-        if assignment.message == nil {
-            controller.setActivityIndicatorVisible(true)
-        }
-        
-        dispatch_async(TSNetworkQueue) {
-            assignment.loadMessage()
-            let delegate = AssignmentDelegate(assignment: assignment, controller: self.controller)
-            sync {
-                self.controller.pushDelegate(delegate)
-                self.controller.setActivityIndicatorVisible(false)
-            }
-        }
+        let displayClass = allClasses[index.item - 2]
+        let delegate = ClassDelegate(controller: controller, displayClass: displayClass)
+        controller.pushDelegate(delegate)
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
-        return index.item != 0 && index.item != 1 && (assignments.count == 0 ? index.item != 2 : true)
+        return index.item != 0 && index.item != 1 && (allClasses.count == 0 ? index.item != 2 : true)
     }
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {

@@ -378,6 +378,10 @@ struct Stack<T> {
         return pop
     }
     
+    var top: T? {
+        return array[count - 1]
+    }
+    
     var count: Int {
         return array.count
     }

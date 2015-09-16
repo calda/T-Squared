@@ -98,6 +98,7 @@
                                         <fontDescription key="fontDescription" type="system" weight="light" pointSize="15"/>
                                         <textInputTraits key="textInputTraits" returnKeyType="next"/>
                                         <connections>
+                                            <action selector="switchToPasswordInput:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="Tyv-aG-arM"/>
                                             <action selector="switchToPasswordInput:" destination="BYZ-38-t0r" id="jpq-UV-hlI"/>
                                             <outlet property="delegate" destination="BYZ-38-t0r" id="38u-lP-f1s"/>
                                         </connections>
@@ -116,6 +117,7 @@
                                         <fontDescription key="fontDescription" type="system" weight="light" pointSize="15"/>
                                         <textInputTraits key="textInputTraits" keyboardAppearance="light" returnKeyType="go" secureTextEntry="YES"/>
                                         <connections>
+                                            <action selector="loginPressed:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="ZfP-DW-bY1"/>
                                             <action selector="loginPressed:" destination="BYZ-38-t0r" id="nwU-CR-dFd"/>
                                             <outlet property="delegate" destination="BYZ-38-t0r" id="Si2-v1-ULr"/>
                                         </connections>
@@ -544,8 +546,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000001192092896" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Assignments" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="7lD-SM-gH2">
-                                                    <rect key="frame" x="16" y="10" width="296" height="30"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000001192092896" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Assignments" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="7lD-SM-gH2">
+                                                    <rect key="frame" x="16" y="10" width="288" height="30"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -557,7 +559,7 @@
                                             <constraints>
                                                 <constraint firstItem="7lD-SM-gH2" firstAttribute="leading" secondItem="7uO-Cv-Fg7" secondAttribute="leadingMargin" constant="8" id="7Ve-me-5U7"/>
                                                 <constraint firstItem="7lD-SM-gH2" firstAttribute="centerY" secondItem="7uO-Cv-Fg7" secondAttribute="centerY" id="PzV-iQ-gu3"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="7lD-SM-gH2" secondAttribute="trailing" id="bQa-tn-5VM"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="7lD-SM-gH2" secondAttribute="trailing" constant="8" id="bQa-tn-5VM"/>
                                                 <constraint firstItem="7lD-SM-gH2" firstAttribute="top" secondItem="7uO-Cv-Fg7" secondAttribute="topMargin" id="nIa-SN-nrC"/>
                                             </constraints>
                                             <variation key="default">
@@ -1053,10 +1055,10 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HW03: Binary Search Tree" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="bDf-GV-jXI">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="232" verticalHuggingPriority="249" text="HW03: Binary Search Tree" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="bDf-GV-jXI">
                                                     <rect key="frame" x="16" y="8" width="263" height="32"/>
                                                     <animations/>
-                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="26"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="21"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>

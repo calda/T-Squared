@@ -32,13 +32,15 @@ class HttpClient {
         session.configuration.HTTPShouldSetCookies = false
         session.configuration.HTTPCookieAcceptPolicy = NSHTTPCookieAcceptPolicy.OnlyFromMainDocumentDomain
         session.configuration.HTTPCookieStorage?.cookieAcceptPolicy = NSHTTPCookieAcceptPolicy.OnlyFromMainDocumentDomain
+        session.configuration.requestCachePolicy = .ReloadIgnoringLocalCacheData
     }
     
     internal func sendGet() -> String {
+        NSURLCache.sharedURLCache().removeAllCachedResponses()
+        
         var ready = false
         var content: String!
-        let request = NSMutableURLRequest(URL: self.url)
-        request.cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
+        let request = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 5.0)
         
         let task = session.dataTaskWithRequest(request) {
             (data, response, error) -> Void in
@@ -57,10 +59,11 @@ class HttpClient {
     }
     
     internal func sendPost(params: String) -> String {
+        NSURLCache.sharedURLCache().removeAllCachedResponses()
+        
         var ready = false
         var content: String!
-        let request = NSMutableURLRequest(URL: self.url)
-        request.cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
+        let request = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 5.0)
         
         request.HTTPMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
@@ -159,8 +162,7 @@ class HttpClient {
         let response = loginClient.sendPost("warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)") as NSString
         //print("warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)")
         //print("to https://login.gatech.edu/\(formPost)")
-        //print(response)
-        //print("SPLIT")
+        
         
         if response.containsString("Incorrect login or disabled account.") || response.containsString("Login requested by:") {
             didCompletion = true

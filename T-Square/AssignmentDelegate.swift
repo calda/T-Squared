@@ -132,7 +132,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath.section == 0 {
             let identifier = cells[indexPath.item].identifier
-            if identifier == "blank" { return 15.0 }
+            if identifier == "blank" { return heightForBlankCellAtIndexPath(indexPath) }
             if identifier == "back" { return 50.0 }
             if identifier == "attachment" { return 50.0 }
             
@@ -154,10 +154,10 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         
         if indexPath.section == 2 && indexPath.item == 0 { return 40.0 }
         if indexPath.section == 1 && indexPath.item == assignment.attachments!.count {
-            return 15.0
+            return heightForBlankCellAtIndexPath(indexPath)
         }
         if indexPath.section == 2 && indexPath.item == assignment.submissions!.count + 1 {
-            return 15.0
+            return heightForBlankCellAtIndexPath(indexPath)
         }
         if indexPath.item == 1 && indexPath.section == 3 {
             let text = assignment.feedback!
@@ -165,9 +165,28 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
             return height * 1.1
         }
         if indexPath.item == 2 && indexPath.section == 3 {
-            return 15.0
+            return heightForBlankCellAtIndexPath(indexPath)
         }
         else { return 50.0 }
+    }
+    
+    func heightForBlankCellAtIndexPath(indexPath: NSIndexPath) -> CGFloat {
+        let rowsInSection = tableView(controller.tableView, numberOfRowsInSection: indexPath.section)
+        //find out if this is the last section
+        if indexPath.item == (rowsInSection - 1) {
+            //find out if this is the last section
+            let sectionCount = numberOfSectionsInTableView(controller.tableView)
+            if indexPath.section == (sectionCount - 1) { return 50.0 }
+            //find out if all following sections have no cell
+            for section in (indexPath.section + 1) ..< sectionCount {
+                let rowsInSection = tableView(controller.tableView, numberOfRowsInSection: section)
+                if rowsInSection != 0 { return 15.0 }
+            }
+            //return 50.0 if this is the definitive last cell in the table
+            //this prevents filler cells with 15.0
+            return 50.0
+        }
+        return 15.0
     }
     
     //MARK: - Stackable Table Delegate methods
@@ -196,10 +215,10 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         var attachment: Attachment?
         
         if index.section == 1 {
-            attachment = assignment.attachments![index.item]
+            attachment = assignment.attachments![index.item - 1]
         }
         if index.section == 2 {
-            attachment = assignment.submissions![index.item]
+            attachment = assignment.submissions![index.item - 1]
         }
         
         if let attachment = attachment {

@@ -56,7 +56,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             //load assignments
             dispatch_async(TSNetworkQueue, {
                 let assignments = TSAuthenticatedReader.getAssignmentsForClass(displayClass)
-                let delegate = AssignmentsDelegate(assignments: assignments, controller: controller)
+                let delegate = AssignmentsDelegate(assignments: assignments, owningClass: displayClass, controller: controller)
                 sync() {
                     controller.setActivityIndicatorVisible(false)
                     controller.pushDelegate(delegate)

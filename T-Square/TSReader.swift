@@ -18,16 +18,17 @@ class TSReader {
     
     init(username: String) {
         self.username = username
+        self.classes = nil
     }
     
-    static func authenticatedReader(user user: String, password: String, completion: (TSReader?) -> ()) {
+    static func authenticatedReader(user user: String, password: String, isNewLogin: Bool, completion: (TSReader?) -> ()) {
         HttpClient.authenticateWithUsername(user, password: password, completion: { success in
             completion(success ? TSReader(username: user) : nil)
         })
         
         //check if this is first time logging in
         let data = NSUserDefaults.standardUserDefaults()
-        if data.valueForKey(TSInstallDateKey) == nil {
+        if data.valueForKey(TSInstallDateKey) == nil || isNewLogin {
             data.setValue(NSDate(), forKey: TSInstallDateKey)
         }
     }
@@ -76,6 +77,53 @@ class TSReader {
         
         self.classes = classes
         return classes
+    }
+    
+    var allClasses: [Class]?
+    func getAllClasses() -> [Class] {
+        
+        if let allClasses = allClasses {
+            return allClasses
+        }
+        
+        guard let doc = HttpClient.contentsOfPage("https://t-square.gatech.edu/portal/pda/") else { return classes ?? [] }
+        
+        for workspaceLink in doc.css("a, link") {
+            if workspaceLink["title"] != "My Workspace" { continue }
+            let workspaceURL = workspaceLink["href"]!
+            guard let workspace = HttpClient.contentsOfPage(workspaceURL) else { return classes ?? [] }
+            
+            for worksiteLink in workspace.css("a, link") {
+                if worksiteLink["title"] != "Worksite Setup" { continue }
+                let worksiteURL = worksiteLink["href"]!
+                guard let worksite = HttpClient.contentsOfPage(worksiteURL) else { return classes ?? [] }
+                
+                var allClasses: [Class] = []
+                
+                for header in worksite.css("h4") {
+                    let links = header.css("a, link")
+                    if links.count == 0 { continue }
+                    let classLink = links[links.count - 1]
+                    
+                    let className = classLink.text!.cleansed()
+                    if className == "My Workspace" { continue }
+                    
+                    //show the short-form name unless there would be duplicates
+                    let newClass = Class(fromElement: classLink)
+                    for otherClass in allClasses {
+                        if newClass.name == otherClass.name {
+                            newClass.useSectionName()
+                            otherClass.useSectionName()
+                        }
+                    }
+                    allClasses.append(newClass)
+                }
+                
+                return allClasses
+            }
+        }
+        
+        return classes ?? []
     }
     
     

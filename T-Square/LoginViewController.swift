@@ -46,7 +46,7 @@ class LoginViewController: UIViewController {
             animateFormSubviewsWithDuration(0.0, hidden: true)
             usernameField.text = savedUsername
             passwordField.text = savedPassword
-            loginPressed(self.view)
+            doLogin(newLogin: false)
         }
         
         UIView.animateWithDuration(0.7, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
@@ -102,6 +102,15 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func loginPressed(sender: AnyObject) {
+        doLogin(newLogin: true)
+    }
+    
+    func doLogin(newLogin newLogin: Bool) {
+        if usernameField.text! == "" || passwordField.text! == "" {
+            shakeView(formView)
+            return
+        }
+        
         //center the form
         self.passwordField.resignFirstResponder()
         self.usernameField.resignFirstResponder()
@@ -122,7 +131,7 @@ class LoginViewController: UIViewController {
         
         //attempt to authenticate
         dispatch_async(TSNetworkQueue, {
-            TSReader.authenticatedReader(user: self.usernameField.text!, password: self.passwordField.text!, completion: { reader in
+            TSReader.authenticatedReader(user: self.usernameField.text!, password: self.passwordField.text!, isNewLogin: newLogin, completion: { reader in
                 
                 if let reader = reader {
                     TSAuthenticatedReader = reader
@@ -142,6 +151,7 @@ class LoginViewController: UIViewController {
                 
             })
         })
+        
     }
     
     func setSavedCredentials(correct correct: Bool) {
@@ -207,9 +217,25 @@ class LoginViewController: UIViewController {
     func presentClassesView(reader: TSReader) {
         tapRecognizer.enabled = false
         var classes: [Class] = []
-        while classes.count == 0 {
+        var loadAttempt = 0
+        while classes.count == 0 && loadAttempt < 10 {
+            loadAttempt++
             classes = reader.getClasses()
         }
+        
+        if loadAttempt >= 10 {
+            //present an alert and then exit the app if the classes aren't loading
+            //this means a failed authentication looked like it passed
+            //AKA I have no idea what happened
+            let alert = UIAlertController(title: "There was a problem logging you in.", message: "This happens every now and then. Please restart T-Squared and try again.", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "Restart", style: .Default, handler: { _ in
+                HttpClient.sendLogoutRequest()
+            }))
+            self.presentViewController(alert, animated: true, completion: nil)
+            self.setSavedCredentials(correct: false)
+            return
+        }
+        
         classesViewController.classes = classes
         classesViewController.reloadTable()
         

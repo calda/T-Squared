@@ -30,8 +30,25 @@ class Class : CustomStringConvertible {
         
         //create user-facing name
         let nameParts = ID.componentsSeparatedByString("-")
-        self.name = nameParts[0] + " " + nameParts[1]
-        self.subjectName = GTSubjects[nameParts[0]]
+        if nameParts.count >= 2 {
+            self.name = nameParts[0] + " " + nameParts[1]
+            self.subjectName = GTSubjects[nameParts[0]]
+        }
+        else {
+            self.name = ID
+            let nsname = name as NSString
+            
+            //attempt to find the subject name from the first few characters
+            for i in 1...5 {
+                let substring = nsname.substringToIndex(i)
+                if let subjectName = GTSubjects[substring] {
+                    self.subjectName = subjectName
+                    return
+                }
+            }
+            
+            self.subjectName = nil
+        }
     }
     
     func useSectionName() {

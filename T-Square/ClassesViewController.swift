@@ -13,6 +13,7 @@ import UIKit
 
 let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled"
 let TSBackNotification = "edu.gatech.cal.backTriggered"
+let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 
 class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate {
 
@@ -530,7 +531,9 @@ extension StackableTableDelegate {
                     controller.pushDelegate(self)
                 }
                 else {
-                    controller.tableView.reloadData()
+                    if controller.tableView.delegate === self {
+                        controller.tableView.reloadData()
+                    }
                 }
             }
         })

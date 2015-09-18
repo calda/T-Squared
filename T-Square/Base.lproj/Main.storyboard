@@ -98,6 +98,7 @@
                                         <fontDescription key="fontDescription" type="system" weight="light" pointSize="15"/>
                                         <textInputTraits key="textInputTraits" returnKeyType="next"/>
                                         <connections>
+                                            <action selector="switchToPasswordInput:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="co4-Ha-0Qx"/>
                                             <action selector="switchToPasswordInput:" destination="BYZ-38-t0r" id="jpq-UV-hlI"/>
                                             <outlet property="delegate" destination="BYZ-38-t0r" id="38u-lP-f1s"/>
                                         </connections>
@@ -116,6 +117,7 @@
                                         <fontDescription key="fontDescription" type="system" weight="light" pointSize="15"/>
                                         <textInputTraits key="textInputTraits" keyboardAppearance="light" returnKeyType="go" secureTextEntry="YES"/>
                                         <connections>
+                                            <action selector="loginPressed:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="Ypw-RF-XEe"/>
                                             <action selector="loginPressed:" destination="BYZ-38-t0r" id="nwU-CR-dFd"/>
                                             <outlet property="delegate" destination="BYZ-38-t0r" id="Si2-v1-ULr"/>
                                         </connections>
@@ -458,7 +460,7 @@
                                             <outlet property="subjectLabel" destination="4A0-Yb-A8b" id="0c3-A5-suk"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="classTitle" rowHeight="80" id="LzG-E5-aaG" customClass="ClassNameCell" customModule="T_Squared" customModuleProvider="target">
+                                    <tableViewCell autoresizesSubviews="NO" clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="classTitle" rowHeight="80" id="LzG-E5-aaG" customClass="ClassNameCell" customModule="T_Squared" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="142" width="320" height="80"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="LzG-E5-aaG" id="Rj4-Uo-sz5">

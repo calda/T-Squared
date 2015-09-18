@@ -67,6 +67,7 @@ class LoginViewController: UIViewController {
     override func viewDidAppear(animated: Bool) {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardHeightChanged:", name: UIKeyboardWillChangeFrameNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "centerForm", name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "networkErrorRecieved", name: TSNetworkErrorNotification, object: nil)
     }
     
     //MARK: - Animating and processing form input
@@ -152,6 +153,18 @@ class LoginViewController: UIViewController {
             })
         })
         
+    }
+    
+    func networkErrorRecieved() {
+        sync {
+            self.animateFormSubviewsWithDuration(0.5, hidden: false)
+            self.animateActivityIndicator(on: false)
+            
+            let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Are you connected to the internet?", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
+            alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
     }
     
     func setSavedCredentials(correct correct: Bool) {

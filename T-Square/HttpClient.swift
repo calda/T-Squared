@@ -35,32 +35,56 @@ class HttpClient {
         session.configuration.requestCachePolicy = .ReloadIgnoringLocalCacheData
     }
     
-    internal func sendGet() -> String {
+    internal func sendGet() -> String? {
         NSURLCache.sharedURLCache().removeAllCachedResponses()
         
+        var attempts = 0
+        var failed = false
+        var stopTrying = false
         var ready = false
         var content: String!
         let request = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 5.0)
         
-        let task = session.dataTaskWithRequest(request) {
-            (data, response, error) -> Void in
-            content = NSString(data: data!, encoding: NSASCIIStringEncoding) as! String
-            ready = true
+        while !stopTrying && !ready {
+        
+            let task = session.dataTaskWithRequest(request) {
+                (data, response, error) -> Void in
+                if let data = data {
+                    if let loadedContent = NSString(data: data, encoding: NSASCIIStringEncoding) {
+                        content = loadedContent as String
+                        ready = true
+                        return
+                    }
+                }
+                
+                attempts++
+                failed = true
+                if attempts >= 3 {
+                    stopTrying = true
+                }
+                
+            }
+            
+            task.resume()
+            while !ready && !failed {
+                usleep(10)
+            }
+        
         }
-        task.resume()
-        while !ready {
-            usleep(10)
-        }
+        
         if content != nil {
             return content
         } else {
-            return ""
+            return nil
         }
     }
     
-    internal func sendPost(params: String) -> String {
+    internal func sendPost(params: String) -> String? {
         NSURLCache.sharedURLCache().removeAllCachedResponses()
         
+        var attempts = 0
+        var stopTrying = false
+        var failed = false
         var ready = false
         var content: String!
         let request = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 5.0)
@@ -70,15 +94,33 @@ class HttpClient {
         request.HTTPBody = params.dataUsingEncoding(NSASCIIStringEncoding, allowLossyConversion: false)
         request.HTTPShouldHandleCookies = true
         
-        let task = session.dataTaskWithRequest(request) {
-            (data, response, error) -> Void in
-            content = NSString(data: data!, encoding: NSASCIIStringEncoding) as! String
-            ready = true
+        while !stopTrying && !ready {
+            
+            let task = session.dataTaskWithRequest(request) {
+                (data, response, error) -> Void in
+                if let data = data {
+                    if let loadedContent = NSString(data: data, encoding: NSASCIIStringEncoding) {
+                        content = loadedContent as String
+                        ready = true
+                        return
+                    }
+                }
+                
+                attempts++
+                failed = true
+                if attempts >= 3 {
+                    stopTrying = true
+                }
+                
+            }
+            
+            task.resume()
+            while !ready && !failed {
+                usleep(10)
+            }
+            
         }
-        task.resume()
-        while !ready {
-            usleep(10)
-        }
+        
         if content != nil {
             return content
         } else {
@@ -120,7 +162,11 @@ class HttpClient {
         
         //request the login page
         let client = HttpClient(url: "https://login.gatech.edu/cas/login?service=https%3A%2F%2Ft-square.gatech.edu%2Fsakai-login-tool%2Fcontainer")
-        let loginScreen = client.sendGet() as NSString
+        guard let loginScreenText = client.sendGet() else {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            return
+        }
+        let loginScreen = loginScreenText as NSString
         
         defer {
             if !didCompletion {
@@ -159,7 +205,10 @@ class HttpClient {
         }
         
         let loginClient = HttpClient(url: "https://login.gatech.edu/\(formPost)")
-        let response = loginClient.sendPost("warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)") as NSString
+        guard let response = loginClient.sendPost("warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)") else {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            return
+        }
         //print("warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)")
         //print("to https://login.gatech.edu/\(formPost)")
         
@@ -181,22 +230,31 @@ class HttpClient {
     }
     
     static func contentsOfPage(url: String) -> HTMLDocument? {
-        //let page = HttpClient(url: url)
-        //let text = page.sendGet()
+        let fetchURL = url.stringByReplacingOccurrencesOfString("site", withString: "pda")
+        let page = HttpClient(url: fetchURL)
         
-        let URL = NSURL(string: url.stringByReplacingOccurrencesOfString("site", withString: "pda"))!
-        //let data = NSData(contentsOfURL: URL)!
-        let text = try! NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding)
+        guard let text = page.sendGet() else {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            return nil
+        }
+        
         return Kanna.HTML(html: text as String, encoding: NSUTF8StringEncoding)
     }
     
     static func getPageForResourceFolder(resource: ResourceFolder) -> HTMLDocument? {
         if resource.collectionID == "" && resource.navRoot == "" {
-            return contentsOfPage(resource.link)
+            let contents = contentsOfPage(resource.link)
+            if contents == nil {
+                NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            }
+            return contents
         }
         let postString = "source=0&criteria=title&sakai_action=doNavigate&collectionId=\(resource.collectionID)&navRoot=\(resource.navRoot)"
         let client = HttpClient(url: resource.link)
-        let pageText = client.sendPost(postString)
+        guard let pageText = client.sendPost(postString) else {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            return nil
+        }
         return Kanna.HTML(html: pageText, encoding: NSUTF8StringEncoding)
     }
     

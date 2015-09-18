@@ -146,10 +146,18 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             let text: String
             switch(identifier) {
                 case "announcementTitle": fontSize = 22.0; text = announcement.name; break;
-                case "announcementText": fontSize = 18.0; text = announcement.message ?? "Loading message..."; break;
+                case "announcementText": fontSize = 18.5; text = announcement.message ?? "Loading message..."; break;
                 default: fontSize = 19.0; text = "";
             }
-            let height = heightForText(text, width: tableView.frame.width - 24.0, font: UIFont.systemFontOfSize(fontSize))
+            
+            let font: UIFont
+            if #available(iOS 8.2, *) {
+                font = UIFont.systemFontOfSize(fontSize, weight: UIFontWeightThin)
+            } else {
+                font = UIFont.systemFontOfSize(fontSize)
+            }
+            
+            let height = heightForText(text, width: tableView.frame.width - 24.0, font: font)
             
             if identifier == "announcementText" {
                 return max(100.0, height + 30.0)
@@ -163,6 +171,18 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
     }
     
     //MARK: - Stackable Table Delegate methods
+    
+    func loadData() {
+        return
+    }
+    
+    func clearCachedData() {
+        return
+    }
+    
+    func isFirstLoad() -> Bool {
+        return false
+    }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
         return index.section == 1 && index.item != 0

@@ -98,7 +98,6 @@
                                         <fontDescription key="fontDescription" type="system" weight="light" pointSize="15"/>
                                         <textInputTraits key="textInputTraits" returnKeyType="next"/>
                                         <connections>
-                                            <action selector="switchToPasswordInput:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="Tyv-aG-arM"/>
                                             <action selector="switchToPasswordInput:" destination="BYZ-38-t0r" id="jpq-UV-hlI"/>
                                             <outlet property="delegate" destination="BYZ-38-t0r" id="38u-lP-f1s"/>
                                         </connections>
@@ -117,7 +116,6 @@
                                         <fontDescription key="fontDescription" type="system" weight="light" pointSize="15"/>
                                         <textInputTraits key="textInputTraits" keyboardAppearance="light" returnKeyType="go" secureTextEntry="YES"/>
                                         <connections>
-                                            <action selector="loginPressed:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="ZfP-DW-bY1"/>
                                             <action selector="loginPressed:" destination="BYZ-38-t0r" id="nwU-CR-dFd"/>
                                             <outlet property="delegate" destination="BYZ-38-t0r" id="Si2-v1-ULr"/>
                                         </connections>
@@ -511,7 +509,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="49"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000000000000004" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Assignments" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="QUd-DR-MCj">
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000000000000004" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Assignments" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="QUd-DR-MCj">
                                                     <rect key="frame" x="16" y="10" width="263" height="30"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" weight="light" pointSize="25"/>
@@ -581,7 +579,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="49"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000001192092896" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Assignments" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="gjG-7q-ENl">
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000001192092896" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Assignments" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="gjG-7q-ENl">
                                                     <rect key="frame" x="16" y="12" width="263" height="26"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" weight="light" pointSize="21"/>
@@ -870,7 +868,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.5" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="posted by Jonathan Victor Jemson" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9Tm-Nu-8eG">
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.5" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="posted by Jonathan Victor Jemson" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9Tm-Nu-8eG">
                                                     <rect key="frame" x="16" y="9" width="296" height="21"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" weight="light" pointSize="17"/>
@@ -1001,7 +999,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="49"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000001192092896" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Assignments" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="i10-kB-kqn">
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000001192092896" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Assignments" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="i10-kB-kqn">
                                                     <rect key="frame" x="57" y="12" width="222" height="26"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" weight="light" pointSize="21"/>

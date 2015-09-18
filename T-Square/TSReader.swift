@@ -119,6 +119,7 @@ class TSReader {
                     allClasses.append(newClass)
                 }
                 
+                self.allClasses = allClasses
                 return allClasses
             }
         }

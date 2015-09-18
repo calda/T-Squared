@@ -50,7 +50,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if indexPath.section == 0 {
             if indexPath.item == 0 { return 50.0 }
             if indexPath.item == (classes?.count ?? 0) + 1 {
-                return 40.0
+                return 50.0
             }
             return 70.0
         }
@@ -241,10 +241,17 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     @IBAction func viewPanned(sender: UIPanGestureRecognizer) {
-        if delegateStack.count == 0 { return }
-        
         if sender.state == .Began {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
             tableViewRestingPosition = tableView.frame.origin
+        }
+        
+        if sender.state == .Ended {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+        }
+        
+        if delegateStack.count == 0 {
+            return
         }
         
         if sender.state == .Ended {
@@ -351,22 +358,16 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                     setActivityIndicatorVisible(true)
                 }
                 
-                dispatch_async(TSNetworkQueue) {
-                    let allClasses = TSAuthenticatedReader.getAllClasses()
-                    let delegate = AllClassesDelegate(allClasses: allClasses, controller: self)
-                    sync() {
-                        self.pushDelegate(delegate)
-                        self.setActivityIndicatorVisible(false)
-                    }
-                }
-                
+                let delegate = AllClassesDelegate(controller: self)
+                delegate.loadDataAndPushInController(self)
                 return
             }
             
             //show class
             guard let classes = classes else { return }
             let displayClass = classes[index.item - 1]
-            pushDelegate(ClassDelegate(controller: self, displayClass: displayClass))
+            let delegate = ClassDelegate(controller: self, displayClass: displayClass)
+            delegate.loadDataAndPushInController(self)
         }
         
         if index.section == 1 {
@@ -386,9 +387,13 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             || delegate is ClassDelegate
     }
     
-    override func pushDelegate(delegate: StackableTableDelegate) {
+    private func pushDelegate(delegate: StackableTableDelegate) {
+        pushDelegate(delegate, hasBeenUpdatedToNewLoadFormat: true)
+    }
+    
+    override func pushDelegate(delegate: StackableTableDelegate, hasBeenUpdatedToNewLoadFormat: Bool) {
         bottomView.hidden = !(usesBottomView(delegate))
-        super.pushDelegate(delegate)
+        super.pushDelegate(delegate, hasBeenUpdatedToNewLoadFormat: true)
         updateBottomView()
         let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)
         playTransitionForView(bottomView, duration: 0.4, transition: kCATransitionPush, subtype: kCATransitionFromRight, timingFunction: timingFunction)
@@ -405,6 +410,18 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
         return index != NSIndexPath(forItem: 0, inSection: 1)
+    }
+    
+    func loadData() {
+        self.classes = TSAuthenticatedReader.getClasses()
+    }
+    
+    func clearCachedData() {
+        TSAuthenticatedReader.classes = nil
+    }
+    
+    func isFirstLoad() -> Bool {
+        return TSAuthenticatedReader.classes == nil
     }
     
     //MARK: - Auxillary Functions
@@ -485,6 +502,39 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             self.activityIndicator.transform = transform
             self.activityIndicator.alpha = visible ? 1.0 : 0.0
         }, completion: nil)
+    }
+    
+}
+
+extension StackableTableDelegate {
+    
+    func loadDataAndPushInController(controller: ClassesViewController) {
+        let firstLoad = isFirstLoad()
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+        controller.setActivityIndicatorVisible(firstLoad || (self is AnnouncementDelegate))
+        
+        if !firstLoad {
+            self.loadData()
+            controller.pushDelegate(self)
+            clearCachedData()
+        }
+        
+        dispatch_async(TSNetworkQueue, {
+            self.loadData()
+            
+            sync {
+                UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+                controller.setActivityIndicatorVisible(false || (self is AnnouncementDelegate))
+                
+                if firstLoad {
+                    controller.pushDelegate(self)
+                }
+                else {
+                    controller.tableView.reloadData()
+                }
+            }
+        })
+        
     }
     
 }

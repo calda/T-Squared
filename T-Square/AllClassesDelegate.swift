@@ -12,17 +12,16 @@ import UIKit
 class AllClassesDelegate : NSObject, StackableTableDelegate {
     
     let controller: ClassesViewController
-    let allClasses: [Class]
+    var allClasses: [Class] = []
     
-    init(allClasses: [Class], controller: ClassesViewController) {
+    init(controller: ClassesViewController) {
         self.controller = controller
-        self.allClasses = allClasses
     }
     
     //MARK: - Table View Delegate
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (allClasses.count == 0 ? 1 : allClasses.count) + 2
+        return (allClasses.count == 0 ? 1 : allClasses.count) + 3
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -32,33 +31,52 @@ class AllClassesDelegate : NSObject, StackableTableDelegate {
             return cell
         }
         if indexPath.item == 1 {
-            let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle")! as! TitleCell
-            cell.decorate("All Classes (Active and Hidden)")
+            let cell = tableView.dequeueReusableCellWithIdentifier("classTitle")! as! ClassNameCell
+            cell.nameLabel.text = "All Classes"
+            cell.subjectLabel.text = "Active and Hidden"
+            cell.hideSeparator()
             return cell
         }
-        if indexPath.item == 2 && allClasses.count == 0 {
+        if indexPath.item == 2 {
+            return tableView.dequeueReusableCellWithIdentifier("blank")!
+        }
+        if indexPath.item == 3 && allClasses.count == 0 {
             let cell = tableView.dequeueReusableCellWithIdentifier("subtitle")! as! TitleCell
-            cell.decorate("You aren't in any classes yet. Welcome to Tech.")
+            cell.decorate("You aren't in any classes yet.")
             return cell
         }
-        let displayClass = allClasses[indexPath.item - 2]
+        let displayClass = allClasses[indexPath.item - 3]
         let cell = tableView.dequeueReusableCellWithIdentifier("class") as! ClassNameCell
         cell.decorate(displayClass)
         return cell
     }
     
     @objc func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return indexPath.item == 0 || indexPath.item == 1 ? 50.0 : 70.0
+        if indexPath.item == 0 { return 50.0 }
+        if indexPath.item == 2 { return 20.0 }
+        return 70.0
     }
     
     //MARK: - Stackable Table Delegate Methods
     
+    func loadData() {
+        self.allClasses = TSAuthenticatedReader.getAllClasses()
+    }
+    
+    func clearCachedData() {
+        TSAuthenticatedReader.allClasses = nil
+    }
+    
+    func isFirstLoad() -> Bool {
+        return TSAuthenticatedReader.allClasses == nil
+    }
+    
     func processSelectedCell(index: NSIndexPath) {
-        if index.item == 0 || (index.item == 1) || (index.item == 2 && allClasses.count == 0) { return }
+        if index.item == 0 || (index.item == 1) || (index.item == 2) || (index.item == 3 && allClasses.count == 0) { return }
         
-        let displayClass = allClasses[index.item - 2]
+        let displayClass = allClasses[index.item - 3]
         let delegate = ClassDelegate(controller: controller, displayClass: displayClass)
-        controller.pushDelegate(delegate)
+        delegate.loadDataAndPushInController(controller)
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {

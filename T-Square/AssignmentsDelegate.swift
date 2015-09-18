@@ -13,17 +13,11 @@ class AssignmentsDelegate : NSObject, StackableTableDelegate {
     
     let controller: ClassesViewController
     let owningClass: Class
-    let assignments: [Assignment]
+    var assignments: [Assignment] = []
     
-    init(assignments: [Assignment], owningClass: Class, controller: ClassesViewController) {
+    init(owningClass: Class, controller: ClassesViewController) {
         self.owningClass = owningClass
         self.controller = controller
-        self.assignments = assignments.sort({ item1, item2 in
-            if let date1 = item1.dueDate, let date2 = item2.dueDate {
-                return date1.timeIntervalSinceDate(date2) > 0
-            }
-            return false
-        })
     }
     
     //MARK: - Table View Delegate
@@ -60,6 +54,24 @@ class AssignmentsDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Stackable Table Delegate Methods
     
+    func loadData() {
+        let classAssignments = TSAuthenticatedReader.getAssignmentsForClass(owningClass)
+        self.assignments = classAssignments.sort({ item1, item2 in
+            if let date1 = item1.dueDate, let date2 = item2.dueDate {
+                return date1.timeIntervalSinceDate(date2) > 0
+            }
+            return false
+        })
+    }
+    
+    func clearCachedData() {
+        owningClass.assignments = nil
+    }
+    
+    func isFirstLoad() -> Bool {
+        return owningClass.assignments == nil
+    }
+    
     func processSelectedCell(index: NSIndexPath) {
         if index.item == 0 || (index.item == 1) || (index.item == 2 && assignments.count == 0) { return }
         
@@ -68,14 +80,8 @@ class AssignmentsDelegate : NSObject, StackableTableDelegate {
             controller.setActivityIndicatorVisible(true)
         }
         
-        dispatch_async(TSNetworkQueue) {
-            assignment.loadMessage()
-            let delegate = AssignmentDelegate(assignment: assignment, controller: self.controller)
-            sync {
-                self.controller.pushDelegate(delegate)
-                self.controller.setActivityIndicatorVisible(false)
-            }
-        }
+        let delegate = AssignmentDelegate(assignment: assignment, controller: self.controller)
+        delegate.loadDataAndPushInController(controller)
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {

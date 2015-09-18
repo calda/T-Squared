@@ -54,14 +54,8 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             }
             
             //load assignments
-            dispatch_async(TSNetworkQueue, {
-                let assignments = TSAuthenticatedReader.getAssignmentsForClass(displayClass)
-                let delegate = AssignmentsDelegate(assignments: assignments, owningClass: displayClass, controller: controller)
-                sync() {
-                    controller.setActivityIndicatorVisible(false)
-                    controller.pushDelegate(delegate)
-                }
-            })
+            let delegate = AssignmentsDelegate(owningClass: displayClass, controller: controller)
+            delegate.loadDataAndPushInController(controller)
         }),
         
         
@@ -72,21 +66,15 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             }
             
             //load root resources
-            dispatch_async(TSNetworkQueue, {
-                if let rootFolder = TSAuthenticatedReader.getResourceRootForClass(displayClass) {
-                    let resources = TSAuthenticatedReader.getResourcesInFolder(rootFolder)
-                    let delegate = ResourcesDelegate(controller: controller, resources: resources, inFolder: rootFolder)
-                    sync() {
-                        controller.setActivityIndicatorVisible(false)
-                        controller.pushDelegate(delegate)
-                    }
-                }
-                else {
-                    let alert = UIAlertController(title: "No Resources Folder", message: "This class does not have a Resources folder.", preferredStyle: .Alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-                    controller.presentViewController(alert, animated: true, completion: nil)
-                }
-            })
+            if let rootFolder = TSAuthenticatedReader.getResourceRootForClass(displayClass) {
+                let delegate = ResourcesDelegate(controller: controller, inFolder: rootFolder)
+                delegate.loadDataAndPushInController(controller)
+            }
+            else {
+                let alert = UIAlertController(title: "No Resources Folder", message: "This class does not have a Resources folder.", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                controller.presentViewController(alert, animated: true, completion: nil)
+            }
             
         }),
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Gradebook"), onTap: nil),
@@ -161,6 +149,26 @@ class ClassDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Stackable Delegate methods
     
+    func loadData() {
+        controller.loadingAnnouncements = true
+        dispatch_async(TSNetworkQueue) {
+            self.displayClass.announcements = TSAuthenticatedReader.getAnnouncementsForClass(self.displayClass)
+            sync {
+                self.controller.loadingAnnouncements = false
+                self.controller.reloadTable()
+            }
+        }
+        
+    }
+    
+    func clearCachedData() {
+        return
+    }
+    
+    func isFirstLoad() -> Bool {
+        return false
+    }
+    
     func canHighlightCell(index: NSIndexPath) -> Bool {
         return index.section == 0
                ? cells[index.item].onTap != nil
@@ -172,7 +180,8 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             if index.item == 0 { return }
             if index.item == 1 && displayClass.announcements.count == 0 { return }
             let announcement = displayClass.announcements[index.item - 1]
-            controller.pushDelegate(AnnouncementDelegate(announcement: announcement, controller: controller))
+            let delegate = AnnouncementDelegate(announcement: announcement, controller: controller)
+            delegate.loadDataAndPushInController(controller)
         }
         
         if index.section == 0 {

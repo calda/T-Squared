@@ -17,8 +17,8 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
     let assignment: Assignment
     
     init(assignment: Assignment, controller: ClassesViewController) {
-        self.assignment = assignment
         self.controller = controller
+        self.assignment = assignment
         super.init()
     }
     
@@ -190,6 +190,21 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
     }
     
     //MARK: - Stackable Table Delegate methods
+    
+    func loadData() {
+        assignment.loadMessage()
+    }
+    
+    func clearCachedData() {
+        assignment.message = nil
+        assignment.attachments = nil
+        assignment.submissions = nil
+        assignment.feedback = nil
+    }
+    
+    func isFirstLoad() -> Bool {
+        return assignment.message == nil
+    }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
         return index.section == 1 && index.item != 0

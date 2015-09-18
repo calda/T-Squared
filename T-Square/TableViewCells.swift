@@ -53,7 +53,7 @@ class AnnouncementCell : UITableViewCell {
     
     static func presentAnnouncement(announcement: Announcement, inController controller: ClassesViewController) {
         let delegate = AnnouncementDelegate(announcement: announcement, controller: controller)
-        controller.pushDelegate(delegate)
+        delegate.loadDataAndPushInController(controller)
     }
     
 }

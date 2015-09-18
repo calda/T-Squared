@@ -14,23 +14,13 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
     let openFolder: ResourceFolder
     let controller: ClassesViewController
     
-    let allResources: [Resource]
+    var allResources: [Resource] = []
     var folders: [ResourceFolder] = []
     var files: [Resource] = []
 
-    init(controller: ClassesViewController, resources: [Resource], inFolder folder: ResourceFolder) {
+    init(controller: ClassesViewController, inFolder folder: ResourceFolder) {
         self.openFolder = folder
         self.controller = controller
-        self.allResources = resources
-        
-        for resource in resources {
-            if let resource = resource as? ResourceFolder {
-                folders.append(resource)
-            }
-            else {
-                files.append(resource)
-            }
-        }
     }
     
     //MARK: - Table View Methods
@@ -93,6 +83,30 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Stackable Table Delegate Methods
     
+    func loadData() {
+        let resources = TSAuthenticatedReader.getResourcesInFolder(openFolder)
+        self.allResources = resources
+        
+        for resource in resources {
+            if let resource = resource as? ResourceFolder {
+                folders.append(resource)
+            }
+            else {
+                files.append(resource)
+            }
+        }
+    }
+    
+    func clearCachedData() {
+        openFolder.resourcesInFolder = nil
+        self.folders = []
+        self.files = []
+    }
+    
+    func isFirstLoad() -> Bool {
+        return openFolder.resourcesInFolder == nil
+    }
+    
     func canHighlightCell(index: NSIndexPath) -> Bool {
         return index.section != 0
     }
@@ -100,17 +114,8 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
     func processSelectedCell(index: NSIndexPath) {
         if index.section == 1 {
             let folder = folders[index.item]
-            if folder.resourcesInFolder == nil {
-                controller.setActivityIndicatorVisible(true)
-            }
-            dispatch_async(TSNetworkQueue, {
-                let resources = TSAuthenticatedReader.getResourcesInFolder(folder)
-                let delegate = ResourcesDelegate(controller: self.controller, resources: resources, inFolder: folder)
-                sync {
-                    self.controller.pushDelegate(delegate)
-                    self.controller.setActivityIndicatorVisible(false)
-                }
-            })
+            let delegate = ResourcesDelegate(controller: self.controller, inFolder: folder)
+            delegate.loadDataAndPushInController(controller)
         }
         if index.section == 2 {
             let file = files[index.item]

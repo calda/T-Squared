@@ -401,7 +401,7 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    func pushDelegate(delegate: StackableTableDelegate) {
+    func pushDelegate(delegate: StackableTableDelegate, hasBeenUpdatedToNewLoadFormat: Bool) {
         pushDelegate(delegate, isBack: false, atOffset: CGPointZero)
     }
     
@@ -476,6 +476,9 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
     func processSelectedCell(index: NSIndexPath)
     func canHighlightCell(index: NSIndexPath) -> Bool
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool)
+    func loadData()
+    func clearCachedData()
+    func isFirstLoad() -> Bool
     optional func getTitle() -> String
     optional func getBackButtonImage() -> UIImage
     optional func scrollViewDidScroll(scrollView: UIScrollView)

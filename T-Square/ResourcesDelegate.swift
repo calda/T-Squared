@@ -86,8 +86,19 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
     func loadData() {
         let resources = TSAuthenticatedReader.getResourcesInFolder(openFolder)
         self.allResources = resources
+        createGroupsFromAllResources()
+    }
+    
+    func loadCachedData() {
+        allResources = openFolder.resourcesInFolder ?? []
+        createGroupsFromAllResources()
+    }
+    
+    func createGroupsFromAllResources() {
+        folders = []
+        files = []
         
-        for resource in resources {
+        for resource in allResources {
             if let resource = resource as? ResourceFolder {
                 folders.append(resource)
             }
@@ -95,12 +106,6 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
                 files.append(resource)
             }
         }
-    }
-    
-    func clearCachedData() {
-        openFolder.resourcesInFolder = nil
-        self.folders = []
-        self.files = []
     }
     
     func isFirstLoad() -> Bool {

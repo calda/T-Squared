@@ -8,10 +8,12 @@
 
 import Foundation
 import UIKit
+import SafariServices
 
 //MARK: View Controller and initial Delegate
 
 let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled"
+let TSSetActivityIndicatorVisibleNotification = "edu.gatech.cal.activityIndicatorVisible"
 let TSBackNotification = "edu.gatech.cal.backTriggered"
 let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 
@@ -136,7 +138,6 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         for ann in newAnnouncements {
             announcements.append(ann)
-            ann.date!.timeIntervalSinceDate(ann.date!)
         }
         
         //resort
@@ -236,19 +237,26 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     //MARK: - User Interaction
     
-    @IBAction func touchDown(sender: UITapGestureRecognizer) {
-        let touch = sender.locationInView(tableView)
-        self.processTouchInTableView(touch, state: sender.state)
-    }
+    var panning = false
     
     @IBAction func viewPanned(sender: UIPanGestureRecognizer) {
+        //do nothing for vertical scrolling until panning actually starts
+        if !panning {
+            let velocity = sender.velocityInView(self.tableView)
+            if 2 * abs(velocity.y) > abs(velocity.x) { return }
+        }
+        
         if sender.state == .Began {
+            panning = true
             NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
             tableViewRestingPosition = tableView.frame.origin
         }
         
+        if !panning { return }
+        
         if sender.state == .Ended {
             NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+            panning = false
         }
         
         if delegateStack.count == 0 {
@@ -262,7 +270,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             let newTablePosition = tableViewRestingPosition
             let newBottomPosition = CGPointMake(tableViewRestingPosition.x, bottomView.frame.origin.y)
             
-            if sender.velocityInView(self.tableView).x < 0 {
+            if sender.velocityInView(self.tableView).x <= 0 {
                 //if they were swiping back towards the left, do nothing
                 UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
                     self.tableView.frame.origin = newTablePosition
@@ -284,15 +292,16 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             return
         }
         
-        //do nothing for vertical scrolling
-        let velocity = sender.velocityInView(self.tableView)
-        if 2 * abs(velocity.y) > abs(velocity.x) { return }
-        
         tableView.scrollEnabled = false
         tableView.userInteractionEnabled = false
         let translation = sender.translationInView(self.view)
         self.tableView.frame.origin = CGPointMake(max(tableViewRestingPosition.x, tableViewRestingPosition.x + translation.x), 0.0)
         self.bottomView.frame.origin = CGPointMake(max(tableViewRestingPosition.x, tableViewRestingPosition.x + translation.x), bottomView.frame.origin.y)
+    }
+    
+    @IBAction func touchDown(sender: UITapGestureRecognizer) {
+        let touch = sender.locationInView(tableView)
+        self.processTouchInTableView(touch, state: sender.state)
     }
     
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -388,6 +397,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             || delegate is ClassDelegate
     }
     
+    func pushDelegate(delegate: StackableTableDelegate, ifCurrentMatchesExpected expected: UITableViewDelegate) {
+        if expected === tableView.delegate {
+            pushDelegate(delegate)
+        }
+    }
+    
     private func pushDelegate(delegate: StackableTableDelegate) {
         pushDelegate(delegate, hasBeenUpdatedToNewLoadFormat: true)
     }
@@ -407,6 +422,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         updateBottomView()
         let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)
         playTransitionForView(bottomView, duration: 0.4, transition: kCATransitionPush, subtype: kCATransitionFromLeft, timingFunction: timingFunction)
+        self.setActivityIndicatorVisible(false)
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
@@ -417,8 +433,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         self.classes = TSAuthenticatedReader.getClasses()
     }
     
-    func clearCachedData() {
-        TSAuthenticatedReader.classes = nil
+    func loadCachedData() {
+        self.classes = TSAuthenticatedReader.classes ?? []
     }
     
     func isFirstLoad() -> Bool {
@@ -488,11 +504,27 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let alert = UIAlertController(title: "Open link in Safari?", message: "There are multiple links in this message. Which would you like to open?", preferredStyle: .Alert)
         for link in links {
             alert.addAction(UIAlertAction(title: websiteForLink(link) + "/...", style: .Default, handler: { _ in
-                UIApplication.sharedApplication().openURL(NSURL(string: link)!)
+                self.openLinkInSafari(link)
             }))
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func openLinkInSafari(link: String) {
+        guard let url = NSURL(string: link) else {
+            let alert = UIAlertController(title: "Could not open link.", message: "We had a problem opening that link. (\(link))", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+            return
+        }
+        
+        if #available(iOS 9.0, *) {
+            let safari = SFSafariViewController(URL: url)
+            self.presentViewController(safari, animated: true, completion: nil)
+        } else {
+            UIApplication.sharedApplication().openURL(url)
+        }
     }
     
     func setActivityIndicatorVisible(visible: Bool) {
@@ -510,14 +542,18 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
 extension StackableTableDelegate {
     
     func loadDataAndPushInController(controller: ClassesViewController) {
+        let previousDelegate: UITableViewDelegate! = controller.tableView.delegate
+        
         let firstLoad = isFirstLoad()
         UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-        controller.setActivityIndicatorVisible(firstLoad || (self is AnnouncementDelegate))
+        if (firstLoad) {
+            controller.setActivityIndicatorVisible(true)
+        }
         
         if !firstLoad {
-            self.loadData()
+            self.loadCachedData()
             controller.pushDelegate(self)
-            clearCachedData()
+            NSNotificationCenter.defaultCenter().postNotificationName(TSSetActivityIndicatorVisibleNotification, object: true)
         }
         
         dispatch_async(TSNetworkQueue, {
@@ -525,10 +561,13 @@ extension StackableTableDelegate {
             
             sync {
                 UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-                controller.setActivityIndicatorVisible(false || (self is AnnouncementDelegate))
+                if controller.activityIndicator.alpha == 1.0 && !(self is AnnouncementDelegate) {
+                    controller.setActivityIndicatorVisible(false)
+                }
+                NSNotificationCenter.defaultCenter().postNotificationName(TSSetActivityIndicatorVisibleNotification, object: false)
                 
                 if firstLoad {
-                    controller.pushDelegate(self)
+                    controller.pushDelegate(self, ifCurrentMatchesExpected: previousDelegate)
                 }
                 else {
                     if controller.tableView.delegate === self {

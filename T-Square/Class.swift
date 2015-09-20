@@ -12,6 +12,7 @@ import Kanna
 class Class : CustomStringConvertible {
     
     let ID: String
+    let subjectID: String?
     let subjectName: String?
     var name: String
     let link: String
@@ -32,6 +33,7 @@ class Class : CustomStringConvertible {
         let nameParts = ID.componentsSeparatedByString("-")
         if nameParts.count >= 2 {
             self.name = nameParts[0] + " " + nameParts[1]
+            self.subjectID = nameParts[0]
             self.subjectName = GTSubjects[nameParts[0]]
         }
         else {
@@ -42,13 +44,44 @@ class Class : CustomStringConvertible {
             for i in 1...5 {
                 let substring = nsname.substringToIndex(i)
                 if let subjectName = GTSubjects[substring] {
+                    self.subjectID = substring
                     self.subjectName = subjectName
                     return
                 }
             }
             
+            self.subjectID = nil
             self.subjectName = nil
         }
+        
+        verifySingleSubjectName()
+    }
+    
+    func verifySingleSubjectName() {
+        if let subjectID = subjectID where (ID as NSString).countOccurancesOfString(subjectID) > 1 {
+            var subs: [String] = []
+            
+            let subNames = ID.componentsSeparatedByString(" ")
+            for sub in subNames {
+                let nameParts = sub.componentsSeparatedByString("-")
+                if nameParts.count >= 2 {
+                    let new = nameParts[0] + " " + nameParts[1]
+                    if !subs.contains(new) {
+                        subs.append(new)
+                    }
+                }
+            }
+            
+            if subs.count > 0 {
+                var newName = ""
+                for i in 0 ..< subs.count {
+                    newName += subs[i]
+                    newName += (i != (subs.count - 1) ? " / " : "")
+                }
+                self.name = newName
+            }
+        }
+
     }
     
     func useSectionName() {

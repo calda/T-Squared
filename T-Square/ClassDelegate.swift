@@ -81,8 +81,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Open in Safari", hideSeparator: true), onTap: { controller, displayClass in
             
             let link = displayClass.link
-            let url = NSURL(string: link)!
-            UIApplication.sharedApplication().openURL(url)
+            controller.openLinkInSafari(link)
             
         }),
         (identifier: "blank", onDisplay: hideSeparator, onTap: nil)
@@ -161,7 +160,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         
     }
     
-    func clearCachedData() {
+    func loadCachedData() {
         return
     }
     

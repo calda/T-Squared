@@ -136,6 +136,21 @@ class AssignmentCell : UITableViewCell {
 
 class BackCell : UITableViewCell {
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setActivityIndicatorEnabled:", name: TSSetActivityIndicatorVisibleNotification, object: nil)
+    }
+    
+    func setActivityIndicatorEnabled(notification: NSNotification) {
+        activityIndicator.startAnimating()
+        
+        if let visible = notification.object as? Bool {
+            activityIndicator.alpha = visible ? 1.0 : 0.0
+        }
+    }
+    
     @IBAction func backButtonPressed(sender: UIButton) {
         NSNotificationCenter.defaultCenter().postNotificationName(TSBackNotification, object: nil)
     }

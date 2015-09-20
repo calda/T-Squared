@@ -33,12 +33,14 @@ class Assignment {
     }
     
     func loadMessage(attempt attempt: Int = 0) {
-        if message != nil { return } //already loaded
+        message = nil
+        attachments = nil
+        submissions = nil
+        feedback = nil
         
         if let page = HttpClient.contentsOfPage(self.link) {
             
             if !page.toHTML!.containsString("<div class=\"textPanel\">") {
-                print("reloading assignment")
                 if attempt > 10 {
                     self.message = "Could not load message for assignment."
                 }
@@ -92,7 +94,6 @@ class Assignment {
                     
                     for divTag in submissionsPage.css("div") {
                         if divTag["class"] != "textPanel" { continue }
-                        print(divTag.textWithLineBreaks)
                         if divTag["class"] != "textPanel" { continue }
                         feedback += divTag.textWithLineBreaks
                     }

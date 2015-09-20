@@ -64,8 +64,9 @@ class AssignmentsDelegate : NSObject, StackableTableDelegate {
         })
     }
     
-    func clearCachedData() {
-        owningClass.assignments = nil
+    func loadCachedData() {
+        assignments = owningClass.assignments ?? []
+        return
     }
     
     func isFirstLoad() -> Bool {

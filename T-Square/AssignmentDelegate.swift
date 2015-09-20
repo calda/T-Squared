@@ -195,11 +195,8 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         assignment.loadMessage()
     }
     
-    func clearCachedData() {
-        assignment.message = nil
-        assignment.attachments = nil
-        assignment.submissions = nil
-        assignment.feedback = nil
+    func loadCachedData() {
+        return
     }
     
     func isFirstLoad() -> Bool {
@@ -230,7 +227,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         var attachment: Attachment?
         
         if index.section == 1 {
-            attachment = assignment.attachments![index.item - 1]
+            attachment = assignment.attachments![index.item]
         }
         if index.section == 2 {
             attachment = assignment.submissions![index.item - 1]

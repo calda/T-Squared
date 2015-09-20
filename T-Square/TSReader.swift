@@ -15,15 +15,17 @@ let TSLastLoadDate = "edu.gatech.cal.lastLoadDate"
 class TSReader {
     
     let username: String
+    var initialPage: HTMLDocument? = nil
     
-    init(username: String) {
+    init(username: String, initialPage: HTMLDocument?) {
         self.username = username
         self.classes = nil
+        self.initialPage = initialPage
     }
     
     static func authenticatedReader(user user: String, password: String, isNewLogin: Bool, completion: (TSReader?) -> ()) {
-        HttpClient.authenticateWithUsername(user, password: password, completion: { success in
-            completion(success ? TSReader(username: user) : nil)
+        HttpClient.authenticateWithUsername(user, password: password, completion: { success, response in
+            completion(success ? TSReader(username: user, initialPage: response) : nil)
         })
         
         //check if this is first time logging in
@@ -37,11 +39,10 @@ class TSReader {
     var classes: [Class]?
     func getClasses() -> [Class] {
         
-        if let classes = self.classes {
-            return classes
+        guard let doc = initialPage ?? HttpClient.contentsOfPage("https://t-square.gatech.edu/portal/pda/") else {
+            initialPage = nil
+            return []
         }
-        
-        guard let doc = HttpClient.contentsOfPage("https://t-square.gatech.edu/portal/pda/") else { return [] }
         
         var classes: [Class] = []
         var saveLinksAsClasses: Bool = false
@@ -81,10 +82,6 @@ class TSReader {
     
     var allClasses: [Class]?
     func getAllClasses() -> [Class] {
-        
-        if let allClasses = allClasses {
-            return allClasses
-        }
         
         guard let doc = HttpClient.contentsOfPage("https://t-square.gatech.edu/portal/pda/") else { return classes ?? [] }
         
@@ -179,6 +176,7 @@ class TSReader {
     }
     
     func getResourceRootForClass(currentClass: Class) -> ResourceFolder? {
+        
         if let root = currentClass.rootResource {
             return root
         }
@@ -196,10 +194,6 @@ class TSReader {
     }
     
     func getResourcesInFolder(folder: ResourceFolder) -> [Resource] {
-        if let resources = folder.resourcesInFolder {
-            return resources
-        }
-        
         var resources: [Resource] = []
         //load resources if they haven't been already
         guard let resourcesPage = HttpClient.getPageForResourceFolder(folder) else { return resources }
@@ -238,10 +232,6 @@ class TSReader {
     }
     
     func getAssignmentsForClass(currentClass: Class) -> [Assignment] {
-        if let assignments = currentClass.assignments {
-            return assignments
-        }
-        
         guard let classPage = currentClass.getClassPage() else { return [] }
         
         var assignments: [Assignment] = []

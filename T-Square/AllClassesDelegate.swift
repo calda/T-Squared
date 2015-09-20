@@ -63,8 +63,8 @@ class AllClassesDelegate : NSObject, StackableTableDelegate {
         self.allClasses = TSAuthenticatedReader.getAllClasses()
     }
     
-    func clearCachedData() {
-        TSAuthenticatedReader.allClasses = nil
+    func loadCachedData() {
+        self.allClasses = TSAuthenticatedReader.allClasses ?? []
     }
     
     func isFirstLoad() -> Bool {

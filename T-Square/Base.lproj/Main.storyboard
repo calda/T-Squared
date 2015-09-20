@@ -813,11 +813,17 @@
                                                         <action selector="backButtonPressed:" destination="hGp-PN-xBo" eventType="touchUpInside" id="Mei-5p-Q6o"/>
                                                     </connections>
                                                 </button>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="Xss-XU-dV6">
+                                                    <rect key="frame" x="282" y="15" width="20" height="20"/>
+                                                    <animations/>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <animations/>
                                             <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
                                             <constraints>
+                                                <constraint firstItem="Xss-XU-dV6" firstAttribute="trailing" secondItem="Yri-7X-Prc" secondAttribute="trailingMargin" constant="-10" id="8Vw-fM-V6z"/>
                                                 <constraint firstAttribute="bottom" secondItem="6gv-6P-dCD" secondAttribute="bottom" id="Jwl-uB-4VH"/>
+                                                <constraint firstItem="Xss-XU-dV6" firstAttribute="centerY" secondItem="Yri-7X-Prc" secondAttribute="centerY" id="PpF-bn-MXX"/>
                                                 <constraint firstItem="0Z6-EC-d4t" firstAttribute="top" secondItem="Yri-7X-Prc" secondAttribute="topMargin" id="chC-8L-hpK"/>
                                                 <constraint firstItem="0Z6-EC-d4t" firstAttribute="leading" secondItem="Yri-7X-Prc" secondAttribute="leadingMargin" id="e2f-hC-grX"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="0Z6-EC-d4t" secondAttribute="bottom" id="hNf-yW-MH9"/>
@@ -827,6 +833,9 @@
                                         </tableViewCellContentView>
                                         <animations/>
                                         <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        <connections>
+                                            <outlet property="activityIndicator" destination="Xss-XU-dV6" id="MjL-lc-c8o"/>
+                                        </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcementTitle" rowHeight="60" id="ucQ-Pd-FWI" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="622" width="320" height="60"/>

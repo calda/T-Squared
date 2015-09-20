@@ -48,7 +48,6 @@ class Announcement : CustomStringConvertible {
             if let page = HttpClient.contentsOfPage(self.link) {
                 
                 if !page.toHTML!.containsString("<p>") {
-                    print("reloading message")
                     self.loadMessage(completion)
                 }
                 else {

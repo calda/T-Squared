@@ -272,28 +272,26 @@ class LoginViewController: UIViewController {
     
     //logout from gatech login service and trash saved passwords
     func logout() {
-        logout(false)
-    }
-    
-    func logout(confirmed: Bool) {
-        
-        if confirmed {
-            let alert = UIAlertController(title: "You have been logged out.", message: "T-Squared will now exit. Open the app again to log in with a different account.", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: { _ in
-                self.usernameField.text = ""
-                self.passwordField.text = ""
-                self.setSavedCredentials(correct: false)
-                HttpClient.sendLogoutRequest()
-            }))
-            self.presentViewController(alert, animated: true, completion: nil)
-            return
+        NSURLCache.sharedURLCache().removeAllCachedResponses()
+        let cookies = NSHTTPCookieStorage.sharedHTTPCookieStorage()
+        for cookie in (cookies.cookies ?? []) {
+            cookies.deleteCookie(cookie)
         }
         
-        let alert = UIAlertController(title: "Logout from T-Squared?", message: "Your username and password will be forgotten.", preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
-        alert.addAction(UIAlertAction(title: "Logout", style: .Default, handler: { _ in self.logout(true) }))
-        self.presentViewController(alert, animated: true, completion: nil)
+        HttpClient.sessionID = nil
+        HttpClient.authFormPost = nil
+        HttpClient.authLTPost = nil
         
+        self.usernameField.text = ""
+        self.passwordField.text = ""    
+        self.setSavedCredentials(correct: false)
+        
+        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+            self.formView.alpha = 1.0
+            self.formView.transform = CGAffineTransformMakeScale(1.0, 1.0)
+            self.containerLeading.constant = self.view.frame.width
+            self.view.layoutIfNeeded()
+        }, completion: nil)
     }
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {

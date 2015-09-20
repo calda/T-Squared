@@ -234,7 +234,6 @@ func linksInText(string: String) -> [(text: String, range: NSRange)] {
             var wordEnd = idRange.location + idRange.length
             
             while ("\(text.stringAtIndex(wordEnd))" != " ") && (wordEnd != text.length - 2) {
-                print(text.stringAtIndex(wordEnd))
                 wordEnd++;
             }
             
@@ -476,8 +475,8 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
     func processSelectedCell(index: NSIndexPath)
     func canHighlightCell(index: NSIndexPath) -> Bool
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool)
+    func loadCachedData()
     func loadData()
-    func clearCachedData()
     func isFirstLoad() -> Bool
     optional func getTitle() -> String
     optional func getBackButtonImage() -> UIImage
@@ -597,11 +596,24 @@ extension UITableViewCell {
     }
 }
 
+extension String {
+    
+    var length: Int {
+        return (self as NSString).length
+    }
+    
+}
+
 extension NSString {
     
     func stringAtIndex(index: Int) -> String {
         let char = self.characterAtIndex(index)
         return "\(Character(UnicodeScalar(char)))"
+    }
+    
+    func countOccurancesOfString(string: String) -> Int {
+        let strCount = self.length - self.stringByReplacingOccurrencesOfString(string, withString: "").length
+        return strCount / string.length
     }
     
 }

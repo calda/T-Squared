@@ -176,7 +176,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
         return
     }
     
-    func clearCachedData() {
+    func loadCachedData() {
         return
     }
     

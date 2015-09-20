@@ -29,9 +29,9 @@ class HttpClient {
         self.session = NSURLSession(configuration: config)
         NSURLCache.setSharedURLCache(NSURLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil))
         
-        session.configuration.HTTPShouldSetCookies = false
-        session.configuration.HTTPCookieAcceptPolicy = NSHTTPCookieAcceptPolicy.OnlyFromMainDocumentDomain
-        session.configuration.HTTPCookieStorage?.cookieAcceptPolicy = NSHTTPCookieAcceptPolicy.OnlyFromMainDocumentDomain
+        session.configuration.HTTPShouldSetCookies = true
+        session.configuration.HTTPCookieAcceptPolicy = NSHTTPCookieAcceptPolicy.Always
+        session.configuration.HTTPCookieStorage?.cookieAcceptPolicy = NSHTTPCookieAcceptPolicy.Always
         session.configuration.requestCachePolicy = .ReloadIgnoringLocalCacheData
     }
     
@@ -92,7 +92,7 @@ class HttpClient {
         request.HTTPMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.HTTPBody = params.dataUsingEncoding(NSASCIIStringEncoding, allowLossyConversion: false)
-        request.HTTPShouldHandleCookies = true
+        //request.HTTPShouldHandleCookies = true
         
         while !stopTrying && !ready {
             
@@ -133,7 +133,6 @@ class HttpClient {
     }
     
     //MARK: - Pulling data from the page
-    
     static var sessionID: String?
     static var authFormPost: String?
     static var authLTPost: String?
@@ -157,7 +156,9 @@ class HttpClient {
         return info
     }
     
-    static func authenticateWithUsername(user: String, password: String, completion: (Bool) -> ()) {
+    static var previous: String?
+    
+    static func authenticateWithUsername(user: String, password: String, completion: (Bool, HTMLDocument?) -> ()) {
         var didCompletion = false
         
         //request the login page
@@ -170,13 +171,10 @@ class HttpClient {
         
         defer {
             if !didCompletion {
-                print("login failed, already logged in I think?")
-                sync() { completion(true) }
+                sync() { completion(true, nil) }
             }
         }
         
-        //print(loginScreen)
-        //parse a jsessionid
         var formPost: String
         var LT: String
         
@@ -204,23 +202,21 @@ class HttpClient {
             return
         }
         
+        //send HTTP POST for login
         let loginClient = HttpClient(url: "https://login.gatech.edu/\(formPost)")
         guard let response = loginClient.sendPost("warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)") else {
             NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
             return
         }
-        //print("warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)")
-        //print("to https://login.gatech.edu/\(formPost)")
-        
         
         if response.containsString("Incorrect login or disabled account.") || response.containsString("Login requested by:") {
             didCompletion = true
             HttpClient.sessionID = HttpClient.getInfoFromPage(formPost, infoSearch: "jsessionid=", terminator: "?")
-            sync() { completion(false) }
+            sync() { completion(false, nil) }
         }
         else {
             didCompletion = true
-            sync() { completion(true) }
+            sync() { completion(true, HTML(html: response, encoding: NSUTF8StringEncoding)) }
         }
     }
     

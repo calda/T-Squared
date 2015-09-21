@@ -81,7 +81,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Open in Safari", hideSeparator: true), onTap: { controller, displayClass in
             
             let link = displayClass.link
-            controller.openLinkInSafari(link)
+            controller.openLinkInSafari(link, title: displayClass.name)
             
         }),
         (identifier: "blank", onDisplay: hideSeparator, onTap: nil)

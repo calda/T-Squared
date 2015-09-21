@@ -187,6 +187,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func doneLoadingAnnoucements() {
+        NSNotificationCenter.defaultCenter().postNotificationName(TSSetActivityIndicatorVisibleNotification, object: false)
         loadingAnnouncements = false
         reloadTable()
     }
@@ -504,27 +505,34 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let alert = UIAlertController(title: "Open link in Safari?", message: "There are multiple links in this message. Which would you like to open?", preferredStyle: .Alert)
         for link in links {
             alert.addAction(UIAlertAction(title: websiteForLink(link) + "/...", style: .Default, handler: { _ in
-                self.openLinkInSafari(link)
+                self.openLinkInSafari(link, title: websiteForLink(link))
             }))
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
-    func openLinkInSafari(link: String) {
-        guard let url = NSURL(string: link) else {
+    func openLinkInSafari(link: String, title: String) {
+        guard let _ = NSURL(string: link) else {
             let alert = UIAlertController(title: "Could not open link.", message: "We had a problem opening that link. (\(link))", preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
             return
         }
         
-        if #available(iOS 9.0, *) {
+        let webView = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("web") as! TSWebView
+        self.presentViewController(webView, animated: true, completion: {
+            webView.titleLabel.text = title
+            webView.openLink(link)
+        })
+        
+        
+        /*if #available(iOS 9.0, *) {
             let safari = SFSafariViewController(URL: url)
             self.presentViewController(safari, animated: true, completion: nil)
         } else {
             UIApplication.sharedApplication().openURL(url)
-        }
+        }*/
     }
     
     func setActivityIndicatorVisible(visible: Bool) {

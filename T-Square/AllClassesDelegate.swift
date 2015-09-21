@@ -80,7 +80,7 @@ class AllClassesDelegate : NSObject, StackableTableDelegate {
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
-        return index.item != 0 && index.item != 1 && (allClasses.count == 0 ? index.item != 2 : true)
+        return index.item != 0 && index.item != 1 && index.item != 2 && (allClasses.count == 0 ? index.item != 3 : true)
     }
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {

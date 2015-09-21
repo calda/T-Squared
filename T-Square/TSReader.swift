@@ -66,7 +66,7 @@ class TSReader {
                     //show the short-form name unless there would be duplicates
                     let newClass = Class(fromElement: link)
                     for otherClass in classes {
-                        if newClass.name == otherClass.name {
+                        if otherClass.name.hasPrefix(newClass.name) {
                             newClass.useSectionName()
                             otherClass.useSectionName()
                         }
@@ -89,7 +89,7 @@ class TSReader {
             if workspaceLink["title"] != "My Workspace" { continue }
             let workspaceURL = workspaceLink["href"]!
             guard let workspace = HttpClient.contentsOfPage(workspaceURL) else { return classes ?? [] }
-            
+            print(workspace.toHTML)
             for worksiteLink in workspace.css("a, link") {
                 if worksiteLink["title"] != "Worksite Setup" { continue }
                 let worksiteURL = worksiteLink["href"]!
@@ -108,7 +108,7 @@ class TSReader {
                     //show the short-form name unless there would be duplicates
                     let newClass = Class(fromElement: classLink)
                     for otherClass in allClasses {
-                        if newClass.name == otherClass.name {
+                        if otherClass.name.hasPrefix(newClass.name) {
                             newClass.useSectionName()
                             otherClass.useSectionName()
                         }

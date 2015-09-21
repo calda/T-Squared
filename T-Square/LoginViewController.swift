@@ -272,6 +272,8 @@ class LoginViewController: UIViewController {
     
     //logout from gatech login service and trash saved passwords
     func logout() {
+        self.classesViewController.announcements = []
+        self.classesViewController.classes = nil
         NSURLCache.sharedURLCache().removeAllCachedResponses()
         let cookies = NSHTTPCookieStorage.sharedHTTPCookieStorage()
         for cookie in (cookies.cookies ?? []) {
@@ -281,6 +283,7 @@ class LoginViewController: UIViewController {
         HttpClient.sessionID = nil
         HttpClient.authFormPost = nil
         HttpClient.authLTPost = nil
+        TSAuthenticatedReader = nil
         
         self.usernameField.text = ""
         self.passwordField.text = ""    

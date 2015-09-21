@@ -68,12 +68,14 @@ class TitleCell : UITableViewCell {
     
 }
 
-class TitleWithButtonCell : TitleCell {
+class TitleWithButtonCell : BackCell {
+    
     
     @IBOutlet weak var button: UILabel!
+    @IBOutlet weak var titleLabel: UILabel!
     
     func decorate(text: String, buttonText: String) {
-        decorate(text)
+        titleLabel.text = text
         button.text = buttonText
     }
     
@@ -147,7 +149,9 @@ class BackCell : UITableViewCell {
         activityIndicator.startAnimating()
         
         if let visible = notification.object as? Bool {
-            activityIndicator.alpha = visible ? 1.0 : 0.0
+            UIView.animateWithDuration(0.3, animations: {
+                self.activityIndicator.alpha = visible ? 1.0 : 0.0
+            })
         }
     }
     

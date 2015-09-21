@@ -31,6 +31,7 @@
 		2E8E4CCF1B9A6BD800D62A2E /* ResourcesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8E4CCE1B9A6BD800D62A2E /* ResourcesDelegate.swift */; settings = {ASSET_TAGS = (); }; };
 		2E9A2D8A1BA6592200E93BA0 /* AssignmentDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9A2D891BA6592200E93BA0 /* AssignmentDelegate.swift */; settings = {ASSET_TAGS = (); }; };
 		2ED1E8C41BA90EC2007F1A90 /* AllClassesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */; settings = {ASSET_TAGS = (); }; };
+		2EFA126A1BAE6F48007510A0 /* TSWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFA12691BAE6F48007510A0 /* TSWebView.swift */; settings = {ASSET_TAGS = (); }; };
 		373101B7C0015F93AB0201EE /* Pods_T_Square.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 578C2BFFE673C532D8ADDCF6 /* Pods_T_Square.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -85,6 +86,7 @@
 		2E8E4CCE1B9A6BD800D62A2E /* ResourcesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourcesDelegate.swift; sourceTree = "<group>"; };
 		2E9A2D891BA6592200E93BA0 /* AssignmentDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssignmentDelegate.swift; sourceTree = "<group>"; };
 		2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllClassesDelegate.swift; sourceTree = "<group>"; };
+		2EFA12691BAE6F48007510A0 /* TSWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSWebView.swift; sourceTree = "<group>"; };
 		50300C8C5BD5B54F8EDFA4E2 /* Pods-T-Square.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-T-Square.release.xcconfig"; path = "Pods/Target Support Files/Pods-T-Square/Pods-T-Square.release.xcconfig"; sourceTree = "<group>"; };
 		578C2BFFE673C532D8ADDCF6 /* Pods_T_Square.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_T_Square.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA8169D999B5C2627FC2CE0 /* Pods-T-Square.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-T-Square.debug.xcconfig"; path = "Pods/Target Support Files/Pods-T-Square/Pods-T-Square.debug.xcconfig"; sourceTree = "<group>"; };
@@ -151,6 +153,7 @@
 				2E7C6F6B1B8E6DDE00E95183 /* Info.plist */,
 				2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */,
 				2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */,
+				2EFA12691BAE6F48007510A0 /* TSWebView.swift */,
 				2E1A63431B9696A7002D7632 /* TableViewCells.swift */,
 				2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */,
 				2E3C4E3B1B99447C00DD0B6B /* ClassDelegate.swift */,
@@ -395,6 +398,7 @@
 				2E3C4E3C1B99447C00DD0B6B /* ClassDelegate.swift in Sources */,
 				2E4207BD1B8FBA27002B79E6 /* TSReader.swift in Sources */,
 				2E8244821B9A517500236B60 /* Resource.swift in Sources */,
+				2EFA126A1BAE6F48007510A0 /* TSWebView.swift in Sources */,
 				2E4207D61B9009F8002B79E6 /* ClassesViewController.swift in Sources */,
 				2E8AFE071B92DF5700DE7E28 /* AnouncementDelegate.swift in Sources */,
 			);

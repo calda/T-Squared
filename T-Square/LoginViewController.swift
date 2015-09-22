@@ -13,6 +13,7 @@ let TSUsernamePath = "edu.gatech.cal.username"
 let TSPasswordPath = "edu.gatech.cal.password"
 var TSAuthenticatedReader: TSReader!
 let TSLogoutNotification = "edu.gatech.cal.logout"
+let TSDismissWebViewNotification = "edu.gatech.cal.dismissWeb"
 
 class LoginViewController: UIViewController {
 
@@ -27,15 +28,20 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var saveCredentialsSwitch: UISwitch!
     @IBOutlet weak var containerLeading: NSLayoutConstraint!
+    @IBOutlet weak var webViewTop: NSLayoutConstraint!
     @IBOutlet var tapRecognizer: UITapGestureRecognizer!
     
     var classesViewController: ClassesViewController!
+    var browserViewController: TSWebView!
+    @IBOutlet var activityCircle: UIView!
     
     //MARK: - Preparing the View Controller
     override func viewWillAppear(animated: Bool) {
         if animated { return }
+        if TSAuthenticatedReader != nil { return } //we're already authenticated
         
         self.formCenter.constant = self.view.frame.height / 2.0
+        self.webViewTop.constant = UIScreen.mainScreen().bounds.height
         self.containerLeading.constant = UIScreen.mainScreen().bounds.width
         self.view.layoutIfNeeded()
         
@@ -55,12 +61,22 @@ class LoginViewController: UIViewController {
         }, completion: nil)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "logout", name: TSLogoutNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "dismissWebView", name: TSDismissWebViewNotification, object: nil)
         
+        activityCircle.hidden = false
+        activityCircle.layer.cornerRadius = 25.0
+        activityCircle.layer.masksToBounds = true
+        activityCircle.transform = CGAffineTransformMakeScale(0.0, 0.0)
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let classes = segue.destinationViewController as? ClassesViewController {
+            classes.loginController = self
             classesViewController = classes
+        }
+        if let browser = segue.destinationViewController as? TSWebView {
+            browser.loginController = self
+            self.browserViewController = browser
         }
     }
     
@@ -304,6 +320,47 @@ class LoginViewController: UIViewController {
             self.containerLeading.constant = self.view.frame.width
             self.view.layoutIfNeeded()
         }
+    }
+    
+    //MARK: - Methods that shouldn't be in this View Controller
+    
+    func setActivityCircleVisible(visible: Bool) {
+        let scale: CGFloat = visible ? 1.0 : 0.1
+        let transform = CGAffineTransformMakeScale(scale, scale)
+        
+        UIView.animateWithDuration(visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+            self.activityCircle.transform = transform
+            self.activityCircle.alpha = visible ? 1.0 : 0.0
+        }, completion: nil)
+    }
+    
+    var webViewVisible = false
+    
+    override func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return webViewVisible ? .LightContent : .Default
+    }
+    
+    func presentWebViewWithURL(URL: NSURL, title: String) {
+        webViewVisible = true
+        
+        browserViewController.openLink("\(URL)")
+        browserViewController.previousURL = nil
+        browserViewController.titleLabel.text = title
+        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
+            self.webViewTop.constant = 0.0
+            self.setNeedsStatusBarAppearanceUpdate()
+            self.view.layoutIfNeeded()
+        }, completion: nil)
+    }
+    
+    func dismissWebView() {
+        webViewVisible = false
+        
+        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
+            self.webViewTop.constant = self.view.frame.height
+            self.view.layoutIfNeeded()
+            self.setNeedsStatusBarAppearanceUpdate()
+        }, completion: nil)
     }
     
     

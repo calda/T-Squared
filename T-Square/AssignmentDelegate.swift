@@ -99,7 +99,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
                 return cell
             }
         }
-        else { //if indexPath.section == 3
+        else if indexPath.section == 3 {
             if indexPath.item == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle")! as! TitleCell
                 cell.decorate("Feedback")
@@ -115,6 +115,14 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
                 return cell
             }
         }
+        else { //if section ==
+            if indexPath.item == 0 {
+                return tableView.dequeueReusableCellWithIdentifier("blank")!
+            }
+            let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle") as! TitleCell
+            cell.decorate("Submit Assignment")
+            return cell
+        }
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -122,14 +130,19 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         else if section == 1 { return assignment.attachments == nil ? 0 : assignment.attachments!.count + (assignment.submissions != nil ? 1 : 0) }
         else if section == 2 { return assignment.submissions == nil ? 0 : assignment.submissions!.count + 2 }
         else if section == 3 { return assignment.feedback != nil ? 3 : 0 }
+        else if section == 4 { return !assignment.completed ? 2 : 0 }
         else { return 0 }
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 4
+        return 5
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if indexPath.section == 4 && indexPath.item == 0 {
+            return 20.0
+        }
+        
         if indexPath.section == 0 {
             let identifier = cells[indexPath.item].identifier
             if identifier == "blank" { return heightForBlankCellAtIndexPath(indexPath) }
@@ -204,7 +217,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
-        return index.section == 1 && index.item != 0
+        return (index.section == 1 && index.item != 0) || (index.section == 4 && index.item == 1 )
     }
     
     func processSelectedCell(index: NSIndexPath) {
@@ -222,6 +235,16 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
                     }
                 }
             }
+            return
+        }
+        
+        if index.section == 4 && index.item != 0 {
+            let link = assignment.link
+            controller.openLinkInSafari(link, title: "Assignment")
+            delay(0.1) {
+                self.controller.loginController.browserViewController.scrollToBottomWhenDoneLoading = true
+            }
+            return
         }
         
         var attachment: Attachment?
@@ -239,7 +262,11 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
     }
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
-        
+        if indexPath.section == 4 {
+            UIView.animateWithDuration(0.3, animations: {
+                cell.backgroundColor = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
+            })
+        }
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {

@@ -20,7 +20,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="login-background" translatesAutoresizingMaskIntoConstraints="NO" id="K8h-DM-YzJ">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background-gradient" translatesAutoresizingMaskIntoConstraints="NO" id="K8h-DM-YzJ">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <animations/>
                                 <gestureRecognizers/>
@@ -226,7 +226,7 @@
                                 <rect key="frame" x="150" y="314" width="20" height="20"/>
                                 <animations/>
                             </activityIndicatorView>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="edV-RZ-61l">
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="edV-RZ-61l" userLabel="table container">
                                 <rect key="frame" x="320" y="20" width="0.0" height="548"/>
                                 <animations/>
                                 <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -247,6 +247,37 @@
                                 </constraints>
                                 <blurEffect style="extraLight"/>
                             </visualEffectView>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rq9-mh-oAo" userLabel="web container">
+                                <rect key="frame" x="0.0" y="568" width="320" height="568"/>
+                                <animations/>
+                                <connections>
+                                    <segue destination="daH-DB-cHY" kind="embed" id="bTz-5V-soB"/>
+                                </connections>
+                            </containerView>
+                            <visualEffectView hidden="YES" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VHC-cA-FmW" userLabel="activityIndicator">
+                                <rect key="frame" x="135" y="259" width="50" height="50"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="KiB-x5-8NX">
+                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="Kwh-Au-aSY">
+                                            <rect key="frame" x="7" y="6" width="37" height="37"/>
+                                            <animations/>
+                                        </activityIndicatorView>
+                                    </subviews>
+                                    <animations/>
+                                    <constraints>
+                                        <constraint firstItem="Kwh-Au-aSY" firstAttribute="centerX" secondItem="KiB-x5-8NX" secondAttribute="centerX" id="lOS-YE-RND"/>
+                                        <constraint firstItem="Kwh-Au-aSY" firstAttribute="centerY" secondItem="KiB-x5-8NX" secondAttribute="centerY" id="lfP-pH-mLy"/>
+                                    </constraints>
+                                </view>
+                                <animations/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="6iz-Th-4gt"/>
+                                    <constraint firstAttribute="height" constant="50" id="zyh-RB-eMS"/>
+                                </constraints>
+                                <blurEffect style="dark"/>
+                            </visualEffectView>
                         </subviews>
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -263,22 +294,28 @@
                             <constraint firstItem="e8A-wz-lHq" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="G6P-9k-cal"/>
                             <constraint firstItem="vYZ-N3-Uvn" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" id="GfY-SX-0Q0"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="vYZ-N3-Uvn" secondAttribute="bottom" id="Hbf-0e-a7t"/>
+                            <constraint firstItem="Rq9-mh-oAo" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="JEK-pn-YbV"/>
                             <constraint firstItem="edV-RZ-61l" firstAttribute="leading" secondItem="K8h-DM-YzJ" secondAttribute="trailing" id="Mqn-Ly-CWR"/>
                             <constraint firstItem="K8h-DM-YzJ" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="QTt-MW-sU0"/>
                             <constraint firstItem="4BH-Ta-NeK" firstAttribute="centerY" secondItem="Rgs-6b-9hv" secondAttribute="centerY" constant="50" id="QpA-Fm-4Ef"/>
                             <constraint firstItem="vYZ-N3-Uvn" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="SGH-a6-5tk"/>
+                            <constraint firstItem="VHC-cA-FmW" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="WuE-fc-6Bz"/>
                             <constraint firstAttribute="trailing" secondItem="e8A-wz-lHq" secondAttribute="trailing" id="Ycd-Ll-jlr"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="K8h-DM-YzJ" secondAttribute="bottom" id="Z3m-qW-Nwc"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Rgs-6b-9hv" secondAttribute="bottom" id="aZF-Jb-ki0"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="edV-RZ-61l" secondAttribute="bottom" id="cby-Hf-dqC"/>
                             <constraint firstItem="qBw-DU-fj0" firstAttribute="top" secondItem="K8h-DM-YzJ" secondAttribute="top" id="dtj-aM-AbF"/>
                             <constraint firstItem="vYZ-N3-Uvn" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="gb8-Gm-YrH"/>
+                            <constraint firstItem="Rq9-mh-oAo" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="568" id="gmh-eV-U9l"/>
                             <constraint firstItem="Rgs-6b-9hv" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="-10" id="gzL-Rd-BFK"/>
                             <constraint firstItem="qBw-DU-fj0" firstAttribute="trailing" secondItem="K8h-DM-YzJ" secondAttribute="trailing" id="hIv-xA-HGY"/>
                             <constraint firstItem="Rgs-6b-9hv" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="jEJ-0w-Uy6"/>
+                            <constraint firstItem="VHC-cA-FmW" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="k6d-jk-3Kf"/>
                             <constraint firstItem="qBw-DU-fj0" firstAttribute="leading" secondItem="K8h-DM-YzJ" secondAttribute="leading" id="kbN-jV-Yj7"/>
                             <constraint firstAttribute="trailing" secondItem="Rgs-6b-9hv" secondAttribute="trailing" id="lpb-xI-xdB"/>
+                            <constraint firstItem="Rq9-mh-oAo" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" id="mbL-vA-KQ3"/>
                             <constraint firstItem="edV-RZ-61l" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" symbolic="YES" id="xd6-Oe-bjY"/>
+                            <constraint firstItem="Rq9-mh-oAo" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="yHG-fd-0Zv"/>
                             <constraint firstItem="K8h-DM-YzJ" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="yUM-S5-TwW"/>
                             <constraint firstItem="qBw-DU-fj0" firstAttribute="bottom" secondItem="K8h-DM-YzJ" secondAttribute="bottom" id="yYz-x4-ScN"/>
                         </constraints>
@@ -299,6 +336,7 @@
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="lightContent"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                     <connections>
+                        <outlet property="activityCircle" destination="VHC-cA-FmW" id="MZw-g8-GO4"/>
                         <outlet property="activityIndicator" destination="4BH-Ta-NeK" id="3zo-W1-8g9"/>
                         <outlet property="backgroundBottom" destination="Hbf-0e-a7t" id="S67-Cd-HgG"/>
                         <outlet property="containerLeading" destination="Cl6-dh-2K3" id="FeT-VM-Ttm"/>
@@ -310,6 +348,7 @@
                         <outlet property="saveCredentialsSwitch" destination="xua-q3-Lrm" id="PA6-N5-fDv"/>
                         <outlet property="tapRecognizer" destination="DxF-28-en0" id="jUs-mp-jn2"/>
                         <outlet property="usernameField" destination="Bsz-tm-zDl" id="9aN-zi-4Z1"/>
+                        <outlet property="webViewTop" destination="gmh-eV-U9l" id="FCP-dO-nqb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -619,7 +658,7 @@
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x6Z-WU-GJN">
                                                     <rect key="frame" x="0.0" y="9" width="320" height="30"/>
                                                     <animations/>
-                                                    <color key="backgroundColor" red="0.086274509803921567" green="0.30980392156862746" blue="0.52549019607843139" alpha="0.71892755679999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="backgroundColor" red="0.086274509799999996" green="0.30980392159999998" blue="0.52549019610000003" alpha="0.85486949570000004" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="16z-6w-nnW"/>
                                                     </constraints>
@@ -658,7 +697,7 @@
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dDG-nE-nxo">
                                                     <rect key="frame" x="0.0" y="9" width="320" height="30"/>
                                                     <animations/>
-                                                    <color key="backgroundColor" red="0.086274509799999996" green="0.30980392159999998" blue="0.52549019610000003" alpha="0.71892755679999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="backgroundColor" red="0.086274509799999996" green="0.30980392159999998" blue="0.52549019610000003" alpha="0.85486949570000004" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="Syv-dS-lsX"/>
                                                     </constraints>
@@ -1150,35 +1189,10 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                     <outletCollection property="gestureRecognizers" destination="V0D-HW-DNa" appends="YES" id="F86-l2-w1v"/>
                                 </connections>
                             </tableView>
-                            <visualEffectView hidden="YES" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VHC-cA-FmW" userLabel="activityIndicator">
-                                <rect key="frame" x="135" y="259" width="50" height="50"/>
-                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="KiB-x5-8NX">
-                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="Kwh-Au-aSY">
-                                            <rect key="frame" x="7" y="6" width="37" height="37"/>
-                                            <animations/>
-                                        </activityIndicatorView>
-                                    </subviews>
-                                    <animations/>
-                                    <constraints>
-                                        <constraint firstItem="Kwh-Au-aSY" firstAttribute="centerX" secondItem="KiB-x5-8NX" secondAttribute="centerX" id="lOS-YE-RND"/>
-                                        <constraint firstItem="Kwh-Au-aSY" firstAttribute="centerY" secondItem="KiB-x5-8NX" secondAttribute="centerY" id="lfP-pH-mLy"/>
-                                    </constraints>
-                                </view>
-                                <animations/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="50" id="6iz-Th-4gt"/>
-                                    <constraint firstAttribute="height" constant="50" id="zyh-RB-eMS"/>
-                                </constraints>
-                                <blurEffect style="dark"/>
-                            </visualEffectView>
                         </subviews>
                         <animations/>
-                        <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.086274509799999996" green="0.30980392159999998" blue="0.52549019610000003" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="VHC-cA-FmW" firstAttribute="centerX" secondItem="dQK-sp-grQ" secondAttribute="centerX" id="3id-n6-5W9"/>
                             <constraint firstItem="8tg-3g-bcL" firstAttribute="top" secondItem="51g-sT-9eN" secondAttribute="bottom" id="4zT-ie-FI2"/>
                             <constraint firstItem="TjS-JT-ILn" firstAttribute="leading" secondItem="dQK-sp-grQ" secondAttribute="leading" id="DJ7-0d-2PG"/>
                             <constraint firstItem="7bg-uP-HRH" firstAttribute="top" secondItem="inq-AA-zwf" secondAttribute="bottom" id="E8b-bY-GIK"/>
@@ -1196,7 +1210,6 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                             <constraint firstAttribute="trailing" secondItem="51g-sT-9eN" secondAttribute="trailing" id="btI-8C-iq6"/>
                             <constraint firstItem="51g-sT-9eN" firstAttribute="height" secondItem="dQK-sp-grQ" secondAttribute="height" id="dkf-9o-VHf"/>
                             <constraint firstItem="51g-sT-9eN" firstAttribute="leading" secondItem="dQK-sp-grQ" secondAttribute="leading" id="iZO-xo-ukq"/>
-                            <constraint firstItem="VHC-cA-FmW" firstAttribute="centerY" secondItem="dQK-sp-grQ" secondAttribute="centerY" id="p8X-x2-aO2"/>
                             <constraint firstItem="7bg-uP-HRH" firstAttribute="top" secondItem="dQK-sp-grQ" secondAttribute="topMargin" id="paP-US-Ph7"/>
                             <constraint firstItem="8tg-3g-bcL" firstAttribute="top" secondItem="7bg-uP-HRH" secondAttribute="bottom" id="pes-9L-Crz"/>
                             <constraint firstAttribute="trailing" secondItem="7bg-uP-HRH" secondAttribute="trailing" id="pwx-WE-m82"/>
@@ -1271,6 +1284,13 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                             <action selector="exitWebView:" destination="daH-DB-cHY" eventType="touchUpInside" id="dra-gI-bMF"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="D6C-bM-HTL" userLabel="back-extra">
+                                        <rect key="frame" x="72" y="23" width="45" height="45"/>
+                                        <animations/>
+                                        <connections>
+                                            <action selector="backPressed:" destination="daH-DB-cHY" eventType="touchUpInside" id="RFx-gV-blv"/>
+                                        </connections>
+                                    </button>
                                     <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kMV-Ac-vgi" userLabel="back">
                                         <rect key="frame" x="82" y="33" width="25" height="25"/>
                                         <animations/>
@@ -1281,6 +1301,13 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         <state key="normal" image="button-web-back"/>
                                         <connections>
                                             <action selector="backPressed:" destination="daH-DB-cHY" eventType="touchUpInside" id="0Pl-mK-T4C"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IGK-Ly-8Se" userLabel="refrsh-exta">
+                                        <rect key="frame" x="270" y="20" width="50" height="50"/>
+                                        <animations/>
+                                        <connections>
+                                            <action selector="refresh:" destination="daH-DB-cHY" eventType="touchUpInside" id="ees-1z-L0u"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HKN-6H-g43" userLabel="refresh">
@@ -1302,6 +1329,13 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2yb-3r-LjU" userLabel="forward-extra">
+                                        <rect key="frame" x="203" y="22" width="45" height="45"/>
+                                        <animations/>
+                                        <connections>
+                                            <action selector="forwardPressed:" destination="daH-DB-cHY" eventType="touchUpInside" id="ujs-eN-7BY"/>
+                                        </connections>
+                                    </button>
                                     <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YqV-Pa-AFR" userLabel="forward">
                                         <rect key="frame" x="213" y="32" width="25" height="25"/>
                                         <animations/>
@@ -1319,30 +1353,54 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                 <color key="backgroundColor" red="0.086274509799999996" green="0.30980392159999998" blue="0.52549019610000003" alpha="0.85486949573863635" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="IR1-Fe-BEC" firstAttribute="centerY" secondItem="XNP-6A-BDU" secondAttribute="centerY" constant="10" id="1d4-Oy-xDf"/>
+                                    <constraint firstItem="D6C-bM-HTL" firstAttribute="leading" secondItem="kMV-Ac-vgi" secondAttribute="leading" constant="-10" id="3bi-ht-gOX"/>
                                     <constraint firstItem="kMV-Ac-vgi" firstAttribute="centerY" secondItem="IR1-Fe-BEC" secondAttribute="centerY" id="3iU-db-ZAq"/>
+                                    <constraint firstItem="2yb-3r-LjU" firstAttribute="top" secondItem="YqV-Pa-AFR" secondAttribute="top" constant="-10" id="7ti-tm-k3x"/>
                                     <constraint firstItem="IR1-Fe-BEC" firstAttribute="width" relation="lessThanOrEqual" secondItem="XNP-6A-BDU" secondAttribute="width" constant="-200" id="Dsr-vr-2P5"/>
+                                    <constraint firstItem="IGK-Ly-8Se" firstAttribute="trailing" secondItem="HKN-6H-g43" secondAttribute="trailing" constant="10" id="EuK-8I-lk8"/>
                                     <constraint firstAttribute="trailing" secondItem="HKN-6H-g43" secondAttribute="trailing" constant="10" id="GAN-mV-71T"/>
+                                    <constraint firstItem="D6C-bM-HTL" firstAttribute="trailing" secondItem="kMV-Ac-vgi" secondAttribute="trailing" constant="10" id="Gbk-kL-YWu"/>
+                                    <constraint firstItem="2yb-3r-LjU" firstAttribute="bottom" secondItem="YqV-Pa-AFR" secondAttribute="bottom" constant="10" id="O6G-zh-Wvw"/>
+                                    <constraint firstItem="IGK-Ly-8Se" firstAttribute="bottom" secondItem="HKN-6H-g43" secondAttribute="bottom" constant="10" id="PTd-e2-Kij"/>
                                     <constraint firstItem="YqV-Pa-AFR" firstAttribute="leading" secondItem="IR1-Fe-BEC" secondAttribute="trailing" constant="4" id="Srb-Tp-TKt"/>
                                     <constraint firstAttribute="bottom" secondItem="Msh-6m-hR8" secondAttribute="bottom" constant="10" id="UuO-qc-VMz"/>
                                     <constraint firstItem="IR1-Fe-BEC" firstAttribute="leading" secondItem="kMV-Ac-vgi" secondAttribute="trailing" constant="4" id="Uzh-00-KYA"/>
+                                    <constraint firstItem="D6C-bM-HTL" firstAttribute="bottom" secondItem="kMV-Ac-vgi" secondAttribute="bottom" constant="10" id="WQv-HJ-tUj"/>
+                                    <constraint firstItem="2yb-3r-LjU" firstAttribute="trailing" secondItem="YqV-Pa-AFR" secondAttribute="trailing" constant="10" id="X2f-XB-69r"/>
                                     <constraint firstItem="IR1-Fe-BEC" firstAttribute="centerX" secondItem="XNP-6A-BDU" secondAttribute="centerX" id="XA6-VV-mdt"/>
+                                    <constraint firstItem="2yb-3r-LjU" firstAttribute="leading" secondItem="YqV-Pa-AFR" secondAttribute="leading" constant="-10" id="bfq-Qt-HdD"/>
+                                    <constraint firstItem="D6C-bM-HTL" firstAttribute="top" secondItem="kMV-Ac-vgi" secondAttribute="top" constant="-10" id="gml-dN-ZEp"/>
                                     <constraint firstItem="YqV-Pa-AFR" firstAttribute="centerY" secondItem="IR1-Fe-BEC" secondAttribute="centerY" id="jGD-fT-O3k"/>
+                                    <constraint firstItem="IGK-Ly-8Se" firstAttribute="leading" secondItem="HKN-6H-g43" secondAttribute="leading" constant="-10" id="kwW-Ck-xW2"/>
                                     <constraint firstAttribute="bottom" secondItem="HKN-6H-g43" secondAttribute="bottom" constant="10" id="oXJ-Kk-9uF"/>
                                     <constraint firstAttribute="height" constant="70" id="s6N-r0-71H"/>
                                     <constraint firstItem="Msh-6m-hR8" firstAttribute="leading" secondItem="XNP-6A-BDU" secondAttribute="leading" constant="10" id="u1d-Io-tI1"/>
+                                    <constraint firstItem="IGK-Ly-8Se" firstAttribute="top" secondItem="HKN-6H-g43" secondAttribute="top" constant="-10" id="yXt-AR-qdX"/>
                                 </constraints>
                             </view>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="1" translatesAutoresizingMaskIntoConstraints="NO" id="kKH-nb-XCi">
-                                <rect key="frame" x="0.0" y="68" width="320" height="2"/>
+                                <rect key="frame" x="0.0" y="48" width="320" height="2"/>
                                 <animations/>
                                 <color key="progressTintColor" red="0.16862745098039217" green="0.2627450980392157" blue="0.44705882352941179" alpha="1" colorSpace="calibratedRGB"/>
                             </progressView>
+                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2hb-fj-iIb">
+                                <rect key="frame" x="0.0" y="50" width="320" height="518"/>
+                                <animations/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="delegate" destination="daH-DB-cHY" id="c8L-Lm-MXY"/>
+                                </connections>
+                            </webView>
                         </subviews>
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="ovu-Oo-13G" firstAttribute="top" secondItem="2hb-fj-iIb" secondAttribute="bottom" id="Fkw-xX-k4I"/>
+                            <constraint firstItem="2hb-fj-iIb" firstAttribute="top" secondItem="kKH-nb-XCi" secondAttribute="bottom" id="Fnt-LC-HnO"/>
+                            <constraint firstAttribute="trailing" secondItem="2hb-fj-iIb" secondAttribute="trailing" id="H3J-UH-knH"/>
                             <constraint firstAttribute="trailing" secondItem="XNP-6A-BDU" secondAttribute="trailing" id="J8b-vY-Sp6"/>
                             <constraint firstItem="XNP-6A-BDU" firstAttribute="leading" secondItem="kkl-d8-gI2" secondAttribute="leading" id="S2E-dS-iii"/>
+                            <constraint firstItem="2hb-fj-iIb" firstAttribute="leading" secondItem="kkl-d8-gI2" secondAttribute="leading" id="TI6-7y-2J1"/>
                             <constraint firstItem="XNP-6A-BDU" firstAttribute="top" secondItem="kkl-d8-gI2" secondAttribute="top" id="bXT-KZ-XQW"/>
                             <constraint firstItem="kKH-nb-XCi" firstAttribute="top" secondItem="GfI-Oh-OK6" secondAttribute="bottom" constant="48" id="bpw-Gy-Z5E"/>
                             <constraint firstAttribute="trailing" secondItem="kKH-nb-XCi" secondAttribute="trailing" id="gRH-Q3-PgO"/>
@@ -1354,15 +1412,18 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                         <outlet property="backButton" destination="kMV-Ac-vgi" id="Sqm-pp-jJ6"/>
                         <outlet property="forwardButton" destination="YqV-Pa-AFR" id="twZ-Z3-4JW"/>
                         <outlet property="progressBar" destination="kKH-nb-XCi" id="88x-rN-cHk"/>
+                        <outlet property="refreshButton" destination="HKN-6H-g43" id="ngG-1m-o35"/>
                         <outlet property="titleLabel" destination="IR1-Fe-BEC" id="6Po-N9-TyB"/>
+                        <outlet property="webView" destination="2hb-fj-iIb" id="dva-89-ex4"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Jol-RL-OFP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="467" y="991"/>
+            <point key="canvasLocation" x="680" y="1073"/>
         </scene>
     </scenes>
     <resources>
+        <image name="background-gradient" width="1280" height="1280"/>
         <image name="background-techtower" width="1242" height="2208"/>
         <image name="button-back" width="25" height="25"/>
         <image name="button-paperclip" width="50" height="50"/>
@@ -1372,6 +1433,5 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
         <image name="button-web-forward" width="100" height="100"/>
         <image name="button-web-refresh" width="100" height="100"/>
         <image name="icon-folder" width="50" height="50"/>
-        <image name="login-background" width="1242" height="2208"/>
     </resources>
 </document>

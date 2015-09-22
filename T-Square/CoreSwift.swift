@@ -596,6 +596,14 @@ extension UITableViewCell {
     }
 }
 
+extension UIView {
+    
+    static func animateWithDuration(duration: NSTimeInterval, delay: NSTimeInterval, usingSpringWithDamping damping: CGFloat, animations: () -> ()) {
+        UIView.animateWithDuration(duration, delay: delay, usingSpringWithDamping: damping, initialSpringVelocity: 0.0, options: [], animations: animations, completion: nil)
+    }
+    
+}
+
 extension String {
     
     var length: Int {

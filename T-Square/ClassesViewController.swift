@@ -32,8 +32,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet var touchRecognizer: UITouchGestureRecognizer!
     @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
-    @IBOutlet weak var activityIndicator: UIVisualEffectView!
     
+    var activityIndicator: UIView! {
+        return loginController.activityCircle
+    }
+    var loginController: LoginViewController!
     var documentController: UIDocumentInteractionController?
     
     //MARK: - Table View cell arrangement
@@ -194,16 +197,15 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     //MARK: - Customization of the view
     
+    override func viewWillAppear(animated: Bool) {
+        tableView.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 30.0, right: 0.0)
+    }
+    
     override func viewDidAppear(animated: Bool) {
         tableViewRestingPosition = tableView.frame.origin
         updateBottomView()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setTouchDelegateEnabled:", name: TSSetTouchDelegateEnabledNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "backTriggered", name: TSBackNotification, object: nil)
-        
-        activityIndicator.hidden = false
-        activityIndicator.layer.cornerRadius = 25.0
-        activityIndicator.layer.masksToBounds = true
-        activityIndicator.transform = CGAffineTransformMakeScale(0.0, 0.0)
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -513,18 +515,20 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func openLinkInSafari(link: String, title: String) {
-        guard let _ = NSURL(string: link) else {
+        guard let URL = NSURL(string: link) else {
             let alert = UIAlertController(title: "Could not open link.", message: "We had a problem opening that link. (\(link))", preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
             return
         }
         
-        let webView = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("web") as! TSWebView
+        loginController.presentWebViewWithURL(URL, title: title)
+        
+        /*let webView = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("web") as! TSWebView
         self.presentViewController(webView, animated: true, completion: {
             webView.titleLabel.text = title
             webView.openLink(link)
-        })
+        })*/
         
         
         /*if #available(iOS 9.0, *) {
@@ -536,13 +540,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func setActivityIndicatorVisible(visible: Bool) {
-        let scale: CGFloat = visible ? 1.0 : 0.1
-        let transform = CGAffineTransformMakeScale(scale, scale)
-        
-        UIView.animateWithDuration(visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
-            self.activityIndicator.transform = transform
-            self.activityIndicator.alpha = visible ? 1.0 : 0.0
-        }, completion: nil)
+        loginController.setActivityCircleVisible(visible)
     }
     
 }

@@ -77,7 +77,12 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             }
             
         }),
-        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Gradebook"), onTap: nil),
+        
+        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Gradebook"), onTap: { controller, displayClass in
+            let grades = TSAuthenticatedReader.getGradesForClass(displayClass)
+            print(grades)
+        }),
+        
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("View More Options", hideSeparator: true), onTap: { controller, displayClass in
             
             let link = displayClass.link

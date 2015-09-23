@@ -274,6 +274,62 @@ class TSReader {
         return assignments
     }
     
+    func getGradesForClass(currentClass: Class) -> GradeGroup {
+        let rootGroup = GradeGroup(name: currentClass.name, weight: 1.0)
+        
+        guard let classPage = currentClass.getClassPage() else { return rootGroup }
+        //load page for class announcements
+        for link in classPage.css("a, link") {
+            if link.text != "Gradebook" { continue }
+            guard let gradebookPage = HttpClient.contentsOfPage(link["href"]!) else { return rootGroup }
+            
+            //load grades
+            var currentGroup = rootGroup
+            
+            for row in gradebookPage.css("tr") {
+                let cols = row.css("td")
+                
+                if cols.count < 3 { continue }
+                
+                //start of a new category
+                if (cols[1].toHTML ?? "").containsString("categoryHeading") {
+                    let nameIndex = 1
+                    let weightIndex = 4
+                    if currentGroup !== rootGroup {
+                        rootGroup.scores.append(currentGroup)
+                    }
+                    let name = cols[nameIndex].text ?? "Unnamed Grouping"
+                    let weight = cols[weightIndex].text ?? "100%"
+                    currentGroup = GradeGroup(name: name, weight: weight)
+                    
+                }
+                
+                //grade in the existing category
+                else {
+                    let nameIndex = (cols.count == 6 ? 1 : 0)
+                    let scoreIndex = (cols.count == 6 ? 3 : 2)
+                    let weightIndex: Int? = (cols.count == 6 ? 4 : nil)
+                    let commentIndex = (cols.count == 6 ? 5 : 4)
+                    
+                    let name = cols[nameIndex].text?.cleansed() ?? "Unnamed Assignment"
+                    let score = cols[scoreIndex].text?.cleansed()
+                    let weight: String? = (weightIndex != nil ? cols[weightIndex!].text?.cleansed() : nil)
+                    let comment = cols[commentIndex].text?.cleansed()
+                    
+                    let grade = Grade(name: name, score: score, weight: weight, comment: comment)
+                    currentGroup.scores.append(grade)
+                }
+            }
+            
+            if currentGroup !== rootGroup {
+                rootGroup.scores.append(currentGroup)
+            }
+        }
+        
+        currentClass.grades = rootGroup
+        return rootGroup
+    }
+    
 }
 
 extension String {

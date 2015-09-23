@@ -46,7 +46,9 @@ class HttpClient {
         let request = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 5.0)
         
         while !stopTrying && !ready {
-        
+            
+            failed = false
+            
             let task = session.dataTaskWithRequest(request) {
                 (data, response, error) -> Void in
                 if let data = data {
@@ -69,14 +71,14 @@ class HttpClient {
             while !ready && !failed {
                 usleep(10)
             }
+            
+            if content != nil {
+                return content
+            }
         
         }
         
-        if content != nil {
-            return content
-        } else {
-            return nil
-        }
+        return content
     }
     
     internal func sendPost(params: String) -> String? {
@@ -98,6 +100,9 @@ class HttpClient {
             
             let task = session.dataTaskWithRequest(request) {
                 (data, response, error) -> Void in
+                
+                failed = false
+                
                 if let data = data {
                     if let loadedContent = NSString(data: data, encoding: NSASCIIStringEncoding) {
                         content = loadedContent as String
@@ -119,13 +124,13 @@ class HttpClient {
                 usleep(10)
             }
             
+            if content != nil {
+                return content
+            }
+            
         }
         
-        if content != nil {
-            return content
-        } else {
-            return ""
-        }
+        return content
     }
     
     internal func setUrl(url: String) {

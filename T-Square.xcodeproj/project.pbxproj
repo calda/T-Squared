@@ -31,6 +31,7 @@
 		2E8E4CCF1B9A6BD800D62A2E /* ResourcesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8E4CCE1B9A6BD800D62A2E /* ResourcesDelegate.swift */; settings = {ASSET_TAGS = (); }; };
 		2E9A2D8A1BA6592200E93BA0 /* AssignmentDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9A2D891BA6592200E93BA0 /* AssignmentDelegate.swift */; settings = {ASSET_TAGS = (); }; };
 		2ED1E8C41BA90EC2007F1A90 /* AllClassesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */; settings = {ASSET_TAGS = (); }; };
+		2EE303201BB239DF00FFEA5A /* Grade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE3031F1BB239DF00FFEA5A /* Grade.swift */; settings = {ASSET_TAGS = (); }; };
 		2EFA126A1BAE6F48007510A0 /* TSWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFA12691BAE6F48007510A0 /* TSWebView.swift */; settings = {ASSET_TAGS = (); }; };
 		373101B7C0015F93AB0201EE /* Pods_T_Square.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 578C2BFFE673C532D8ADDCF6 /* Pods_T_Square.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
@@ -86,6 +87,7 @@
 		2E8E4CCE1B9A6BD800D62A2E /* ResourcesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourcesDelegate.swift; sourceTree = "<group>"; };
 		2E9A2D891BA6592200E93BA0 /* AssignmentDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssignmentDelegate.swift; sourceTree = "<group>"; };
 		2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllClassesDelegate.swift; sourceTree = "<group>"; };
+		2EE3031F1BB239DF00FFEA5A /* Grade.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Grade.swift; sourceTree = "<group>"; };
 		2EFA12691BAE6F48007510A0 /* TSWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSWebView.swift; sourceTree = "<group>"; };
 		50300C8C5BD5B54F8EDFA4E2 /* Pods-T-Square.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-T-Square.release.xcconfig"; path = "Pods/Target Support Files/Pods-T-Square/Pods-T-Square.release.xcconfig"; sourceTree = "<group>"; };
 		578C2BFFE673C532D8ADDCF6 /* Pods_T_Square.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_T_Square.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -167,6 +169,7 @@
 				2E78739C1B90D49900C1F4BE /* Announcement.swift */,
 				2E8244811B9A517500236B60 /* Resource.swift */,
 				2E809C141BA51AD0008849FB /* Assignment.swift */,
+				2EE3031F1BB239DF00FFEA5A /* Grade.swift */,
 			);
 			path = "T-Square";
 			sourceTree = "<group>";
@@ -400,6 +403,7 @@
 				2E8244821B9A517500236B60 /* Resource.swift in Sources */,
 				2EFA126A1BAE6F48007510A0 /* TSWebView.swift in Sources */,
 				2E4207D61B9009F8002B79E6 /* ClassesViewController.swift in Sources */,
+				2EE303201BB239DF00FFEA5A /* Grade.swift in Sources */,
 				2E8AFE071B92DF5700DE7E28 /* AnouncementDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

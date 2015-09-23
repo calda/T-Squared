@@ -20,6 +20,7 @@ class Class : CustomStringConvertible {
     var announcements: [Announcement] = []
     var rootResource: ResourceFolder?
     var assignments: [Assignment]?
+    var grades: GradeGroup?
     
     var description: String {
         return name

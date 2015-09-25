@@ -92,8 +92,12 @@ class AttachmentCell : TitleCell {
     }
     
     static func presentAttachment(attachment: Attachment, inController controller: ClassesViewController) {
-        if let url = NSURL(string: attachment.link) {
+        if let link = attachment.link, url = NSURL(string: link) {
             controller.presentDocumentFromURL(url)
+        }
+        
+        else if let rawText = attachment.rawText {
+            controller.openTextInSafari(rawText, title: attachment.fileName)
         }
     }
     

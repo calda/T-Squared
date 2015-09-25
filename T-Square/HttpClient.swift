@@ -270,14 +270,16 @@ extension String {
         text = (text as NSString).stringByReplacingOccurrencesOfString("\n", withString: "")
         text = (text as NSString).stringByReplacingOccurrencesOfString("\t", withString: "")
         text = (text as NSString).stringByReplacingOccurrencesOfString("\r", withString: "")
+        text = (text as NSString).stringByReplacingOccurrencesOfString("<o:p>", withString: "")
+        text = (text as NSString).stringByReplacingOccurrencesOfString("</o:p>", withString: "")
         
         //leading spaces
-        while text.hasPrefix(" ") {
+        while text.length > 1 && text.stringAtIndex(0).isWhitespace() {
             text = text.substringFromIndex(1)
         }
         
         //trailing spaces
-        while text.hasSuffix(" ") {
+        while text.length > 1 && text.stringAtIndex(text.length - 1).isWhitespace() {
             text = text.substringToIndex(text.length - 1)
         }
         

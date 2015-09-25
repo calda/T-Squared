@@ -17,6 +17,7 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     var loginController: LoginViewController!
     @IBOutlet weak var webView: UIWebView!
     var previousURL: NSURL? = nil
+    var customHTML: String? = nil
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var backButton: UIButton!
@@ -31,6 +32,10 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     var refreshing = false
     var scrollToBottomWhenDoneLoading = false
 
+    override func viewDidLoad() {
+        webView.scalesPageToFit = true
+    }
+    
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
         return UIStatusBarStyle.LightContent
     }
@@ -39,7 +44,7 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         self.webView.frame = CGRect(x: 0, y: 70.0, width: size.width, height: size.height - 70.0)
     }
     
-    func openLink(link: String) {
+    func openLink(link: String, reset: Bool = true) {
         backStack = Stack()
         forwardStack = Stack()
         updateNavButtons()
@@ -47,6 +52,46 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         let request = NSMutableURLRequest(URL: url)
         webView.loadRequest(request)
         webView.hidden = true
+        if reset { customHTML = nil }
+    }
+    
+    func renderText(text: String, resetView: Bool = true) {
+        if resetView {
+            backStack = Stack()
+            forwardStack = Stack()
+        }
+        
+        updateNavButtons()
+        var html = "<html><body style='font-size:300%'>\(text)</body></html>"
+        
+        //convert links to hrefs if there aren't any
+        let links = linksInText(text)
+        if !text.containsString("<a") {
+            for link in links {
+                let href = "<a href=\(link.text)>\(link.text)</a>"
+                html = html.stringByReplacingOccurrencesOfString(link.text, withString: href)
+            }
+        }
+        
+        webView.loadHTMLString(html, baseURL: nil)
+        customHTML = html
+        
+        if resetView {
+            webView.hidden = true
+            
+            //if there is only one link on the page, and that link is the entire contents of the page
+            //then open that page
+            if links.count == 1 && text.cleansed() == links[0].text {
+                guard let url = NSURL(string: links[0].text) else { return }
+                let request = NSMutableURLRequest(URL: url)
+                delay(0.1) { self.titleLabel.text = websiteForLink(links[0].text) }
+                webView.loadRequest(request)
+                
+                previousURL = NSURL(fileURLWithPath: "customHTML")
+                backStack.push(previousURL!)
+                updateNavButtons()
+            }
+        }
     }
     
     func webView(webView: UIWebView, shouldStartLoadWithRequest request: NSURLRequest, navigationType: UIWebViewNavigationType) -> Bool {
@@ -69,7 +114,14 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         goingForwards = false
         goingBackwards = false
         refreshing = false
-        previousURL = webView.request?.URL
+        
+        if customHTML != nil && backStack.count == 0 {
+            previousURL = NSURL(fileURLWithPath: "customHTML")
+        }
+        else {
+            previousURL = webView.request?.URL
+        }
+        
         updateNavButtons()
         loginController.setActivityCircleVisible(false)
         webView.scrollView.contentOffset = CGPointMake(0, 0)
@@ -96,11 +148,16 @@ class TSWebView : UIViewController, UIWebViewDelegate {
             goingBackwards = true
             let newURL = backStack.pop()!
             
-            if let currentURL = webView.request?.URL {
+            let currentURL = webView.request?.URL
+            
+            if let customHTML = customHTML where newURL == NSURL(fileURLWithPath: "customHTML") {
+                renderText(customHTML, resetView: false)
+            }
+            openLink("\(newURL)", reset: false)
+            
+            if let currentURL = currentURL {
                 forwardStack.push(currentURL)
             }
-            
-            openLink("\(newURL)")
             
             animateNavButton(backButton, toLeft: true)
             updateNavButtons()
@@ -111,14 +168,18 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         if forwardStack.count > 0 {
             goingForwards = true
             let newURL = forwardStack.pop()!
+            let currentURL = webView.request?.URL
             
-            if let currentURL = webView.request?.URL {
-                backStack.push(currentURL)
-            }
-            
-            openLink("\(newURL)")
+            openLink("\(newURL)", reset: false)
             animateNavButton(forwardButton, toLeft: false)
             updateNavButtons()
+            
+            if let currentURL = currentURL where "\(currentURL)" != "about:blank" {
+                backStack.push(currentURL)
+            }
+            else if customHTML != nil {
+                backStack.push(NSURL(fileURLWithPath: "customHTML"))
+            }
         }
     }
     

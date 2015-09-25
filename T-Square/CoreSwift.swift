@@ -233,7 +233,14 @@ func linksInText(string: String) -> [(text: String, range: NSRange)] {
             let wordStart = idRange.location
             var wordEnd = idRange.location + idRange.length
             
-            while ("\(text.stringAtIndex(wordEnd))" != " ") && (wordEnd != text.length - 2) {
+            func nextIsWhitespace() -> Bool {
+                if wordEnd == text.length { return false }
+                
+                let currentEnd = text.stringAtIndex(wordEnd)
+                return currentEnd.isWhitespace()
+            }
+            
+            while !nextIsWhitespace() && (wordEnd != text.length) {
                 wordEnd++;
             }
             
@@ -608,6 +615,13 @@ extension String {
     
     var length: Int {
         return (self as NSString).length
+    }
+    
+    func isWhitespace() -> Bool {
+        return self == " " || self == "\n" || self == "\r" || self == "\r\n" || self == "\t"
+            || self == "\u{A0}" || self == "\u{2007}" || self == "\u{202F}" || self == "\u{2060}" || self == "\u{FEFF}"
+        //there are lots of whitespace characters apparently
+        //http://www.fileformat.info/info/unicode/char/00a0/index.htm
     }
     
 }

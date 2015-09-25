@@ -108,11 +108,19 @@ class Announcement : CustomStringConvertible {
 
 class Attachment {
     
-    let link: String
+    let link: String?
     let fileName: String
+    let rawText: String?
     
     init(link: String, fileName: String) {
         self.link = link
+        self.fileName = fileName
+        self.rawText = nil
+    }
+    
+    init(fileName: String, rawText: String) {
+        self.link = nil
+        self.rawText = rawText
         self.fileName = fileName
     }
     

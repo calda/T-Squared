@@ -493,12 +493,31 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func openFromLinks(links: [String]) {
+        
+        func shortSiteForLink(link: String) -> String {
+            let shortWebsite = websiteForLink(link)
+            //handle duplicates
+            var countMatching = 0
+            var thisCount = 1
+            for other in links {
+                let otherShort = websiteForLink(other)
+                if otherShort == shortWebsite {
+                    countMatching++
+                }
+                if other == link {
+                    thisCount = countMatching
+                }
+            }
+            
+            return shortWebsite + (countMatching > 1 ? "\(thisCount)" : "")
+        }
+        
         if links.count == 0 { return }
         if links.count == 1 {
-            let alert = UIAlertController(title: "Open link in Safari?", message: websiteForLink(links[0]) + "/...", preferredStyle: .Alert)
+            let alert = UIAlertController(title: "Open link in Safari?", message: websiteForLink(links[0]), preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
             alert.addAction(UIAlertAction(title: "Open", style: .Default, handler: { _ in
-                UIApplication.sharedApplication().openURL(NSURL(string: links[0])!)
+                self.openLinkInSafari(links[0], title: websiteForLink(links[0]))
             }))
             self.presentViewController(alert, animated: true, completion: nil)
             return
@@ -506,7 +525,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         let alert = UIAlertController(title: "Open link in Safari?", message: "There are multiple links in this message. Which would you like to open?", preferredStyle: .Alert)
         for link in links {
-            alert.addAction(UIAlertAction(title: websiteForLink(link) + "/...", style: .Default, handler: { _ in
+            alert.addAction(UIAlertAction(title: shortSiteForLink(link), style: .Default, handler: { _ in
                 self.openLinkInSafari(link, title: websiteForLink(link))
             }))
         }
@@ -523,20 +542,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
         
         loginController.presentWebViewWithURL(URL, title: title)
-        
-        /*let webView = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("web") as! TSWebView
-        self.presentViewController(webView, animated: true, completion: {
-            webView.titleLabel.text = title
-            webView.openLink(link)
-        })*/
-        
-        
-        /*if #available(iOS 9.0, *) {
-            let safari = SFSafariViewController(URL: url)
-            self.presentViewController(safari, animated: true, completion: nil)
-        } else {
-            UIApplication.sharedApplication().openURL(url)
-        }*/
+    }
+    
+    func openTextInSafari(text: String, title: String) {
+        loginController.presentWebViewWithText(text, title: title)
     }
     
     func setActivityIndicatorVisible(visible: Bool) {

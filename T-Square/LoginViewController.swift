@@ -342,8 +342,18 @@ class LoginViewController: UIViewController {
     
     func presentWebViewWithURL(URL: NSURL, title: String) {
         webViewVisible = true
-        
         browserViewController.openLink("\(URL)")
+        presentWebViewWithTitle(title)
+        
+    }
+    
+    func presentWebViewWithText(text: String, title: String) {
+        webViewVisible = true
+        browserViewController.renderText(text)
+        presentWebViewWithTitle(title)
+    }
+    
+    private func presentWebViewWithTitle(title: String) {
         browserViewController.previousURL = nil
         browserViewController.titleLabel.text = title
         UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {

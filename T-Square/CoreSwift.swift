@@ -617,6 +617,17 @@ extension String {
         return (self as NSString).length
     }
     
+    func asDouble() -> Double? {
+        return NSNumberFormatter().numberFromString(self)?.doubleValue
+    }
+    
+    func percentStringAsDouble() -> Double? {
+        if let displayedNumber = (self as NSString).substringToIndex(self.length - 1).asDouble() {
+            return displayedNumber / 100.0
+        }
+        return nil
+    }
+    
     func isWhitespace() -> Bool {
         return self == " " || self == "\n" || self == "\r" || self == "\r\n" || self == "\t"
             || self == "\u{A0}" || self == "\u{2007}" || self == "\u{202F}" || self == "\u{2060}" || self == "\u{FEFF}"

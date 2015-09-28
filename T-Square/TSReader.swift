@@ -301,7 +301,6 @@ class TSReader {
                     let name = cols[nameIndex].text ?? "Unnamed Grouping"
                     let weight = cols[weightIndex].text ?? "100%"
                     currentGroup = GradeGroup(name: name, weight: weight)
-                    
                 }
                 
                 //grade in the existing category

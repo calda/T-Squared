@@ -140,6 +140,37 @@ class AssignmentCell : UITableViewCell {
     
 }
 
+class GradeGroupCell : UITableViewCell {
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet weak var weightLabel: UILabel!
+    
+    func decorateForGradeGroup(group: GradeGroup) {
+        titleLabel.text = group.name
+        scoreLabel.text = group.scoreString
+        
+        if let weight = group.weight {
+            weightLabel.text = "Weight: \(Int(weight * 100))%"
+        }
+        else {
+            weightLabel.text = "Unspecified Weight"
+        }
+    }
+    
+}
+
+class GradeCell : UITableViewCell {
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var scoreLabel: UILabel!
+    
+    func decorateForScore(grade: Scored) {
+        titleLabel.text = grade.name
+        scoreLabel.text = grade.scoreString
+    }
+}
+
 class BackCell : UITableViewCell {
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!

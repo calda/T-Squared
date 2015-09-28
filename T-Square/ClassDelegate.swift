@@ -49,21 +49,14 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         (identifier: "blank", onDisplay: hideSeparator, onTap: nil),
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Assignments"), onTap: { controller, displayClass in
             
-            if displayClass.assignments == nil {
-                controller.setActivityIndicatorVisible(true)
-            }
-            
             //load assignments
             let delegate = AssignmentsDelegate(owningClass: displayClass, controller: controller)
             delegate.loadDataAndPushInController(controller)
+            
         }),
         
         
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Resources"), onTap: { controller, displayClass in
-        
-            if displayClass.rootResource == nil {
-                controller.setActivityIndicatorVisible(true)
-            }
             
             //load root resources
             if let rootFolder = TSAuthenticatedReader.getResourceRootForClass(displayClass) {
@@ -79,8 +72,10 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         }),
         
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Gradebook"), onTap: { controller, displayClass in
-            let grades = TSAuthenticatedReader.getGradesForClass(displayClass)
-            print(grades)
+            
+            let delegate = GradebookDelegate(forClass: displayClass, controller: controller)
+            delegate.loadDataAndPushInController(controller)
+            
         }),
         
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("View More Options", hideSeparator: true), onTap: { controller, displayClass in

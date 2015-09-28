@@ -10,7 +10,9 @@ import Foundation
 
 protocol Scored {
     
+    var name: String { get }
     var score: Double? { get }
+    var scoreString: String { get }
     var weight: Double? { get }
     
 }
@@ -19,18 +21,40 @@ class Grade : Scored, CustomStringConvertible {
     
     let name: String
     let score: Double?
+    let scoreString: String
     let weight: Double?
     let comment: String?
     
     init(name: String, score: String?, weight: String?, comment: String?) {
         self.name = name
+        self.comment = comment
+        self.scoreString = score?.cleansed() ?? "-"
+        
+        //parse score
+        if scoreString.hasSuffix("%") {
+            if let percentScore = scoreString.percentStringAsDouble() {
+                self.score = percentScore
+                self.weight = 100.0
+                return
+            }
+        }
+        else if scoreString.containsString("/") {
+            let splits = scoreString.componentsSeparatedByString("/")
+            if splits.count >= 2 {
+                if let points = splits[0].asDouble(), let total = splits[1].asDouble() {
+                    self.score = points / total
+                    self.weight = total
+                    return
+                }
+            }
+        }
+        
         self.score = nil
         self.weight = nil
-        self.comment = comment
     }
     
     var description: String {
-        return "\(name)(score=\(score))"
+        return "\(name)(score=\(scoreString))"
     }
     
 }
@@ -43,6 +67,14 @@ class GradeGroup : Scored, CustomStringConvertible {
     
     init(name: String, weight: String?) {
         self.name = name
+        print(weight)
+        if let weightString = weight?.cleansed() where weightString.hasSuffix("%") {
+            if let percent = weightString.percentStringAsDouble() {
+                self.weight = percent * 100.0
+                print(self.weight)
+                return
+            }
+        }
         self.weight = nil
     }
     
@@ -53,30 +85,49 @@ class GradeGroup : Scored, CustomStringConvertible {
     
     var score: Double? {
         if scores.count == 0 { return nil }
+        var totalPoints = 0.0
+        var totalWeight = 0.0
         
-        //unweighted calculation
-        if scores[0].weight == nil {
-            var sumScore = 0.0
-            for score in scores {
-                sumScore += score.score ?? 0.0
+        for score in scores {
+            if let points = score.score, let weight = score.weight {
+                totalPoints += (points * weight)
+                totalWeight += weight
             }
-            return sumScore / Double(scores.count)
         }
         
-        //weighted calculation
-        else {
-            var finalScore = 0.0
-            for score in scores {
-                if let numScore = score.score, let weight = score.weight {
-                    finalScore += (numScore * weight)
-                }
-            }
-            return finalScore
+        if totalWeight == 0.0 { return nil }
+        return totalPoints / totalWeight
+    }
+    
+    var scoreString: String {
+        if let score = score {
+            let rounded = Double(Int(score * 10000) / 100)
+            return "\(rounded)%"
         }
+        return "-"
     }
     
     var description: String {
-        return "\(name)\(scores)"
+        return "\(name) [total score = \(self.scoreString)]\(scores)"
+    }
+    
+    var flattened: [Scored] {
+        var flattenedArray: [Scored] = []
+        for score in scores {
+            if let group = score as? GradeGroup {
+                flattenedArray.append(group)
+                if group.scores.count == 0 {
+                    flattenedArray.append(Grade(name: "Nothing here yet.", score: "", weight: nil, comment: nil))
+                }
+                else {
+                    flattenedArray.appendContentsOf(group.flattened)
+                }
+            }
+            else {
+                flattenedArray.append(score)
+            }
+        }
+        return flattenedArray
     }
     
 }

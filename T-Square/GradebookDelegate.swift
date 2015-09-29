@@ -51,11 +51,12 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         else {
             let cell = tableView.dequeueReusableCellWithIdentifier("grade")! as! GradeCell
             cell.decorateForScore(score)
+            cell.hideSeparator()
             return cell
         }
     }
     
-    func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath.item == 0 || indexPath.item == 1 && scores.count == 0 {
             return 50.0
         }
@@ -64,9 +65,10 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
         
         let score = scores[indexPath.item - 2]
-        if score is GradeGroup { return 49.0 }
-        else { return 40.0 }
+        if score is GradeGroup { return 55.0 }
+        else { return 35.0 }
     }
+    
     
     //MARK: - Stackable Table Delegate methods
     

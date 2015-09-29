@@ -398,6 +398,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         return delegate is ClassesViewController
             || delegate is AnnouncementDelegate
             || delegate is ClassDelegate
+            || delegate is GradebookDelegate
+    }
+    
+    func colorForBottomView(delegate: AnyObject) -> UIColor {
+        if delegate is GradebookDelegate { return UIColor(white: 1.0, alpha: 0.2) }
+        return UIColor(hue: 0.5833, saturation: 0.5, brightness: 1.0, alpha: 0.4)
     }
     
     func pushDelegate(delegate: StackableTableDelegate, ifCurrentMatchesExpected expected: UITableViewDelegate) {
@@ -412,6 +418,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     override func pushDelegate(delegate: StackableTableDelegate, hasBeenUpdatedToNewLoadFormat: Bool) {
         bottomView.hidden = !(usesBottomView(delegate))
+        bottomView.backgroundColor = colorForBottomView(delegate)
         super.pushDelegate(delegate, hasBeenUpdatedToNewLoadFormat: true)
         updateBottomView()
         let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)

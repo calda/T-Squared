@@ -145,7 +145,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             let fontSize: CGFloat
             let text: String
             switch(identifier) {
-                case "announcementTitle": fontSize = 22.0; text = announcement.name; break;
+                case "announcementTitle": fontSize = 22.5; text = announcement.name; break;
                 case "announcementText": fontSize = 18.5; text = announcement.message ?? "Loading message..."; break;
                 default: fontSize = 19.0; text = "";
             }
@@ -157,7 +157,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
                 font = UIFont.systemFontOfSize(fontSize)
             }
             
-            let height = heightForText(text, width: tableView.frame.width - 24.0, font: font)
+            let height = heightForText(text, width: tableView.frame.width - 30.0, font: font)
             
             if identifier == "announcementText" {
                 return max(100.0, height + 30.0)

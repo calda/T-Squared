@@ -49,9 +49,18 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             return cell
         }
         else {
+            if score.scoreString == "COMMENT_PLACEHOLDER" {
+                let cell = tableView.dequeueReusableCellWithIdentifier("gradeComment")! as! TitleCell
+                cell.decorate(score.name)
+                cell.hideSeparator()
+                return cell
+            }
+            
             let cell = tableView.dequeueReusableCellWithIdentifier("grade")! as! GradeCell
             cell.decorateForScore(score)
-            cell.hideSeparator()
+            if !(score.name == "" && score.scoreString == "") {
+                cell.hideSeparator()
+            }
             return cell
         }
     }
@@ -66,7 +75,16 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         let score = scores[indexPath.item - 2]
         if score is GradeGroup { return 55.0 }
-        else { return 35.0 }
+        else {
+            if score.name == "" && score.scoreString == "" { return 20.0 }
+            if score.scoreString == "COMMENT_PLACEHOLDER" {
+                //calculate height needed to display comment
+                let availableWidth: CGFloat = controller.view.frame.width - 58 - 16
+                let font = UIFont.systemFontOfSize(15.0)
+                return heightForText(score.name, width: availableWidth, font: font) + 20.0
+            }
+            return 35.0
+        }
     }
     
     
@@ -85,11 +103,18 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     }
     
     func loadCachedData() {
-        scores = displayClass.grades?.flattened ?? []
+        scores = flattenedGrades(displayClass.grades) ?? []
     }
     
     func loadData() {
-        scores = TSAuthenticatedReader.getGradesForClass(displayClass).flattened
+        scores = flattenedGrades(TSAuthenticatedReader.getGradesForClass(displayClass))
+    }
+    
+    func flattenedGrades(grades: GradeGroup?) -> [Scored] {
+        guard let grades = grades else { return [] }
+        var flattened: [Scored] = [Grade(name: "", score: "", weight: nil, comment: nil)]
+        flattened.appendContentsOf(grades.flattened)
+        return flattened
     }
     
     func isFirstLoad() -> Bool {

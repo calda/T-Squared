@@ -151,7 +151,7 @@ class GradeGroupCell : UITableViewCell {
         scoreLabel.text = group.scoreString
         
         if let weight = group.weight {
-            weightLabel.text = "Weight: \(Int(weight * 100))%"
+            weightLabel.text = "Weight: \(Int(weight))%"
         }
         else {
             weightLabel.text = "Unspecified Weight"
@@ -166,8 +166,18 @@ class GradeCell : UITableViewCell {
     @IBOutlet weak var scoreLabel: UILabel!
     
     func decorateForScore(grade: Scored) {
-        titleLabel.text = grade.name
+        let name = grade.name.cleansed()
+        titleLabel.text = name
         scoreLabel.text = grade.scoreString
+        if grade.scoreString == "-" {
+            titleLabel.alpha = 0.5
+        }
+        else if name.hasPrefix("(") && name.hasSuffix("(") {
+            titleLabel.alpha = 0.5
+        }
+        else {
+            titleLabel.alpha = 1.0
+        }
     }
 }
 

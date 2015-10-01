@@ -28,7 +28,7 @@ class Grade : Scored, CustomStringConvertible {
     init(name: String, score: String?, weight: String?, comment: String?) {
         self.name = name
         self.comment = comment
-        self.scoreString = score?.cleansed() ?? "-"
+        self.scoreString = score?.cleansed() ?? "—"
         
         //parse score
         if scoreString.hasSuffix("%") {
@@ -67,11 +67,9 @@ class GradeGroup : Scored, CustomStringConvertible {
     
     init(name: String, weight: String?) {
         self.name = name
-        print(weight)
         if let weightString = weight?.cleansed() where weightString.hasSuffix("%") {
             if let percent = weightString.percentStringAsDouble() {
                 self.weight = percent * 100.0
-                print(self.weight)
                 return
             }
         }
@@ -113,6 +111,7 @@ class GradeGroup : Scored, CustomStringConvertible {
     
     var flattened: [Scored] {
         var flattenedArray: [Scored] = []
+        
         for score in scores {
             if let group = score as? GradeGroup {
                 flattenedArray.append(group)
@@ -122,9 +121,13 @@ class GradeGroup : Scored, CustomStringConvertible {
                 else {
                     flattenedArray.appendContentsOf(group.flattened)
                 }
+                flattenedArray.append(Grade(name: "", score: "", weight: nil, comment: nil))
             }
             else {
                 flattenedArray.append(score)
+                if let grade = score as? Grade, let comment = grade.comment?.cleansed() where comment != "" && comment != "from Assignments" {
+                    flattenedArray.append(Grade(name: comment, score: "COMMENT_PLACEHOLDER", weight: nil, comment: nil))
+                }
             }
         }
         return flattenedArray

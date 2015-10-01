@@ -59,8 +59,11 @@ class Assignment {
                 else if html.containsString("id=\"addSubmissionForm\"") {
                     splits = page.toHTML!.componentsSeparatedByString("id=\"addSubmissionForm\"")
                 }
-                else if html.containsString("<h4>Original submission text</h4>") {
-                    splits = page.toHTML!.componentsSeparatedByString("<h4>Original submission text</h4>")
+                else if html.containsString("Original submission text") {
+                    splits = page.toHTML!.componentsSeparatedByString("Original submission text")
+                }
+                else if html.containsString("instructor\'s comments") {
+                    splits = page.toHTML!.componentsSeparatedByString("instructor\'s comments")
                 }
                 else {
                     splits = [page.toHTML!]
@@ -74,14 +77,21 @@ class Assignment {
                 
                 for divTag in attachmentsPage.css("div") {
                     if divTag["class"] != "textPanel" { continue }
-                    message += divTag.textWithLineBreaks
+                    var text = divTag.textWithLineBreaks
+                    if text.hasPrefix(" Assignment Instructions") {
+                        text = (text as NSString).substringFromIndex(24)
+                    }
+                    message += text
                 }
                 
                 if message == "" {
                     message = "No message content."
                 }
                 
-                self.message = message.withNoTrailingWhitespace()
+                message = message.withNoTrailingWhitespace()
+                message = (message as NSString).stringByReplacingOccurrencesOfString("<o:p>", withString: "")
+                message = (message as NSString).stringByReplacingOccurrencesOfString("</o:p>", withString: "")
+                self.message = message
                 
                 //load attachments
                 for link in attachmentsPage.css("a, link") {
@@ -109,7 +119,7 @@ class Assignment {
                     var submittedString: String?
                     
                     //load submitted text
-                    if html.containsString("<h4>Original submission text</h4>") {
+                    if html.containsString("Original submission text") {
                         for div in submissionsPage.css("div") {
                             if div["class"] != "textPanel" { continue }
                             submittedString = div.toHTML!

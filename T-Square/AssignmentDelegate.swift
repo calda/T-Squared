@@ -184,6 +184,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
     }
     
     func heightForBlankCellAtIndexPath(indexPath: NSIndexPath) -> CGFloat {
+        
         let rowsInSection = tableView(controller.tableView, numberOfRowsInSection: indexPath.section)
         //find out if this is the last section
         if indexPath.item == (rowsInSection - 1) {
@@ -195,9 +196,9 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
                 let rowsInSection = tableView(controller.tableView, numberOfRowsInSection: section)
                 if rowsInSection != 0 { return 15.0 }
             }
-            //return 50.0 if this is the definitive last cell in the table
-            //this prevents filler cells with 15.0
-            return 50.0
+            //return 0.0 if this is the definitive last cell in the table
+            //creates filler cells with 15.0
+            return 0.0
         }
         return 15.0
     }

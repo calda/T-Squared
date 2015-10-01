@@ -273,6 +273,11 @@ extension String {
         text = (text as NSString).stringByReplacingOccurrencesOfString("<o:p>", withString: "")
         text = (text as NSString).stringByReplacingOccurrencesOfString("</o:p>", withString: "")
         
+        return (text as String).withNoTrailingWhitespace()
+    }
+    
+    func withNoTrailingWhitespace() -> String {
+        var text = self as NSString
         //leading spaces
         while text.length > 1 && text.stringAtIndex(0).isWhitespace() {
             text = text.substringFromIndex(1)
@@ -283,14 +288,6 @@ extension String {
             text = text.substringToIndex(text.length - 1)
         }
         
-        return text as String
-    }
-    
-    func withNoTrailingWhitespace() -> String {
-        var text = self as NSString
-        while text.hasSuffix("\n") || text.hasSuffix("\r") || text.hasSuffix("\t") {
-            text = text.substringToIndex(text.length - 1)
-        }
         return text as String
     }
     

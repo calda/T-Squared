@@ -398,11 +398,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         return delegate is ClassesViewController
             || delegate is AnnouncementDelegate
             || delegate is ClassDelegate
-            || delegate is GradebookDelegate
     }
     
     func colorForBottomView(delegate: AnyObject) -> UIColor {
-        if delegate is GradebookDelegate { return UIColor(white: 1.0, alpha: 0.2) }
         return UIColor(hue: 0.5833, saturation: 0.5, brightness: 1.0, alpha: 0.4)
     }
     

@@ -92,7 +92,7 @@ class Class : CustomStringConvertible {
     func getClassPage() ->  HTMLDocument? {
         if let classPage = self.classPage { return classPage }
         classPage = HttpClient.contentsOfPage(self.link)
-        return classPage!
+        return classPage
     }
     
 }

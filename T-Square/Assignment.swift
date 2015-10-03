@@ -21,6 +21,7 @@ class Assignment {
     var message: String?
     var attachments: [Attachment]?
     var submissions: [Attachment]?
+    var usesInlineText = false
     var feedback: String?
     
     init(name: String, link: String, dueDate: String, completed: Bool, inClass owningClass: Class) {
@@ -126,7 +127,7 @@ class Assignment {
                             var trimmedText = submittedString?.stringByReplacingOccurrencesOfString("<div class=\"textPanel\">", withString: "")
                             trimmedText = trimmedText?.stringByReplacingOccurrencesOfString("</div>", withString: "")
                             
-                            var title = "SubmittedText"
+                            var title = "Submitted Text"
                             let links = linksInText(trimmedText!)
                             if links.count == 1 && trimmedText!.cleansed() == links[0].text {
                                 title = websiteForLink(links[0].text)
@@ -135,6 +136,7 @@ class Assignment {
                             let submittedText = Attachment(fileName: title, rawText: trimmedText!)
                             if self.submissions == nil { self.submissions = [] }
                             self.submissions!.append(submittedText)
+                            self.usesInlineText = true
                             break
                         }
                     }

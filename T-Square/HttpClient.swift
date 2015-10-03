@@ -161,6 +161,13 @@ class HttpClient {
         return info
     }
     
+    static func clearCookies() {
+        let cookies = NSHTTPCookieStorage.sharedHTTPCookieStorage()
+        for cookie in (cookies.cookies ?? []) {
+            cookies.deleteCookie(cookie)
+        }
+    }
+    
     static var previous: String?
     
     static func authenticateWithUsername(user: String, password: String, completion: (Bool, HTMLDocument?) -> ()) {
@@ -230,12 +237,14 @@ class HttpClient {
         crash.threeCharacterString()
     }
     
-    static func contentsOfPage(url: String) -> HTMLDocument? {
+    static func contentsOfPage(url: String, postNotificationOnError: Bool = true) -> HTMLDocument? {
         let fetchURL = url.stringByReplacingOccurrencesOfString("site", withString: "pda")
-        let page = HttpClient(url: fetchURL)
+        let page = HttpClient(url: fetchURL)    
         
         guard let text = page.sendGet() else {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            if postNotificationOnError {
+                NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            }
             return nil
         }
         

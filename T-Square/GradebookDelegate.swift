@@ -30,7 +30,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         if indexPath.item == 0 {
             return tableView.dequeueReusableCellWithIdentifier("back")!
         }
-        if indexPath.item == 1 && scores.count == 0 {
+        if indexPath.item == 1 && (scores.count == 0 || scores.count == 1) {
             let cell = tableView.dequeueReusableCellWithIdentifier("standardTitle")! as! TitleCell
             cell.decorate("Nothing here yet.")
             return cell

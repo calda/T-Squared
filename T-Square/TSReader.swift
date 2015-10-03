@@ -15,17 +15,19 @@ let TSLastLoadDate = "edu.gatech.cal.lastLoadDate"
 class TSReader {
     
     let username: String
+    let password: String
     var initialPage: HTMLDocument? = nil
     
-    init(username: String, initialPage: HTMLDocument?) {
+    init(username: String, password: String, initialPage: HTMLDocument?) {
         self.username = username
+        self.password = password
         self.classes = nil
         self.initialPage = initialPage
     }
     
     static func authenticatedReader(user user: String, password: String, isNewLogin: Bool, completion: (TSReader?) -> ()) {
         HttpClient.authenticateWithUsername(user, password: password, completion: { success, response in
-            completion(success ? TSReader(username: user, initialPage: response) : nil)
+            completion(success ? TSReader(username: user, password: password, initialPage: response) : nil)
         })
         
         //check if this is first time logging in
@@ -34,7 +36,6 @@ class TSReader {
             data.setValue(NSDate(), forKey: TSInstallDateKey)
         }
     }
-    
     
     var classes: [Class]?
     func getClasses() -> [Class] {
@@ -313,7 +314,11 @@ class TSReader {
                     let name = cols[nameIndex].text?.cleansed() ?? "Unnamed Assignment"
                     let score = cols[scoreIndex].text?.cleansed()
                     let weight: String? = (weightIndex != nil ? cols[weightIndex!].text?.cleansed() : nil)
-                    let comment = cols[commentIndex].text?.cleansed()
+                    
+                    var comment: String? = nil
+                    if commentIndex < cols.count {
+                        comment = cols[commentIndex].text?.cleansed()
+                    }
                     
                     let grade = Grade(name: name, score: score, weight: weight, comment: comment)
                     currentGroup.scores.append(grade)

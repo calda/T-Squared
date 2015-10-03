@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import WebKit
+import Kanna
 
 class TSWebView : UIViewController, UIWebViewDelegate {
     
@@ -23,7 +24,6 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var forwardButton: UIButton!
     @IBOutlet weak var progressBar: UIProgressView!
-    @IBOutlet weak var refreshButton: UIButton!
     
     var backStack: Stack<NSURL> = Stack()
     var forwardStack: Stack<NSURL> = Stack()
@@ -206,14 +206,62 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         NSNotificationCenter.defaultCenter().postNotificationName(TSDismissWebViewNotification, object: nil)
     }
     
-    @IBAction func refresh(sender: AnyObject) {
-        refreshing = true
-        webView.reload()
+    @IBAction func openShareSheet(sender: AnyObject) {
+        var shareItems: [AnyObject] = []
+        var activities: [UIActivity] = []
         
-        let transform = CGAffineTransformRotate(refreshButton.transform, CGFloat(-M_PI))
-        UIView.animateWithDuration(0.7, delay: 0.0, usingSpringWithDamping: 0.65, initialSpringVelocity: 0.0, options: [], animations: {
-            self.refreshButton.transform = transform
-        }, completion: nil)
+        if let currentURL = webView.request?.URL where currentURL != NSURL(string: "about:blank") {
+            shareItems.append(currentURL)
+            activities.append(SafariActivity())
+        }
+        else if let customHTML = customHTML, let customDoc = Kanna.HTML(html: customHTML, encoding: NSUTF8StringEncoding), let customText = customDoc.text {
+            shareItems.append(customText)
+        }
+        
+        let shareSheet = UIActivityViewController(activityItems: shareItems, applicationActivities: activities)
+        self.presentViewController(shareSheet, animated: true, completion: nil)
     }
     
 }
+
+class SafariActivity : UIActivity {
+    
+    var URL: NSURL?
+    
+    override func activityType() -> String? {
+        return NSStringFromClass(SafariActivity)
+    }
+    
+    override func activityTitle() -> String? {
+        return "Open in Safari"
+    }
+    
+    override func activityImage() -> UIImage? {
+        return UIImage(named: "action-safari")
+    }
+    
+    override func prepareWithActivityItems(activityItems: [AnyObject]) {
+        for item in activityItems {
+            if let item = item as? NSURL {
+                URL = item
+            }
+        }
+    }
+    
+    override func canPerformWithActivityItems(activityItems: [AnyObject]) -> Bool {
+        for item in activityItems {
+            if let _ = item as? NSURL {
+                return true
+            }
+        }
+        return false
+    }
+    
+    override func performActivity() {
+        if let URL = URL {
+            UIApplication.sharedApplication().openURL(URL)
+        }
+    }
+    
+}
+

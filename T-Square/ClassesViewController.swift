@@ -197,6 +197,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     //MARK: - Customization of the view
     
+    override func viewDidLoad() {
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self, action: "tableRefreshed:", forControlEvents: .ValueChanged)
+        tableView.addSubview(refresh)
+    }
+    
     override func viewWillAppear(animated: Bool) {
         tableView.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 30.0, right: 0.0)
     }
@@ -360,6 +366,16 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
     }
     
+    func tableRefreshed(refresh: UIRefreshControl) {
+        guard let delegate = tableView.delegate as? StackableTableDelegate else {
+            refresh.endRefreshing()
+            return
+        }
+        
+        delegate.loadData()
+        refresh.endRefreshing()
+    }
+    
     //MARK: - Stackable Table Delegate methods
     
     func processSelectedCell(index: NSIndexPath) {
@@ -400,8 +416,14 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             || delegate is ClassDelegate
     }
     
-    func colorForBottomView(delegate: AnyObject) -> UIColor {
-        return UIColor(hue: 0.5833, saturation: 0.5, brightness: 1.0, alpha: 0.4)
+    var DISABLE_PUSHES = false {
+        didSet {
+            if DISABLE_PUSHES {
+                delay(1.0) {
+                    self.DISABLE_PUSHES = false
+                }
+            }
+        }
     }
     
     func pushDelegate(delegate: StackableTableDelegate, ifCurrentMatchesExpected expected: UITableViewDelegate) {
@@ -415,8 +437,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     override func pushDelegate(delegate: StackableTableDelegate, hasBeenUpdatedToNewLoadFormat: Bool) {
+        if DISABLE_PUSHES { return }
+        
         bottomView.hidden = !(usesBottomView(delegate))
-        bottomView.backgroundColor = colorForBottomView(delegate)
         super.pushDelegate(delegate, hasBeenUpdatedToNewLoadFormat: true)
         updateBottomView()
         let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)
@@ -519,7 +542,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         if links.count == 0 { return }
         if links.count == 1 {
-            let alert = UIAlertController(title: "Open link in Safari?", message: websiteForLink(links[0]), preferredStyle: .Alert)
+            let alert = UIAlertController(title: "Open link?", message: websiteForLink(links[0]), preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
             alert.addAction(UIAlertAction(title: "Open", style: .Default, handler: { _ in
                 self.openLinkInSafari(links[0], title: websiteForLink(links[0]))
@@ -528,7 +551,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             return
         }
         
-        let alert = UIAlertController(title: "Open link in Safari?", message: "There are multiple links in this message. Which would you like to open?", preferredStyle: .Alert)
+        let alert = UIAlertController(title: "Open link?", message: "There are multiple links in this message. Which would you like to open?", preferredStyle: .Alert)
         for link in links {
             alert.addAction(UIAlertAction(title: shortSiteForLink(link), style: .Default, handler: { _ in
                 self.openLinkInSafari(link, title: websiteForLink(link))

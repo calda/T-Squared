@@ -8,6 +8,8 @@
 
 import UIKit
 
+let TSReturnFromBackgroundNotification = "edu.gatech.cal.returnFromBackground"
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -20,6 +22,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillResignActive(application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+        
+        if TSAuthenticatedReader == nil { return }
+        
+        //disable selection for all cells
+        if let loginController = window?.rootViewController as? LoginViewController {
+            let tableView = loginController.classesViewController.tableView
+            if let delegate = tableView.delegate as? StackableTableDelegate {
+                for cell in tableView.visibleCells {
+                    if let indexPath = tableView.indexPathForCell(cell) {
+                        delegate.animateSelection(cell, indexPath: indexPath, selected: false)
+                    }
+                }
+            }
+        }
     }
 
     func applicationDidEnterBackground(application: UIApplication) {
@@ -28,7 +44,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
-        // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+        
+        //verify login still valid
+        delay(0.6) {
+            guard let _ = TSAuthenticatedReader else { return }
+            guard let loginController = self.window?.rootViewController as? LoginViewController else { return }
+            
+            print("Validating connection")
+            let rootPage = "http://t-square.gatech.edu/portal/pda/"
+            let pageContents = HttpClient.contentsOfPage(rootPage, postNotificationOnError: false)?.toHTML
+            
+            guard let contents = pageContents else {
+                print("Network unavailable.")
+                let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Network connection is unavailable.", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "Nevermind", style: .Destructive, handler: nil))
+                alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
+                loginController.presentViewController(alert, animated: true, completion: nil)
+                return
+            }
+            
+            if !contents.containsString("Log Out") {
+                print("Cookies invalid. Attempting to reconnect.")
+                TSReader.authenticatedReader(user: TSAuthenticatedReader.username, password: TSAuthenticatedReader.password, isNewLogin: false, completion: { reader in
+                    if let reader = reader {
+                        TSAuthenticatedReader = reader
+                        print("Successfully reconnected to T-Square")
+                    }
+                    else {
+                        loginController.unpresentClassesView()
+                        let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Your login credentials have changed since the last time you logged in.", preferredStyle: .Alert)
+                        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                        loginController.presentViewController(alert, animated: true, completion: nil)
+                    }
+                })
+            }
+            else {
+                print("Cookies still valid.")
+            }
+        }
     }
 
     func applicationDidBecomeActive(application: UIApplication) {

@@ -62,6 +62,9 @@ class LoginViewController: UIViewController {
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "logout", name: TSLogoutNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dismissWebView", name: TSDismissWebViewNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardHeightChanged:", name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "centerForm", name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "networkErrorRecieved", name: TSNetworkErrorNotification, object: nil)
         
         activityCircle.hidden = false
         activityCircle.layer.cornerRadius = 25.0
@@ -78,12 +81,6 @@ class LoginViewController: UIViewController {
             browser.loginController = self
             self.browserViewController = browser
         }
-    }
-    
-    override func viewDidAppear(animated: Bool) {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardHeightChanged:", name: UIKeyboardWillChangeFrameNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "centerForm", name: UIKeyboardWillHideNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "networkErrorRecieved", name: TSNetworkErrorNotification, object: nil)
     }
     
     //MARK: - Animating and processing form input
@@ -180,6 +177,8 @@ class LoginViewController: UIViewController {
             alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
             alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
             self.presentViewController(alert, animated: true, completion: nil)
+            
+            self.classesViewController.DISABLE_PUSHES = true
         }
     }
     
@@ -286,15 +285,21 @@ class LoginViewController: UIViewController {
         })
     }
     
+    func unpresentClassesView() {
+        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+            self.formView.alpha = 1.0
+            self.formView.transform = CGAffineTransformMakeScale(1.0, 1.0)
+            self.containerLeading.constant = self.view.frame.width
+            self.view.layoutIfNeeded()
+        }, completion: nil)
+    }
+    
     //logout from gatech login service and trash saved passwords
     func logout() {
         self.classesViewController.announcements = []
         self.classesViewController.classes = nil
         NSURLCache.sharedURLCache().removeAllCachedResponses()
-        let cookies = NSHTTPCookieStorage.sharedHTTPCookieStorage()
-        for cookie in (cookies.cookies ?? []) {
-            cookies.deleteCookie(cookie)
-        }
+        HttpClient.clearCookies()
         
         HttpClient.sessionID = nil
         HttpClient.authFormPost = nil
@@ -305,12 +310,7 @@ class LoginViewController: UIViewController {
         self.passwordField.text = ""    
         self.setSavedCredentials(correct: false)
         
-        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
-            self.formView.alpha = 1.0
-            self.formView.transform = CGAffineTransformMakeScale(1.0, 1.0)
-            self.containerLeading.constant = self.view.frame.width
-            self.view.layoutIfNeeded()
-        }, completion: nil)
+        unpresentClassesView()
     }
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
@@ -344,7 +344,6 @@ class LoginViewController: UIViewController {
         webViewVisible = true
         browserViewController.openLink("\(URL)")
         presentWebViewWithTitle(title)
-        
     }
     
     func presentWebViewWithText(text: String, title: String) {
@@ -365,6 +364,7 @@ class LoginViewController: UIViewController {
     
     func dismissWebView() {
         webViewVisible = false
+        postNotification(TSSetActivityIndicatorVisibleNotification, object: false)
         
         UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
             self.webViewTop.constant = self.view.frame.height
@@ -373,6 +373,4 @@ class LoginViewController: UIViewController {
         }, completion: nil)
     }
     
-    
 }
-

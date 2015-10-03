@@ -99,8 +99,12 @@ class GradeGroup : Scored, CustomStringConvertible {
     
     var scoreString: String {
         if let score = score {
-            let rounded = Double(Int(score * 10000) / 100)
-            return "\(rounded)%"
+            let rounded = Double(Int(score * 1000)) / 10.0
+            var roundedString = "\(rounded)"
+            if roundedString.hasSuffix(".0") {
+                roundedString = (roundedString as NSString).substringToIndex(roundedString.length - 2)
+            }
+            return "\(roundedString)%"
         }
         return "-"
     }

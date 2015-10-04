@@ -169,6 +169,7 @@ class HttpClient {
     }
     
     static var previous: String?
+    static var isRunningInBackground = false
     
     static func authenticateWithUsername(user: String, password: String, completion: (Bool, HTMLDocument?) -> ()) {
         var didCompletion = false
@@ -228,13 +229,17 @@ class HttpClient {
         }
         else {
             didCompletion = true
-            sync() { completion(true, HTML(html: response, encoding: NSUTF8StringEncoding)) }
+            if isRunningInBackground {
+                //Calling completion on current thread to resolve background activity
+                completion(true, HTML(html: response, encoding: NSUTF8StringEncoding))
+            }
+            else {
+                sync {
+                    //Calling completion synchronously
+                    completion(true, HTML(html: response, encoding: NSUTF8StringEncoding))
+                }
+            }
         }
-    }
-    
-    static func sendLogoutRequest(doCrash: Bool = true) {
-        let crash: Int! = doCrash ? nil : 0
-        crash.threeCharacterString()
     }
     
     static func contentsOfPage(url: String, postNotificationOnError: Bool = true) -> HTMLDocument? {
@@ -321,13 +326,3 @@ extension XMLElement {
     }
     
 }
-
-
-
-
-
-
-
-
-
-

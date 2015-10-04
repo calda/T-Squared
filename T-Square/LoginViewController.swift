@@ -40,6 +40,29 @@ class LoginViewController: UIViewController {
         if animated { return }
         if TSAuthenticatedReader != nil { return } //we're already authenticated
         
+        //double check we aren't already authenticated
+        let rootPage = "http://t-square.gatech.edu/portal/pda/"
+        let pageContents = HttpClient.contentsOfPage(rootPage, postNotificationOnError: false)?.toHTML
+        
+        guard let contents = pageContents else {
+            networkErrorRecieved()
+            return
+        }
+        if contents.containsString("Log Out") {
+            //we're still on a valid connection, but the authenticated reader doesn't exist
+            //recreate the reader
+            if let (username, password) = savedCredentials() {
+                TSAuthenticatedReader = TSReader(username: username, password: password, initialPage: nil)
+                return
+            }
+            else {
+                //the reader doesn't exist, but we don't have stored credentials
+                //clear cookies and then prompt for login again
+                HttpClient.clearCookies()
+            }
+        }
+        
+        //if no valid connections, prompt for login
         self.formCenter.constant = self.view.frame.height / 2.0
         self.webViewTop.constant = UIScreen.mainScreen().bounds.height
         self.containerLeading.constant = UIScreen.mainScreen().bounds.width
@@ -47,9 +70,9 @@ class LoginViewController: UIViewController {
         
         originalLoggingInText = loggingInText.attributedText!
         
-        let data = NSUserDefaults.standardUserDefaults()
-        if let savedUsername = data.stringForKey(TSUsernamePath), let savedPassword = data.stringForKey(TSPasswordPath) {
+        if let (savedUsername, savedPassword) = savedCredentials() {
             animateFormSubviewsWithDuration(0.0, hidden: true)
+            animateActivityIndicator(on: true)
             usernameField.text = savedUsername
             passwordField.text = savedPassword
             doLogin(newLogin: false)
@@ -86,6 +109,9 @@ class LoginViewController: UIViewController {
     //MARK: - Animating and processing form input
     
     func keyboardHeightChanged(notification: NSNotification) {
+        //ignore if the classes controller is visible
+        if self.containerLeading.constant == 0.0 { return }
+        
         if let userInfo = notification.userInfo,
            let keyboardFrame = (userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue {
             
@@ -108,7 +134,7 @@ class LoginViewController: UIViewController {
             self.formCenter.constant = -10.0
             self.backgroundBottom.constant = 0.0
             self.view.layoutIfNeeded()
-            }, completion: nil)
+        }, completion: nil)
     }
 
     @IBAction func switchToPasswordInput(sender: AnyObject) {
@@ -141,7 +167,7 @@ class LoginViewController: UIViewController {
         
         //animate the activity indicator
         animateFormSubviewsWithDuration(0.5, hidden: true)
-        animateActivityIndicator(on: true)
+        delay(0.2) { self.animateActivityIndicator(on: true) }
         
         //attempt to authenticate
         dispatch_async(TSNetworkQueue, {
@@ -185,8 +211,10 @@ class LoginViewController: UIViewController {
     func setSavedCredentials(correct correct: Bool) {
         let save = correct && saveCredentialsSwitch.on
         let data = NSUserDefaults.standardUserDefaults()
-        data.setValue(save ? usernameField.text! : nil, forKey: TSUsernamePath)
-        data.setValue(save ? passwordField.text! : nil, forKey: TSPasswordPath)
+        let usernameData = encryptString(usernameField.text!)
+        let passwordData = encryptString(passwordField.text!)
+        data.setValue(save ? usernameData : nil, forKey: TSUsernamePath)
+        data.setValue(save ? passwordData : nil, forKey: TSPasswordPath)
     }
     
     func animateFormSubviewsWithDuration(duration: Double, hidden: Bool) {
@@ -208,7 +236,7 @@ class LoginViewController: UIViewController {
     func animateActivityIndicator(on on: Bool) {
         
         var originalIndicatorPosition: CGPoint {
-            return CGPointMake(CGRectGetMidX(formView.frame) - activityIndicator.frame.width / 2.0, (CGRectGetMidY(formView.frame) - activityIndicator.frame.height / 2.0) + 20.0)
+            return CGPointMake(CGRectGetMidX(formView.frame) - activityIndicator.frame.width / 2.0, (CGRectGetMidY(formView.frame) - activityIndicator.frame.height / 2.0) + 50.0)
         }
         
         if on {
@@ -246,18 +274,24 @@ class LoginViewController: UIViewController {
         tapRecognizer.enabled = false
         var classes: [Class] = []
         var loadAttempt = 0
-        while classes.count == 0 && loadAttempt < 10 {
+        while classes.count == 0 && loadAttempt < 15 {
             loadAttempt++
             classes = reader.getClasses()
+            
+            if loadAttempt > 10 {
+                HttpClient.clearCookies()
+            }
         }
         
-        if loadAttempt >= 10 {
+        if loadAttempt >= 15 {
             //present an alert and then exit the app if the classes aren't loading
             //this means a failed authentication looked like it passed
             //AKA I have no idea what happened
             let alert = UIAlertController(title: "There was a problem logging you in.", message: "This happens every now and then. Please restart T-Squared and try again.", preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "Restart", style: .Default, handler: { _ in
-                HttpClient.sendLogoutRequest()
+                //crash
+                let null: Int! = nil
+                null.threeCharacterString()
             }))
             self.presentViewController(alert, animated: true, completion: nil)
             self.setSavedCredentials(correct: false)

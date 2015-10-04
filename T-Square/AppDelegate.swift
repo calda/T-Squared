@@ -44,9 +44,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
-        
-        //verify login still valid
-        delay(0.6) {
+    
+    }
+
+    func applicationDidBecomeActive(application: UIApplication) {
+        delay(0.1) {
             guard let _ = TSAuthenticatedReader else { return }
             guard let loginController = self.window?.rootViewController as? LoginViewController else { return }
             
@@ -55,7 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let pageContents = HttpClient.contentsOfPage(rootPage, postNotificationOnError: false)?.toHTML
             
             guard let contents = pageContents else {
-                print("Network unavailable.")
+                //"Network unavailable."
                 let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Network connection is unavailable.", preferredStyle: .Alert)
                 alert.addAction(UIAlertAction(title: "Nevermind", style: .Destructive, handler: nil))
                 alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
@@ -64,11 +66,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             
             if !contents.containsString("Log Out") {
-                print("Cookies invalid. Attempting to reconnect.")
+                //"Cookies invalid. Attempting to reconnect.
+                HttpClient.isRunningInBackground = true
                 TSReader.authenticatedReader(user: TSAuthenticatedReader.username, password: TSAuthenticatedReader.password, isNewLogin: false, completion: { reader in
                     if let reader = reader {
                         TSAuthenticatedReader = reader
-                        print("Successfully reconnected to T-Square")
+                        //Successfully reconnected to T-Square
                     }
                     else {
                         loginController.unpresentClassesView()
@@ -77,21 +80,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         loginController.presentViewController(alert, animated: true, completion: nil)
                     }
                 })
-            }
-            else {
-                print("Cookies still valid.")
+                HttpClient.isRunningInBackground = false
             }
         }
-    }
-
-    func applicationDidBecomeActive(application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     }
 
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-    
 }
-

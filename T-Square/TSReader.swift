@@ -341,6 +341,7 @@ extension String {
     func dateWithTSquareFormat() -> NSDate? {
         //convert date string to NSDate
         let formatter = NSDateFormatter()
+        formatter.locale = NSLocale(localeIdentifier: "en_US")
         formatter.dateStyle = .MediumStyle
         formatter.timeStyle = .ShortStyle
         //correct formatting to match required style

@@ -242,10 +242,14 @@
                                     <animations/>
                                 </view>
                                 <animations/>
+                                <gestureRecognizers/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="dlH-RA-T0I"/>
                                 </constraints>
                                 <blurEffect style="extraLight"/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="V0C-FW-JIS" appends="YES" id="qaZ-kH-0Lb"/>
+                                </connections>
                             </visualEffectView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rq9-mh-oAo" userLabel="web container">
                                 <rect key="frame" x="0.0" y="568" width="320" height="568"/>
@@ -355,6 +359,13 @@
                 <tapGestureRecognizer id="DxF-28-en0">
                     <connections>
                         <action selector="defocusTextViews:" destination="BYZ-38-t0r" id="tcN-Qn-Jer"/>
+                        <outlet property="delegate" destination="BYZ-38-t0r" id="2ps-qM-VcW"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer id="V0C-FW-JIS" userLabel="status bar tap">
+                    <connections>
+                        <action selector="statusBarTapped:" destination="BYZ-38-t0r" id="VgW-yW-OWM"/>
+                        <outlet property="delegate" destination="BYZ-38-t0r" id="Rgf-gC-lP0"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
@@ -407,22 +418,22 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TRK-te-zri">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TRK-te-zri" userLabel="logout">
                                                     <rect key="frame" x="281" y="13" width="23" height="23"/>
                                                     <animations/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="TRK-te-zri" secondAttribute="height" multiplier="1:1" id="zt4-5H-zpS"/>
                                                     </constraints>
-                                                    <state key="normal" image="button-settings"/>
+                                                    <state key="normal" image="button-logout"/>
                                                 </button>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7mD-Xs-A9a">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7mD-Xs-A9a" userLabel="logout large">
                                                     <rect key="frame" x="167" y="0.0" width="153" height="49"/>
                                                     <animations/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="7mD-Xs-A9a" secondAttribute="height" multiplier="150:48" id="5wv-Yr-f5d"/>
                                                     </constraints>
                                                     <connections>
-                                                        <action selector="settingsButtonPressed:" destination="fjA-f3-0dw" eventType="touchUpInside" id="scQ-Ov-i2t"/>
+                                                        <action selector="logoutButtonPressed:" destination="fjA-f3-0dw" eventType="touchUpInside" id="f47-Ef-1Yo"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="jstephens60" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0VQ-P9-T1S">
@@ -432,23 +443,53 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.34999999999999998" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BJm-z4-4A0" userLabel="settings">
+                                                    <rect key="frame" x="16" y="8" width="33" height="33"/>
+                                                    <animations/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="BJm-z4-4A0" secondAttribute="height" multiplier="1:1" id="h5N-1h-Ena"/>
+                                                    </constraints>
+                                                    <state key="normal" image="button-settings"/>
+                                                </button>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NwJ-pD-gt9" userLabel="settings-large">
+                                                    <rect key="frame" x="0.0" y="0.0" width="93" height="48"/>
+                                                    <animations/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="93" id="SkU-0t-xTz"/>
+                                                    </constraints>
+                                                    <connections>
+                                                        <action selector="settingsButtonPressed:" destination="fjA-f3-0dw" eventType="touchUpInside" id="zyH-Wu-uT6"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <animations/>
                                             <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
                                             <constraints>
                                                 <constraint firstItem="TRK-te-zri" firstAttribute="trailing" secondItem="gNh-sP-83Y" secondAttribute="trailingMargin" constant="-8" id="48F-20-9HI"/>
                                                 <constraint firstItem="TRK-te-zri" firstAttribute="leading" secondItem="0VQ-P9-T1S" secondAttribute="trailing" constant="8" id="58z-jc-uim"/>
+                                                <constraint firstAttribute="bottom" secondItem="NwJ-pD-gt9" secondAttribute="bottom" constant="1" id="7b4-EN-v0b"/>
+                                                <constraint firstAttribute="bottom" secondItem="BJm-z4-4A0" secondAttribute="bottom" constant="8" id="BFq-fj-f1b"/>
+                                                <constraint firstItem="BJm-z4-4A0" firstAttribute="top" secondItem="gNh-sP-83Y" secondAttribute="top" constant="8" id="ERo-uu-PNf"/>
                                                 <constraint firstAttribute="bottom" secondItem="7mD-Xs-A9a" secondAttribute="bottom" id="EzU-Cl-ihn"/>
                                                 <constraint firstItem="7mD-Xs-A9a" firstAttribute="top" secondItem="gNh-sP-83Y" secondAttribute="top" id="Frw-f6-qdJ"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="BJm-z4-4A0" secondAttribute="bottom" constant="8" id="GCB-x0-p4Q"/>
                                                 <constraint firstItem="7mD-Xs-A9a" firstAttribute="width" secondItem="7mD-Xs-A9a" secondAttribute="height" multiplier="101:48" id="Jj8-nw-R8I"/>
                                                 <constraint firstItem="TRK-te-zri" firstAttribute="bottom" secondItem="gNh-sP-83Y" secondAttribute="bottomMargin" constant="-5" id="Osi-nO-oX3"/>
+                                                <constraint firstItem="NwJ-pD-gt9" firstAttribute="leading" secondItem="gNh-sP-83Y" secondAttribute="leading" id="gJ2-WR-uuo"/>
+                                                <constraint firstItem="BJm-z4-4A0" firstAttribute="leading" secondItem="gNh-sP-83Y" secondAttribute="leading" constant="16" id="icT-3M-fYm"/>
                                                 <constraint firstItem="TRK-te-zri" firstAttribute="top" secondItem="gNh-sP-83Y" secondAttribute="topMargin" constant="5" id="p0Z-Vr-46M"/>
+                                                <constraint firstItem="BJm-z4-4A0" firstAttribute="top" secondItem="gNh-sP-83Y" secondAttribute="topMargin" constant="8" id="t48-SZ-d1L"/>
+                                                <constraint firstItem="BJm-z4-4A0" firstAttribute="leading" secondItem="gNh-sP-83Y" secondAttribute="leadingMargin" constant="8" id="vA7-zj-8gC"/>
                                                 <constraint firstAttribute="trailing" secondItem="7mD-Xs-A9a" secondAttribute="trailing" id="xKT-O8-Tmh"/>
                                                 <constraint firstItem="TRK-te-zri" firstAttribute="width" secondItem="TRK-te-zri" secondAttribute="height" multiplier="1:1" id="y3k-J6-jbl"/>
+                                                <constraint firstItem="NwJ-pD-gt9" firstAttribute="top" secondItem="gNh-sP-83Y" secondAttribute="top" id="yOv-fD-VOU"/>
                                                 <constraint firstItem="0VQ-P9-T1S" firstAttribute="centerY" secondItem="gNh-sP-83Y" secondAttribute="centerY" id="zml-DZ-Awq"/>
                                             </constraints>
                                             <variation key="default">
                                                 <mask key="constraints">
+                                                    <exclude reference="GCB-x0-p4Q"/>
+                                                    <exclude reference="t48-SZ-d1L"/>
+                                                    <exclude reference="vA7-zj-8gC"/>
                                                     <exclude reference="Jj8-nw-R8I"/>
                                                 </mask>
                                             </variation>
@@ -1678,8 +1719,9 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
         <image name="background-gradient" width="1280" height="1280"/>
         <image name="background-techtower" width="1242" height="2208"/>
         <image name="button-back" width="25" height="25"/>
+        <image name="button-logout" width="25" height="25"/>
         <image name="button-paperclip" width="50" height="50"/>
-        <image name="button-settings" width="256" height="256"/>
+        <image name="button-settings" width="25" height="25"/>
         <image name="button-web-back" width="100" height="100"/>
         <image name="button-web-close" width="100" height="100"/>
         <image name="button-web-forward" width="100" height="100"/>

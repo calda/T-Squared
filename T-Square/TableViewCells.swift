@@ -208,8 +208,12 @@ class BackCell : UITableViewCell {
 
 class LogoutSettingsCell : TitleCell {
     
-    @IBAction func settingsButtonPressed(sender: UIButton) {
+    @IBAction func logoutButtonPressed(sender: UIButton) {
         NSNotificationCenter.defaultCenter().postNotificationName(TSLogoutNotification, object: nil)
+    }
+    
+    @IBAction func settingsButtonPressed(sender: UIButton) {
+        NSNotificationCenter.defaultCenter().postNotificationName(TSShowSettingsNotification, object: nil)
     }
     
 }

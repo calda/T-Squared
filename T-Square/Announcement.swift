@@ -82,7 +82,7 @@ class Announcement : CustomStringConvertible {
     }
     
     func hasBeenRead() -> Bool {
-        guard let date = self.date else { return false }
+        guard let date = self.date else { return true }
         let data = NSUserDefaults.standardUserDefaults()
         
         //mark as read if the announcement pre-dates the install date of the app

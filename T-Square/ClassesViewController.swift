@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SafariServices
+import MessageUI
 
 //MARK: View Controller and initial Delegate
 
@@ -16,8 +17,9 @@ let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled
 let TSSetActivityIndicatorVisibleNotification = "edu.gatech.cal.activityIndicatorVisible"
 let TSBackNotification = "edu.gatech.cal.backTriggered"
 let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
+let TSShowSettingsNotification = "edu.gatech.cal.showSettings"
 
-class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate {
+class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate, MFMailComposeViewControllerDelegate {
 
     var classes: [Class]?
     var loadingAnnouncements: Bool = true
@@ -32,6 +34,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet var touchRecognizer: UITouchGestureRecognizer!
     @IBOutlet weak var collectionViewHeight: NSLayoutConstraint!
+    var refreshControl: UIRefreshControl!
     
     var activityIndicator: UIView! {
         return loginController.activityCircle
@@ -198,9 +201,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Customization of the view
     
     override func viewDidLoad() {
-        let refresh = UIRefreshControl()
-        refresh.addTarget(self, action: "tableRefreshed:", forControlEvents: .ValueChanged)
-        tableView.addSubview(refresh)
+        refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: "tableRefreshed:", forControlEvents: .ValueChanged)
+        tableView.addSubview(refreshControl)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -212,6 +215,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         updateBottomView()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setTouchDelegateEnabled:", name: TSSetTouchDelegateEnabledNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "backTriggered", name: TSBackNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "scrollToTop", name: TSStatusBarTappedNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "pushSettingsDelegate", name: TSShowSettingsNotification, object: nil)
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -228,6 +233,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func updateBottomView(offset offset: CGFloat = 0) {
+        //update the bottom view
         let contentHeight = tableView.contentSize.height + offset
         let scroll = tableView.contentOffset.y
         let height = tableView.frame.height
@@ -242,6 +248,14 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 self.view.layoutIfNeeded()
             })
         }
+        
+        //also update the refresh control's alpha
+        //1.0 alpha when scroll = -65
+        var alpha: CGFloat = 0.0
+        if scroll < -10.0 {
+            alpha = min(1.0, (scroll + 10.0) / -75.0)
+        }
+        refreshControl.alpha = alpha
     }
     
     //MARK: - User Interaction
@@ -373,7 +387,14 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
         
         delegate.loadData()
-        refresh.endRefreshing()
+        tableView.reloadData()
+        delay(0.3) {
+            refresh.endRefreshing()
+        }
+    }
+    
+    func scrollToTop() {
+        tableView.setContentOffset(CGPointZero, animated: true)
     }
     
     //MARK: - Stackable Table Delegate methods
@@ -578,6 +599,27 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     func setActivityIndicatorVisible(visible: Bool) {
         loginController.setActivityCircleVisible(visible)
+    }
+    
+    func pushSettingsDelegate() {
+        pushDelegate(SettingsDelegate(controller: self), hasBeenUpdatedToNewLoadFormat: true)
+    }
+    
+    func openContactEmail() {
+        if !MFMailComposeViewController.canSendMail() {
+            let alert = UIAlertController(title: "Cannot Send Mail", message: "You mail account is not set up correctly.", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+        let mail = MFMailComposeViewController()
+        mail.setToRecipients(["cal@calstephens.tech"])
+        mail.setSubject("T-Squared Support for Version \(NSBundle.applicationVersionNumber) (\(NSBundle.applicationBuildNumber))")
+        mail.mailComposeDelegate = self
+        self.presentViewController(mail, animated: true, completion: nil)
+    }
+    
+    func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
+        controller.dismissViewControllerAnimated(true, completion: nil)
     }
     
 }

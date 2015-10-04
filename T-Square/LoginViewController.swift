@@ -15,7 +15,7 @@ var TSAuthenticatedReader: TSReader!
 let TSLogoutNotification = "edu.gatech.cal.logout"
 let TSDismissWebViewNotification = "edu.gatech.cal.dismissWeb"
 
-class LoginViewController: UIViewController {
+class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
 
     @IBOutlet weak var formCenter: NSLayoutConstraint!
     @IBOutlet weak var backgroundBottom: NSLayoutConstraint!
@@ -266,6 +266,10 @@ class LoginViewController: UIViewController {
             passwordField.resignFirstResponder()
             centerForm()
         }
+    }
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
     
     //MARK: - Switching Views

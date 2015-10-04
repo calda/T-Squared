@@ -650,3 +650,21 @@ extension NSString {
     }
     
 }
+
+extension NSBundle {
+    
+    static var applicationVersionNumber: String {
+        if let version = NSBundle.mainBundle().infoDictionary?["CFBundleShortVersionString"] as? String {
+            return version
+        }
+        return "Version Number Not Available"
+    }
+    
+    static var applicationBuildNumber: String {
+        if let build = NSBundle.mainBundle().infoDictionary?["CFBundleVersion"] as? String {
+            return build
+        }
+        return "Build Number Not Available"
+    }
+    
+}

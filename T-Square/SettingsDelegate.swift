@@ -9,7 +9,8 @@
 import Foundation
 import UIKit
 
-let TSDisclaimerText = "Cal is a freshman at Georgia Tech. He is in no way affiliated with campus officials. This app is an unofficial service provided at user discretion."
+let TSDisclaimerText = "Cal is a freshman at Georgia Tech. He is in no way affiliated with campus officials. This app is an unofficial service provided at user discretion. Saved account information is encrypted, and only leaves the device to authenticate with Georgia Tech's official login service."
+let TSLicenseText = "T-Squared is licensed under the GNU General Public License v2.0. Source Code is provided for those interested in validating the security of their credentials. "
 let TSAvailableWidth = UIScreen.mainScreen().bounds.width - 24.0
 
 
@@ -52,9 +53,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
                 cell.decorate(TSDisclaimerText)
                 cell.titleLabel.alpha = 0.35
             }
-        }, onTap: { controller in
-            controller.openLinkInSafari("http://calstephens.tech", title: "Developer Website")
-        }),
+        }, onTap: nil),
         
         //website title
         (identifier: "boldTitle", height: 30.0, onDisplay: { cell in
@@ -64,7 +63,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
         }, onTap: nil),
         
         //website link
-        (identifier: "subtitle", height: 40.0, onDisplay: { cell in
+        (identifier: "subtitle", height: 30.0, onDisplay: { cell in
             if let cell = cell as? TitleCell {
                 cell.decorate("http://calstephens.tech")
             }
@@ -74,7 +73,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
         
         //blank
         (identifier: "blank", height: 15.0, onDisplay: nil, onTap: nil),
-
+ 
         //email title
         (identifier: "boldTitle", height: 30.0, onDisplay: { cell in
             if let cell = cell as? TitleCell {
@@ -83,12 +82,53 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
         }, onTap: nil),
         
         //email link
-        (identifier: "subtitle", height: 40.0, onDisplay: { cell in
+        (identifier: "subtitle", height: 30.0, onDisplay: { cell in
             if let cell = cell as? TitleCell {
                 cell.decorate("cal@calstephens.tech")
             }
         }, onTap: { controller in
             controller.openContactEmail()
+        }),
+        
+        //blank
+        (identifier: "blank", height: 15.0, onDisplay: nil, onTap: nil),
+        
+        //source code title
+        (identifier: "boldTitle", height: 30.0, onDisplay: { cell in
+            if let cell = cell as? TitleCell {
+                cell.decorate("Source Code")
+            }
+            }, onTap: nil),
+        
+        //source code link
+        (identifier: "subtitle", height: 30.0, onDisplay: { cell in
+            if let cell = cell as? TitleCell {
+                cell.decorate("GitHub")
+            }
+        }, onTap: { controller in
+                controller.openLinkInSafari("https://github.com/calda/T-Square", title: "Source Code")
+        }),
+        
+        //blank
+        (identifier: "blank", height: 15.0, onDisplay: nil, onTap: nil),
+        
+        //license
+        (identifier: "boldTitle", height: 30.0, onDisplay: { cell in
+            if let cell = cell as? TitleCell {
+                cell.decorate("License")
+            }
+        }, onTap: { controller in
+                controller.openLinkInSafari("http://choosealicense.com/licenses/gpl-2.0/", title: "License")
+        }),
+        
+        //disclaimer
+        (identifier: "gradeComment", height: heightForText(TSLicenseText, width: TSAvailableWidth - 50.0, font: UIFont.systemFontOfSize(15.0)) + 20.0, onDisplay: { cell in
+            if let cell = cell as? TitleCell {
+                cell.decorate(TSLicenseText)
+                cell.titleLabel.alpha = 0.35
+            }
+        }, onTap: { controller in
+                controller.openLinkInSafari("http://choosealicense.com/licenses/gpl-2.0/", title: "License")
         })
         
     ]
@@ -126,6 +166,13 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
         UIView.animateWithDuration(0.3, animations: {
             cell.backgroundColor = backgroundColor
         })
+    }
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+        delay(0.5) {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+        }
     }
     
     func loadCachedData() {

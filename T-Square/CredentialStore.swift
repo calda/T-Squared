@@ -9,6 +9,10 @@
 import Foundation
 import CryptoSwift
 
+//Key (key.secure) and IV (IV.secure) are 16-byte UTF8 strings used to encrypt and decrypt user credentials.
+//These files should never be commited to a public repository, as that would compromise the security of the encryption.
+//If the keys are lost, some transition strategy will be necessary. (The app crashes when attempting to decrypt with an invalid key.)
+
 var SECURE_KEY: [UInt8] {
     get {
         let keyPath = NSBundle.mainBundle().pathForResource("key", ofType: "secure")!

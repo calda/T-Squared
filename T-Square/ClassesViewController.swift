@@ -482,7 +482,25 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func loadData() {
+        if self.loadingAnnouncements { return }
+        loadAnnouncements()
+    }
+    
+    func loadAnnouncements() {
         self.classes = TSAuthenticatedReader.getClasses()
+        
+        self.announcements = []
+        self.loadingAnnouncements = true
+        
+        dispatch_async(TSNetworkQueue, {
+            for currentClass in self.classes! {
+                let announcements = TSAuthenticatedReader.getAnnouncementsForClass(currentClass)
+                sync() {
+                    self.addAnnouncements(announcements)
+                }
+            }
+            sync() { self.doneLoadingAnnoucements() }
+        })
     }
     
     func loadCachedData() {

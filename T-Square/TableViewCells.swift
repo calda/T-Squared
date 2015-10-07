@@ -191,7 +191,7 @@ class BackCell : UITableViewCell {
     }
     
     func setActivityIndicatorEnabled(notification: NSNotification) {
-        activityIndicator.startAnimating()
+        self.activityIndicator.startAnimating()
         
         if let visible = notification.object as? Bool {
             UIView.animateWithDuration(0.3, animations: {

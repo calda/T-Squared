@@ -312,15 +312,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
             self.view.layoutIfNeeded()
         }, completion: nil)
         
-        dispatch_async(TSNetworkQueue, {
-            for currentClass in classes {
-                let announcements = reader.getAnnouncementsForClass(currentClass)
-                sync() {
-                    self.classesViewController.addAnnouncements(announcements)
-                }
-            }
-            sync() { self.classesViewController.doneLoadingAnnoucements() }
-        })
+        classesViewController.loadAnnouncements()
     }
     
     func unpresentClassesView() {

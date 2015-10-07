@@ -121,4 +121,11 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         return displayClass.grades == nil
     }
     
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+        delay(0.5) {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+        }
+    }
+    
 }

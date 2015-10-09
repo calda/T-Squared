@@ -21,6 +21,18 @@ class ClassNameCell : UITableViewCell {
     
 }
 
+class ClassNameCellWithIcon : ClassNameCell {
+    
+    @IBOutlet weak var icon: UIImageView!
+    
+    override func decorate(displayClass: Class) {
+        super.decorate(displayClass)
+        self.icon.image = UIImage(named: displayClass.subjectIcon)?.imageWithRenderingMode(.AlwaysTemplate)
+        self.icon.tintColor = UIColor.blackColor()
+    }
+    
+}
+
 class AnnouncementCell : UITableViewCell {
     
     var announcement: Announcement!

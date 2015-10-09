@@ -385,6 +385,7 @@ struct Stack<T> {
     }
     
     var top: T? {
+        if array.count == 0 { return nil }
         return array[count - 1]
     }
     

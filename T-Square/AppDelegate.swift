@@ -10,6 +10,9 @@ import UIKit
 
 let TSStatusBarTappedNotification = "edu.gatech.cal.statusBarTapped"
 
+@available(iOS 9.0, *)
+var TSQueuedShortcutItem: UIApplicationShortcutItem?
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -35,8 +38,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
-
+    
     func applicationDidBecomeActive(application: UIApplication) {
+        
+        //verify authentication
         delay(0.1) {
             guard let _ = TSAuthenticatedReader else { return }
             guard let loginController = self.window?.rootViewController as? LoginViewController else { return }
@@ -61,6 +66,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     if let reader = reader {
                         TSAuthenticatedReader = reader
                         //Successfully reconnected to T-Square
+                        self.openShortcutItemIfPresent()
                     }
                     else {
                         loginController.unpresentClassesView()
@@ -71,6 +77,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 })
                 HttpClient.isRunningInBackground = false
             }
+            else {
+                self.openShortcutItemIfPresent()
+            }
+        }
+    }
+    
+    func openShortcutItemIfPresent() {
+        if #available(iOS 9.0, *) {
+            guard let item = TSQueuedShortcutItem else { return }
+            TSQueuedShortcutItem = nil
+            
+            guard let info = item.userInfo else { return }
+            guard let URL = info["URL"] as? String else { return }
+            guard let ID = info["ID"] as? String else { return }
+            let openedClass = Class(withID: ID, link: URL)
+            
+            print("Opening \(openedClass.ID) from Shortcut Item")
+            guard let loginController = window?.rootViewController as? LoginViewController else { return }
+            guard let classesController = loginController.classesViewController else { return }
+            
+            //do nothing if the open delegate matches this class
+            if let currentDelegate = classesController.tableView.delegate as? ClassDelegate {
+                if currentDelegate.displayClass.link == URL {
+                    currentDelegate.loadData()
+                    return
+                }
+            }
+            
+            let delegate = ClassDelegate(controller: classesController, displayClass: openedClass)
+            delegate.loadDataAndPushInController(classesController)
+            
+            //build a manual delegate stack
+            //so that the only item in the stack is the ClassesViewController
+            classesController.delegateStack = Stack()
+            let stackItem: (delegate: StackableTableDelegate, contentOffset: CGPoint) = (classesController, CGPointMake(0.0, 0.0))
+            classesController.delegateStack.push(stackItem)
+            
+            loginController.animatePresentClassesView()
         }
     }
     
@@ -82,6 +126,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let statusBarFrame = UIApplication.sharedApplication().statusBarFrame
         if CGRectContainsPoint(statusBarFrame, location) {
             postNotification(TSStatusBarTappedNotification, object: nil)
+        }
+    }
+    
+    @available(iOS 9.0, *)
+    func application(application: UIApplication, performActionForShortcutItem shortcutItem: UIApplicationShortcutItem, completionHandler: (Bool) -> Void) {
+        TSQueuedShortcutItem = shortcutItem
+        
+        //hide classes view controller
+        if let loginController = window?.rootViewController as? LoginViewController {
+            loginController.unpresentClassesView(0.0)
+            loginController.animateFormSubviewsWithDuration(0.0, hidden: true)
+            delay(0.2) { loginController.animateActivityIndicator(on: true) }
         }
     }
 

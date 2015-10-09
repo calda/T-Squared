@@ -89,7 +89,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
             if let classes = classes {
                 let displayClass = classes[index - 1]
-                let cell = tableView.dequeueReusableCellWithIdentifier("class") as! ClassNameCell
+                let cell = tableView.dequeueReusableCellWithIdentifier("classWithIcon") as! ClassNameCell
                 cell.decorate(displayClass)
                 //if index == classes.count {
                 //    cell.hideSeparator()
@@ -116,7 +116,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             return cell
         }
         
-        return tableView.dequeueReusableCellWithIdentifier("class")!
+        return tableView.dequeueReusableCellWithIdentifier("classWithIcon")!
     }
     
     func reloadTable(centerTable: Bool = false) {

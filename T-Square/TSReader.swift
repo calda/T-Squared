@@ -48,6 +48,13 @@ class TSReader {
         var classes: [Class] = []
         var saveLinksAsClasses: Bool = false
         
+        defer {
+            if classes.count > 0 {
+                Class.updateShotcutItemsForActiveClasses(classes)
+            }
+            self.initialPage = nil
+        }
+        
         for link in doc.css("a, link") {
             if let rawText = link.text {
                 

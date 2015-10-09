@@ -19,6 +19,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
     init(controller: ClassesViewController, displayClass: Class) {
         self.controller = controller
         self.displayClass = displayClass
+        displayClass.markClassOpened()
     }
     
     static let hideSeparator: (UITableViewCell, Class) -> () = { cell, _ in
@@ -39,7 +40,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
     var cells: [(identifier: String, onDisplay: (UITableViewCell, Class) -> (), onTap: ((ClassesViewController, Class) -> ())? )] = [
     
         (identifier: "back", onDisplay: hideSeparator, onTap: nil),
-        (identifier: "classTitle", onDisplay: { cell, displayClass in
+        (identifier: "classTitleWithIcon", onDisplay: { cell, displayClass in
             if let cell = cell as? ClassNameCell {
                 cell.decorate(displayClass)
                 cell.hideSeparator()
@@ -136,7 +137,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         if indexPath.section == 0 {
             let identifier = cells[indexPath.item].identifier
             if identifier == "blank" { return 15.0 }
-            if identifier == "classTitle" { return 80.0 }
+            if identifier == "classTitleWithIcon" { return 80.0 }
             if identifier == "announcementTitle" { return 60.0 }
         }
         if indexPath.section == 1 {

@@ -39,6 +39,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             let cell = tableView.dequeueReusableCellWithIdentifier("classTitle") as! ClassNameCell
             cell.nameLabel.text = displayClass.grades?.scoreString ?? "--%"
             cell.subjectLabel.text = "Current grade in \(displayClass.name)"
+            cell.hideSeparator()
             return cell
         }
         

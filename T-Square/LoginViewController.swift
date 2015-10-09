@@ -305,18 +305,30 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         classesViewController.classes = classes
         classesViewController.reloadTable()
         
+        //open to the shortcut item if there is one queued
+        if let delegate = UIApplication.sharedApplication().delegate as? AppDelegate {
+            delegate.openShortcutItemIfPresent()
+        }
+        
+        animatePresentClassesView()
+        classesViewController.loadAnnouncements()
+    }
+    
+    func animatePresentClassesView() {
         UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             self.formView.alpha = 0.0
             self.formView.transform = CGAffineTransformMakeScale(0.6, 0.6)
             self.containerLeading.constant = 0.0
             self.view.layoutIfNeeded()
         }, completion: nil)
-        
-        classesViewController.loadAnnouncements()
     }
     
     func unpresentClassesView() {
-        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+        unpresentClassesView()
+    }
+    
+    func unpresentClassesView(duration: Double) {
+        UIView.animateWithDuration(duration, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             self.formView.alpha = 1.0
             self.formView.transform = CGAffineTransformMakeScale(1.0, 1.0)
             self.containerLeading.constant = self.view.frame.width
@@ -339,6 +351,8 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         self.usernameField.text = ""
         self.passwordField.text = ""    
         self.setSavedCredentials(correct: false)
+        NSUserDefaults.standardUserDefaults().setValue(nil, forKey: TSClassOpenCountKey)
+        Class.updateShortcutItems()
         
         unpresentClassesView()
     }

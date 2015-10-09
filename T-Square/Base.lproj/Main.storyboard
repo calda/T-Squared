@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="15A279b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
@@ -540,8 +540,59 @@
                                             <outlet property="subjectLabel" destination="4A0-Yb-A8b" id="0c3-A5-suk"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="classWithIcon" rowHeight="70" id="Rk4-tu-Vts" userLabel="classWithIcon" customClass="ClassNameCellWithIcon" customModule="T_Squared" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="142" width="320" height="70"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Rk4-tu-Vts" id="SZv-8L-gmv">
+                                            <rect key="frame" x="0.0" y="0.0" width="287" height="69"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="257" text="EAS 1601" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FaO-Ps-OcD">
+                                                    <rect key="frame" x="50" y="8" width="107" height="32"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="26"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="dgZ-7R-tPG">
+                                                    <rect key="frame" x="16" y="40" width="263" height="21"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" verticalHuggingPriority="236" horizontalCompressionResistancePriority="738" verticalCompressionResistancePriority="739" image="class-science" translatesAutoresizingMaskIntoConstraints="NO" id="8JL-nU-GtP">
+                                                    <rect key="frame" x="16" y="12" width="24" height="24"/>
+                                                    <animations/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="8JL-nU-GtP" secondAttribute="height" multiplier="1:1" id="M3v-OC-sX5"/>
+                                                    </constraints>
+                                                </imageView>
+                                            </subviews>
+                                            <animations/>
+                                            <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="FaO-Ps-OcD" firstAttribute="top" secondItem="SZv-8L-gmv" secondAttribute="topMargin" id="Idu-Hb-mzO"/>
+                                                <constraint firstItem="8JL-nU-GtP" firstAttribute="leading" secondItem="SZv-8L-gmv" secondAttribute="leadingMargin" constant="8" id="QpJ-bX-sZX"/>
+                                                <constraint firstItem="8JL-nU-GtP" firstAttribute="top" secondItem="SZv-8L-gmv" secondAttribute="topMargin" constant="4" id="VDq-jv-c8i"/>
+                                                <constraint firstItem="dgZ-7R-tPG" firstAttribute="leading" secondItem="SZv-8L-gmv" secondAttribute="leadingMargin" constant="8" id="Ypd-4j-ql6"/>
+                                                <constraint firstItem="8JL-nU-GtP" firstAttribute="height" secondItem="FaO-Ps-OcD" secondAttribute="height" multiplier="0.75" id="de5-Db-BUA"/>
+                                                <constraint firstItem="dgZ-7R-tPG" firstAttribute="bottom" secondItem="SZv-8L-gmv" secondAttribute="bottomMargin" id="juV-Vc-zWE"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="dgZ-7R-tPG" secondAttribute="trailing" id="kkd-g3-YN9"/>
+                                                <constraint firstItem="FaO-Ps-OcD" firstAttribute="leading" secondItem="SZv-8L-gmv" secondAttribute="leadingMargin" constant="42" id="tzF-XV-btj"/>
+                                                <constraint firstItem="dgZ-7R-tPG" firstAttribute="top" secondItem="FaO-Ps-OcD" secondAttribute="bottom" id="yx6-dA-vOf"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <animations/>
+                                        <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        <connections>
+                                            <outlet property="icon" destination="8JL-nU-GtP" id="eIz-wR-rPT"/>
+                                            <outlet property="nameLabel" destination="FaO-Ps-OcD" id="UYB-ta-Qbe"/>
+                                            <outlet property="subjectLabel" destination="dgZ-7R-tPG" id="Z1Z-BK-yMr"/>
+                                        </connections>
+                                    </tableViewCell>
                                     <tableViewCell autoresizesSubviews="NO" clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="classTitle" rowHeight="80" id="LzG-E5-aaG" customClass="ClassNameCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="142" width="320" height="80"/>
+                                        <rect key="frame" x="0.0" y="212" width="320" height="80"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="LzG-E5-aaG" id="Rj4-Uo-sz5">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
@@ -584,8 +635,63 @@
                                             <outlet property="subjectLabel" destination="yzv-64-BjU" id="617-7Q-5NX"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell autoresizesSubviews="NO" clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="classTitleWithIcon" rowHeight="80" id="SH7-Oc-46v" userLabel="classTitleWithIcon" customClass="ClassNameCellWithIcon" customModule="T_Squared" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="292" width="320" height="80"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="SH7-Oc-46v" id="aQa-nu-VVN">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="253" verticalHuggingPriority="253" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="qjT-uP-Gwk">
+                                                    <rect key="frame" x="16" y="50" width="296" height="21"/>
+                                                    <animations/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="21" id="ZLZ-sN-okx"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" verticalHuggingPriority="249" horizontalCompressionResistancePriority="770" verticalCompressionResistancePriority="767" text="EAS 1601" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="N6f-GE-tYh">
+                                                    <rect key="frame" x="62" y="8" width="147" height="42"/>
+                                                    <animations/>
+                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="36"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" verticalHuggingPriority="249" image="class-science" translatesAutoresizingMaskIntoConstraints="NO" id="Qie-hG-sbq">
+                                                    <rect key="frame" x="16" y="13" width="33" height="33"/>
+                                                    <animations/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="Qie-hG-sbq" secondAttribute="height" id="Oac-lh-l0K"/>
+                                                    </constraints>
+                                                </imageView>
+                                            </subviews>
+                                            <animations/>
+                                            <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="qjT-uP-Gwk" firstAttribute="bottom" secondItem="aQa-nu-VVN" secondAttribute="bottomMargin" id="AMW-Oe-ILr"/>
+                                                <constraint firstItem="Qie-hG-sbq" firstAttribute="top" secondItem="aQa-nu-VVN" secondAttribute="topMargin" constant="5" id="Afx-ya-zaa"/>
+                                                <constraint firstItem="N6f-GE-tYh" firstAttribute="leading" secondItem="aQa-nu-VVN" secondAttribute="leadingMargin" constant="54" id="DWr-QH-zPy"/>
+                                                <constraint firstItem="Qie-hG-sbq" firstAttribute="height" secondItem="N6f-GE-tYh" secondAttribute="height" multiplier="0.75" constant="1" id="Ek7-1D-r15"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="qjT-uP-Gwk" secondAttribute="trailing" id="IjH-IN-Qec"/>
+                                                <constraint firstItem="qjT-uP-Gwk" firstAttribute="leading" secondItem="aQa-nu-VVN" secondAttribute="leadingMargin" constant="8" id="Syo-vZ-hcY"/>
+                                                <constraint firstItem="qjT-uP-Gwk" firstAttribute="top" secondItem="N6f-GE-tYh" secondAttribute="bottom" id="aqB-K9-unU"/>
+                                                <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="N6f-GE-tYh" secondAttribute="trailing" id="flf-dm-Krh"/>
+                                                <constraint firstItem="N6f-GE-tYh" firstAttribute="top" secondItem="aQa-nu-VVN" secondAttribute="topMargin" id="hpP-p8-xBa"/>
+                                                <constraint firstItem="Qie-hG-sbq" firstAttribute="leading" secondItem="aQa-nu-VVN" secondAttribute="leadingMargin" constant="8" id="wwC-0a-ANQ"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <animations/>
+                                        <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        <connections>
+                                            <outlet property="icon" destination="Qie-hG-sbq" id="aDs-IB-vpI"/>
+                                            <outlet property="nameLabel" destination="N6f-GE-tYh" id="sZz-RP-HZg"/>
+                                            <outlet property="subjectLabel" destination="qjT-uP-Gwk" id="Yuh-sI-OUW"/>
+                                        </connections>
+                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="standardTitle" rowHeight="50" id="W1h-6I-KYe" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="222" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="372" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="W1h-6I-KYe" id="oZ9-cp-Ou5">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="49"/>
@@ -620,7 +726,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="boldTitle" rowHeight="50" id="FHQ-wu-1L6" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="272" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="422" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="FHQ-wu-1L6" id="7uO-Cv-Fg7">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
@@ -655,7 +761,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="subtitle" rowHeight="50" id="aFQ-MD-N9S" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="322" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="472" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="aFQ-MD-N9S" id="E7Z-bI-3KT">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="49"/>
@@ -690,7 +796,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="title" rowHeight="40" id="AoE-36-0WK" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="372" width="320" height="40"/>
+                                        <rect key="frame" x="0.0" y="522" width="320" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AoE-36-0WK" id="jtU-nB-0Is">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
@@ -729,7 +835,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="titleWithButton" rowHeight="40" id="Jdj-3Q-xGY" customClass="TitleWithButtonCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="412" width="320" height="40"/>
+                                        <rect key="frame" x="0.0" y="562" width="320" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Jdj-3Q-xGY" id="my8-Nk-FOG">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
@@ -796,7 +902,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcement" rowHeight="60" id="R9C-Py-pts" customClass="AnnouncementCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="452" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="602" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="R9C-Py-pts" id="Aph-uo-GPe">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="59"/>
@@ -851,7 +957,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="message" rowHeight="60" id="SV0-7S-hTL" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="512" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="662" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="SV0-7S-hTL" id="Ayp-Mc-aVH">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="59"/>
@@ -886,7 +992,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="back" rowHeight="50" id="hGp-PN-xBo" customClass="BackCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="572" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="722" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="hGp-PN-xBo" id="Yri-7X-Prc">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
@@ -935,7 +1041,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcementTitle" rowHeight="60" id="ucQ-Pd-FWI" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="622" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="772" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ucQ-Pd-FWI" id="TJm-a0-UXK">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="59"/>
@@ -970,7 +1076,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="message-white" rowHeight="40" id="ldi-7Y-Kj8" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="682" width="320" height="40"/>
+                                        <rect key="frame" x="0.0" y="832" width="320" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ldi-7Y-Kj8" id="7EI-pP-bvJ">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
@@ -1005,7 +1111,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcementText" rowHeight="270" id="n6y-kU-iK3" userLabel="announcementText" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="722" width="320" height="270"/>
+                                        <rect key="frame" x="0.0" y="872" width="320" height="270"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="n6y-kU-iK3" id="1Fg-WC-L0H">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="269"/>
@@ -1048,7 +1154,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="attachment" rowHeight="50" id="She-FH-acS" customClass="AttachmentCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="992" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="1142" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="She-FH-acS" id="wYr-cX-bbG">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
@@ -1101,7 +1207,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="folder" rowHeight="50" id="VnO-Ec-BBG" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1042" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="1192" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="VnO-Ec-BBG" id="yvr-2k-Wj6">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="49"/>
@@ -1148,7 +1254,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="assignment" rowHeight="70" id="E3V-j7-B51" customClass="AssignmentCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1092" width="320" height="70"/>
+                                        <rect key="frame" x="0.0" y="1242" width="320" height="70"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="E3V-j7-B51" id="kp2-vC-QBM">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="69"/>
@@ -1189,7 +1295,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="gradeGroup" rowHeight="55" id="Iyz-xe-RVJ" userLabel="gradeGroup" customClass="GradeGroupCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1162" width="320" height="55"/>
+                                        <rect key="frame" x="0.0" y="1312" width="320" height="55"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Iyz-xe-RVJ" id="vrs-Re-dbL">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="54"/>
@@ -1305,7 +1411,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="grade" rowHeight="40" id="nwr-kR-Tjv" userLabel="grade" customClass="GradeCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1217" width="320" height="40"/>
+                                        <rect key="frame" x="0.0" y="1367" width="320" height="40"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nwr-kR-Tjv" id="gr6-6v-1D2">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
@@ -1383,7 +1489,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="gradeComment" rowHeight="60" id="xBy-gH-Llg" userLabel="gradeComment" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1257" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="1407" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="xBy-gH-Llg" id="mb1-em-79C">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="59"/>
@@ -1442,7 +1548,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="blank" rowHeight="30" id="DeP-Si-bjL" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1317" width="320" height="30"/>
+                                        <rect key="frame" x="0.0" y="1467" width="320" height="30"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DeP-Si-bjL" id="sMY-ws-4yO">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="29"/>
@@ -1726,6 +1832,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
         <image name="button-web-close" width="100" height="100"/>
         <image name="button-web-forward" width="100" height="100"/>
         <image name="button-web-share" width="100" height="100"/>
+        <image name="class-science" width="100" height="100"/>
         <image name="icon-folder" width="50" height="50"/>
     </resources>
 </document>

@@ -406,11 +406,11 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }, completion: nil)
     }
     
-    func dismissWebView() {
+    func dismissWebView(duration: Double = 0.5) {
         webViewVisible = false
         postNotification(TSSetActivityIndicatorVisibleNotification, object: false)
         
-        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animateWithDuration(duration, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
             self.webViewTop.constant = self.view.frame.height
             self.view.layoutIfNeeded()
             self.setNeedsStatusBarAppearanceUpdate()

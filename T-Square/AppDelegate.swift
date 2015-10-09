@@ -131,11 +131,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     @available(iOS 9.0, *)
     func application(application: UIApplication, performActionForShortcutItem shortcutItem: UIApplicationShortcutItem, completionHandler: (Bool) -> Void) {
+        
+        guard let info = shortcutItem.userInfo else { return }
+        guard let URL = info["URL"] as? String else { return }
         TSQueuedShortcutItem = shortcutItem
         
-        //hide classes view controller
+        //hide classes view controller and web view if they are already visible
         if let loginController = window?.rootViewController as? LoginViewController {
-            loginController.unpresentClassesView(0.0)
+            
+            if let currentDelegate = loginController.classesViewController.tableView.delegate as? ClassDelegate {
+                if currentDelegate.displayClass.link != URL {
+                    loginController.unpresentClassesView(0.0)
+                }
+            }
+            
+            loginController.dismissWebView(0.0)
             loginController.animateFormSubviewsWithDuration(0.0, hidden: true)
             delay(0.2) { loginController.animateActivityIndicator(on: true) }
         }

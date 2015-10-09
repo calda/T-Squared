@@ -20,7 +20,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background-gradient" translatesAutoresizingMaskIntoConstraints="NO" id="K8h-DM-YzJ">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background-techtower" translatesAutoresizingMaskIntoConstraints="NO" id="K8h-DM-YzJ">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <animations/>
                                 <gestureRecognizers/>
@@ -1822,7 +1822,6 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
         </scene>
     </scenes>
     <resources>
-        <image name="background-gradient" width="1280" height="1280"/>
         <image name="background-techtower" width="1242" height="2208"/>
         <image name="button-back" width="25" height="25"/>
         <image name="button-logout" width="25" height="25"/>

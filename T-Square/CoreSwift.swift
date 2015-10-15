@@ -398,7 +398,7 @@ struct Stack<T> {
 ///Pushing and Poping delegates on a Table View
 class TableViewStackController : UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    var tableView: UITableView!
+    weak var tableView: UITableView!
     var delegateStack: Stack<(delegate: StackableTableDelegate, contentOffset: CGPoint)> = Stack()
     var currentDelegate: StackableTableDelegate!
     

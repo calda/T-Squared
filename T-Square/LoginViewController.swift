@@ -324,7 +324,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func unpresentClassesView() {
-        unpresentClassesView()
+        unpresentClassesView(0.5)
     }
     
     func unpresentClassesView(duration: Double) {

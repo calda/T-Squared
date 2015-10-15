@@ -77,7 +77,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if section == 0 {
             if index == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("settings") as! LogoutSettingsCell
-                cell.decorate(TSAuthenticatedReader.username)
+                cell.decorate(TSAuthenticatedReader?.username ?? "username")
                 cell.hideSeparator()
                 return cell
             }
@@ -494,6 +494,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         dispatch_async(TSNetworkQueue, {
             for currentClass in self.classes! {
+                if TSAuthenticatedReader == nil { break }
                 let announcements = TSAuthenticatedReader.getAnnouncementsForClass(currentClass)
                 sync() {
                     self.addAnnouncements(announcements)

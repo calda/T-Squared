@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 import Kanna
 
 let TSClassOpenCountKey = "edu.gatech.cal.classOpenCount"

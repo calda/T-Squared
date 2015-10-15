@@ -5,17 +5,24 @@
   },
   "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
     "C3D8ED1CB28D809ADCE2C0DE74935E8A502ACD53" : 0,
+    "3F00198FD7638102954E2D442697C31855C6A5BC" : 0,
     "BC93899734C38FDE91DB4368C87F51D581A34EF8" : 0
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B3E3B8FB-486B-47D1-84DF-D3621A5903B5",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
     "C3D8ED1CB28D809ADCE2C0DE74935E8A502ACD53" : "T-Square\/CryptoSwift\/",
+    "3F00198FD7638102954E2D442697C31855C6A5BC" : "T-Square\/Kanna\/",
     "BC93899734C38FDE91DB4368C87F51D581A34EF8" : "T-Square\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "T-Square",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
   "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "T-Square\/T-Square.xcworkspace",
   "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/tid-kijyun\/Kanna.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3F00198FD7638102954E2D442697C31855C6A5BC"
+    },
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Calda\/T-Square.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",

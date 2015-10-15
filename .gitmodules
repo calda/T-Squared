@@ -1,3 +1,6 @@
 [submodule "CryptoSwift"]
 	path = CryptoSwift
 	url = https://github.com/krzyzanowskim/CryptoSwift.git
+[submodule "Kanna"]
+	path = Kanna
+	url = https://github.com/tid-kijyun/Kanna.git

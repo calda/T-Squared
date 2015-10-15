@@ -406,7 +406,11 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }, completion: nil)
     }
     
-    func dismissWebView(duration: Double = 0.5) {
+    func dismissWebView() {
+        dismissWebView(0.5)
+    }
+    
+    func dismissWebView(duration: Double) {
         webViewVisible = false
         postNotification(TSSetActivityIndicatorVisibleNotification, object: false)
         

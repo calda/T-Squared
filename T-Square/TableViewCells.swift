@@ -218,6 +218,25 @@ class BackCell : UITableViewCell {
     
 }
 
+class ToggleCell : UITableViewCell {
+    
+    @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var toggle: UISwitch!
+    var handler: ((Bool) -> ())?
+    
+    func decorateWithText(text: String, initialValue: Bool, handler: (Bool) -> ()) {
+        label.text = text
+        toggle.on = initialValue
+        self.handler = handler
+    }
+    
+    @IBAction func toggleToggled(sender: UISwitch) {
+        let on = sender.on
+        handler?(on)
+    }
+    
+}
+
 class LogoutSettingsCell : TitleCell {
     
     @IBAction func logoutButtonPressed(sender: UIButton) {

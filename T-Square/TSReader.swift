@@ -97,7 +97,7 @@ class TSReader {
             if workspaceLink["title"] != "My Workspace" { continue }
             let workspaceURL = workspaceLink["href"]!
             guard let workspace = HttpClient.contentsOfPage(workspaceURL) else { return classes ?? [] }
-            print(workspace.toHTML)
+
             for worksiteLink in workspace.css("a, link") {
                 if worksiteLink["title"] != "Worksite Setup" { continue }
                 let worksiteURL = worksiteLink["href"]!
@@ -288,8 +288,25 @@ class TSReader {
         guard let classPage = currentClass.getClassPage() else { return rootGroup }
         //load page for class announcements
         for link in classPage.css("a, link") {
-            if link.text != "Gradebook" { continue }
+            if link.text != "Gradebook" && link.text != "Markbook" { continue }
             guard let gradebookPage = HttpClient.contentsOfPage(link["href"]!) else { return rootGroup }
+            
+            
+            //get indecies for name, score, weight, and comment
+            var nameIndex: Int?
+            var scoreIndex: Int?
+            var weightIndex: Int?
+            var commentIndex: Int?
+            
+            let thead = gradebookPage.css("thead")[0]
+            let thArray = thead.css("th")
+            for i in 0 ..< thArray.count {
+                let text = thArray[i].text!.lowercaseString
+                if text.containsString("title") { nameIndex = i }
+                else if text.containsString("grade") { scoreIndex = i }
+                else if text.containsString("weight") { weightIndex = i }
+                else if text.containsString("comment") { commentIndex = i }
+            }
             
             //load grades
             var currentGroup = rootGroup
@@ -300,30 +317,24 @@ class TSReader {
                 if cols.count < 3 { continue }
                 
                 //start of a new category
-                if (cols[1].toHTML ?? "").containsString("categoryHeading") {
-                    let nameIndex = 1
-                    let weightIndex = 4
+                if (cols[nameIndex ?? 1].toHTML ?? "").containsString("categoryHeading") {
                     if currentGroup !== rootGroup {
                         rootGroup.scores.append(currentGroup)
                     }
-                    let name = cols[nameIndex].text ?? "Unnamed Grouping"
-                    let weight = cols[weightIndex].text ?? "100%"
+                    let name = (nameIndex != nil ? cols[nameIndex!].text?.cleansed() : nil) ?? "Unnamed Category"
+                    let weight = (weightIndex != nil ? cols[weightIndex!].text?.cleansed() : nil)
                     currentGroup = GradeGroup(name: name, weight: weight)
                 }
                 
                 //grade in the existing category
                 else {
-                    let nameIndex = (cols.count == 6 ? 1 : 0)
-                    let scoreIndex = (cols.count == 6 ? 3 : 2)
-                    let weightIndex: Int? = (cols.count == 6 ? 4 : nil)
-                    let commentIndex = (cols.count == 6 ? 5 : 4)
                     
-                    let name = cols[nameIndex].text?.cleansed() ?? "Unnamed Assignment"
-                    let score = cols[scoreIndex].text?.cleansed()
+                    let name = (nameIndex != nil ? cols[nameIndex!].text?.cleansed() : nil) ?? "Unnamed Assignment"
+                    let score = (scoreIndex != nil ? cols[scoreIndex!].text?.cleansed() : nil) ?? "-"
                     let weight: String? = (weightIndex != nil ? cols[weightIndex!].text?.cleansed() : nil)
                     
                     var comment: String? = nil
-                    if commentIndex < cols.count {
+                    if let commentIndex = commentIndex where commentIndex < cols.count {
                         comment = cols[commentIndex].text?.cleansed()
                     }
                     

@@ -9,11 +9,14 @@
 import Foundation
 import UIKit
 
+let TSGradebookCalculationSettingKey = "edu.gatech.cal.gradebookCalculationSetting"
+
 class GradebookDelegate : NSObject, StackableTableDelegate {
     
     let displayClass: Class
     let controller: ClassesViewController
     var scores: [Scored] = []
+    var showCalculationSwitch: Bool = false
     
     init(forClass: Class, controller: ClassesViewController) {
         self.displayClass = forClass
@@ -23,10 +26,43 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     //MARK: - Table View Controller methods
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 1 { return 1 }
         return 1 + (scores.count == 0 ? 1 : scores.count + 1)
     }
     
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return showCalculationSwitch ? 2 : 1
+    }
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
+        //section 1 is toggle switch
+        if indexPath.section == 1 {
+            let cell = tableView.dequeueReusableCellWithIdentifier("gradeSwitch")! as! ToggleCell
+            cell.hideSeparator()
+            
+            let data = NSUserDefaults.standardUserDefaults()
+            var dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
+            
+            cell.decorateWithText("Count grades with parenthesis in calculation", initialValue: dict[displayClass.ID] ?? false, handler: { newValue in
+                self.displayClass.grades?.useAllSubscores = newValue
+                self.loadCachedData()
+                
+                delay(0.2) {
+                    self.controller.tableView.scrollToRowAtIndexPath(NSIndexPath(forItem: 0, inSection: 0), atScrollPosition: .Top, animated: true)
+                }
+                
+                delay(0.6) {
+                    self.controller.tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: UITableViewRowAnimation.Fade)
+                }
+                
+                dict[self.displayClass.ID] = newValue
+                data.setValue(dict, forKey: TSGradebookCalculationSettingKey)
+            })
+            
+            return cell
+        }
+        
         if indexPath.item == 0 {
             return tableView.dequeueReusableCellWithIdentifier("back")!
         }
@@ -67,6 +103,10 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if indexPath.section == 1 {
+            return 60.0
+        }
+        
         if indexPath.item == 0 || indexPath.item == 1 && scores.count == 0 {
             return 50.0
         }
@@ -112,9 +152,35 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     }
     
     func flattenedGrades(grades: GradeGroup?) -> [Scored] {
+        showCalculationSwitch = false
+        
         guard let grades = grades else { return [] }
         var flattened: [Scored] = [Grade(name: "", score: "", weight: nil, comment: nil)]
         flattened.appendContentsOf(grades.flattened)
+        
+        var totalGrades = flattened.count
+        var gradesWithParenthesis = 0
+        
+        for score in flattened {
+            if score.scoreString.hasPrefix("(") {
+                gradesWithParenthesis++
+            }
+            else if score.scoreString == "" || score.scoreString == "COMMENT_PLACEHOLDER" {
+                totalGrades--
+            }
+        }
+        
+        if gradesWithParenthesis == totalGrades {
+            let data = NSUserDefaults.standardUserDefaults()
+            var dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
+            dict[displayClass.ID] = true
+            data.setValue(TSGradebookCalculationSettingKey, forKey: TSGradebookCalculationSettingKey)
+            displayClass.grades?.useAllSubscores = true
+        }
+        else if gradesWithParenthesis > 0 {
+            showCalculationSwitch = true
+        }
+        
         return flattened
     }
     

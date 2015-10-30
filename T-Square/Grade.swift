@@ -25,21 +25,26 @@ class Grade : Scored, CustomStringConvertible {
     let weight: Double?
     let comment: String?
     
+    var contributesToAverage: Bool = true
+    
     init(name: String, score: String?, weight: String?, comment: String?) {
         self.name = name
         self.comment = comment
         self.scoreString = score?.cleansed() ?? "—"
         
+        if scoreString.hasPrefix("(") { contributesToAverage = false }
+        let scoreToParse = scoreString.stringByReplacingOccurrencesOfString("(", withString: "").stringByReplacingOccurrencesOfString(")", withString: "")
+        
         //parse score
-        if scoreString.hasSuffix("%") {
-            if let percentScore = scoreString.percentStringAsDouble() {
+        if scoreToParse.hasSuffix("%") {
+            if let percentScore = scoreToParse.percentStringAsDouble() {
                 self.score = percentScore
                 self.weight = 100.0
                 return
             }
         }
-        else if scoreString.containsString("/") {
-            let splits = scoreString.componentsSeparatedByString("/")
+        else if scoreToParse.containsString("/") {
+            let splits = scoreToParse.componentsSeparatedByString("/")
             if splits.count >= 2 {
                 if let points = splits[0].asDouble(), let total = splits[1].asDouble() {
                     self.score = points / total
@@ -50,6 +55,7 @@ class Grade : Scored, CustomStringConvertible {
         }
         
         self.score = nil
+        self.contributesToAverage = false
         self.weight = nil
     }
     
@@ -81,12 +87,23 @@ class GradeGroup : Scored, CustomStringConvertible {
         self.weight = weight
     }
     
+    var useAllSubscores = false {
+        didSet {
+            for score in scores {
+                if let group = score as? GradeGroup {
+                    group.useAllSubscores = self.useAllSubscores
+                }
+            }
+        }
+    }
+    
     var score: Double? {
         if scores.count == 0 { return nil }
         var totalPoints = 0.0
         var totalWeight = 0.0
         
         for score in scores {
+            if (score as? Grade)?.contributesToAverage == false && self.useAllSubscores == false { continue }
             if let points = score.score, let weight = score.weight {
                 totalPoints += (points * weight)
                 totalWeight += weight
@@ -129,7 +146,7 @@ class GradeGroup : Scored, CustomStringConvertible {
             }
             else {
                 flattenedArray.append(score)
-                if let grade = score as? Grade, let comment = grade.comment?.cleansed() where comment != "" && comment != "from Assignments" {
+                if let grade = score as? Grade, let comment = grade.comment?.cleansed() where comment != "" && comment != "from Assignments" && comment != "from Tests & Quizzes" {
                     flattenedArray.append(Grade(name: comment, score: "COMMENT_PLACEHOLDER", weight: nil, comment: nil))
                 }
             }

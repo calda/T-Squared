@@ -98,7 +98,7 @@ class Class : CustomStringConvertible {
                 self.name = newName
             }
         }
-
+        
     }
     
     func useSectionName() {
@@ -197,7 +197,7 @@ let GTSubjects: [String : (description: String, image: String)] = [
     "CEE" : ("Civil and Environmental Engineering", "architecture"),
     "COA" : ("College of Architecture", "architecture"),
     "COE" : ("College of Engineering", "engineering"),
-    "CX" : ("Computational Modeli", "computer"),
+    "CX" : ("Computational Mod, Sim, & Data", "computer"),
     "CSE" : ("Computational Science & Engineering", "computer"),
     "CS" : ("Computer Science", "computer"),
     "COOP" : ("Cooperative Work Assignment", "world"),
@@ -229,7 +229,7 @@ let GTSubjects: [String : (description: String, image: String)] = [
     "KOR" : ("Korean", "language"),
     "LS" : ("Learning Support", "humanities"),
     "LING" : ("Linguistics", "language"),
-    "LMC" : ("Literatu", "language"),
+    "LMC" : ("Literature", "language"),
     "MGT" : ("Management", "world"),
     "MOT" : ("Management of Technology", "world"),
     "MSE" : ("Materials Science & Engineering", "engineering"),
@@ -244,7 +244,7 @@ let GTSubjects: [String : (description: String, image: String)] = [
     "PHIL" : ("Philosophy", "humanities"),
     "PHYS" : ("Physics", "science"),
     "POL" : ("Political Science", "humanities"),
-    "PTFE" : ("Polym", "engineering"),
+    "PTFE" : ("Polymer, Textile and Fiber Engineering", "engineering"),
     "DOPP" : ("Professional Practice", "world"),
     "PSYC" : ("Psychology", "humanities"),
     "PUBP" : ("Public Policy", "humanities"),

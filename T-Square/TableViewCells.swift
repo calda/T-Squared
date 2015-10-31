@@ -237,6 +237,20 @@ class ToggleCell : UITableViewCell {
     
 }
 
+class ButtonCell : UITableViewCell {
+    
+    @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var button: UIButton!
+    
+    func decorateWithText(text: String, buttonImage: String) {
+        label.text = text
+        let image = UIImage(named: buttonImage)
+        button.setImage(image, forState: .Normal)
+        button.setImage(image, forState: .Selected)
+    }
+    
+}
+
 class LogoutSettingsCell : TitleCell {
     
     @IBAction func logoutButtonPressed(sender: UIButton) {

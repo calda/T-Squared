@@ -14,7 +14,26 @@ protocol Scored {
     var score: Double? { get }
     var scoreString: String { get }
     var weight: Double? { get }
+    var isArtificial: Bool { get }
     
+    func representAsString() -> String
+    
+}
+
+func scorefromString(string: String) -> Scored? {
+    if string.hasPrefix("GRADE") {
+        let splits = string.componentsSeparatedByString("~")
+        if splits.count != 4 { return nil }
+        let grade = Grade(name: splits[2], score: splits[3], weight: nil, comment: nil, isArtificial: true)
+        grade.owningGroup = splits[1]
+        return grade
+    }
+    if string.hasPrefix("GROUP") {
+        let splits = string.componentsSeparatedByString("~")
+        if splits.count != 3 { return nil }
+        return GradeGroup(name: splits[1], weight: "\(splits[2])%", isArtificial: true)
+    }
+    return nil
 }
 
 class Grade : Scored, CustomStringConvertible {
@@ -25,12 +44,16 @@ class Grade : Scored, CustomStringConvertible {
     let weight: Double?
     let comment: String?
     
+    var isArtificial: Bool = false
+    var owningGroup: String?
+    
     var contributesToAverage: Bool = true
     
-    init(name: String, score: String?, weight: String?, comment: String?) {
+    init(name: String, score: String?, weight: String?, comment: String?, isArtificial: Bool = false) {
         self.name = name
         self.comment = comment
         self.scoreString = score?.cleansed() ?? "—"
+        self.isArtificial = isArtificial
         
         if scoreString.hasPrefix("(") { contributesToAverage = false }
         let scoreToParse = scoreString.stringByReplacingOccurrencesOfString("(", withString: "").stringByReplacingOccurrencesOfString(")", withString: "")
@@ -63,6 +86,10 @@ class Grade : Scored, CustomStringConvertible {
         return "\(name)(score=\(scoreString))"
     }
     
+    func representAsString() -> String {
+        return "GRADE~\(owningGroup ?? "")~\(name)~\(scoreString)"
+    }
+    
 }
 
 class GradeGroup : Scored, CustomStringConvertible {
@@ -70,9 +97,11 @@ class GradeGroup : Scored, CustomStringConvertible {
     let name: String
     let weight: Double?
     var scores: [Scored] = []
+    let isArtificial: Bool
     
-    init(name: String, weight: String?) {
+    init(name: String, weight: String?, isArtificial: Bool = false) {
         self.name = name
+        self.isArtificial = isArtificial
         if let weightString = weight?.cleansed() where weightString.hasSuffix("%") {
             if let percent = weightString.percentStringAsDouble() {
                 self.weight = percent * 100.0
@@ -82,9 +111,10 @@ class GradeGroup : Scored, CustomStringConvertible {
         self.weight = nil
     }
     
-    init(name: String, weight: Double?) {
+    init(name: String, weight: Double?, isArtificial: Bool = false) {
         self.name = name
         self.weight = weight
+        self.isArtificial = isArtificial
     }
     
     var useAllSubscores = false {
@@ -152,6 +182,10 @@ class GradeGroup : Scored, CustomStringConvertible {
             }
         }
         return flattenedArray
+    }
+    
+    func representAsString() -> String {
+        return "GROUP~\(name)~\(weight ?? 0.0)"
     }
     
 }

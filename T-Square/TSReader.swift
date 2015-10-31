@@ -349,6 +349,48 @@ class TSReader {
         }
         
         currentClass.grades = rootGroup
+        
+        //also load custom grades
+        let data = NSUserDefaults.standardUserDefaults()
+        var dict = data.dictionaryForKey(TSCustomGradesKey) as? [String : [String]] ?? [:]
+        let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
+        
+        if let customGrades = dict[classKey] {
+            var groups: [GradeGroup] = []
+            var grades: [Grade] = []
+            
+            for string in customGrades {
+                if let score = scorefromString(string) {
+                    if let grade = score as? Grade { grades.append(grade) }
+                    if let group = score as? GradeGroup { groups.append(group) }
+                }
+            }
+            
+            for group in groups {
+                rootGroup.scores.append(group)
+            }
+            
+            for grade in grades {
+                let groupName = grade.owningGroup ?? "ROOT"
+                var group: GradeGroup!
+                
+                if groupName == "ROOT" {
+                    group = rootGroup
+                } else  {
+                    for score in rootGroup.scores {
+                        if let currentGroup = score as? GradeGroup where currentGroup.name.lowercaseString == groupName.lowercaseString {
+                            group = currentGroup
+                            break
+                        }
+                    }
+                }
+                
+                group.scores.append(grade)
+            }
+            
+        }
+        
+        
         return rootGroup
     }
     

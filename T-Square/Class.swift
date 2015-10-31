@@ -55,7 +55,7 @@ class Class : CustomStringConvertible {
             let nsname = name as NSString
             
             //attempt to find the subject name from the first few characters
-            for i in 1...5 {
+            for i in 1...min(5,nsname.length) {
                 let substring = nsname.substringToIndex(i)
                 if let subjectInfo = GTSubjects[substring] {
                     self.subjectID = substring

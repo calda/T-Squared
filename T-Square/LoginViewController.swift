@@ -9,8 +9,6 @@
 import UIKit
 import Foundation
 
-let TSUsernamePath = "edu.gatech.cal.username"
-let TSPasswordPath = "edu.gatech.cal.password"
 var TSAuthenticatedReader: TSReader!
 let TSLogoutNotification = "edu.gatech.cal.logout"
 let TSDismissWebViewNotification = "edu.gatech.cal.dismissWeb"
@@ -36,6 +34,21 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet var activityCircle: UIView!
     
     //MARK: - Preparing the View Controller
+    
+    override func viewDidLoad() {
+        //transition from old password scheme
+        let data = NSUserDefaults.standardUserDefaults()
+        
+        if let savedUsername = data.stringForKey("edu.gatech.cal.username"),
+           let savedPassword = data.stringForKey("edu.gatech.cal.password") {
+            saveCredentials(username: savedUsername, password: savedPassword)
+        }
+        
+        //nil-out the current values and close up that hole
+        data.setValue(nil, forKey: "edu.gatech.cal.username")
+        data.setValue(nil, forKey: "edu.gatech.cal.password")
+    }
+    
     override func viewWillAppear(animated: Bool) {
         if animated { return }
         if TSAuthenticatedReader != nil { return } //we're already authenticated
@@ -209,12 +222,12 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func setSavedCredentials(correct correct: Bool) {
-        let save = correct && saveCredentialsSwitch.on
-        let data = NSUserDefaults.standardUserDefaults()
-        let usernameData = encryptString(usernameField.text!)
-        let passwordData = encryptString(passwordField.text!)
-        data.setValue(save ? usernameData : nil, forKey: TSUsernamePath)
-        data.setValue(save ? passwordData : nil, forKey: TSPasswordPath)
+        if !correct || !saveCredentialsSwitch.on {
+            saveCredentials(username: nil, password: nil)
+        }
+        else {
+            saveCredentials(username: usernameField.text, password: passwordField.text)
+        }
     }
     
     func animateFormSubviewsWithDuration(duration: Double, hidden: Bool) {

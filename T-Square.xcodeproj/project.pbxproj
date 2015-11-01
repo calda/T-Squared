@@ -26,6 +26,8 @@
 		2E7C6F801B8E6E5100E95183 /* HttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */; };
 		2E7C6F8C1B8E70C900E95183 /* HttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */; };
 		2E7C6F8E1B8E94BA00E95183 /* CoreSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */; };
+		2E7F58181BE5913C000590EB /* ZLKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7F58171BE5913C000590EB /* ZLKeychainService.swift */; };
+		2E7F581A1BE59566000590EB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E7F58191BE59566000590EB /* Security.framework */; };
 		2E809C151BA51AD0008849FB /* Assignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E809C141BA51AD0008849FB /* Assignment.swift */; };
 		2E809C171BA528FC008849FB /* AssignmentsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E809C161BA528FC008849FB /* AssignmentsDelegate.swift */; };
 		2E8244821B9A517500236B60 /* Resource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8244811B9A517500236B60 /* Resource.swift */; };
@@ -36,11 +38,8 @@
 		2EAA77501BC0891300606C5D /* CryptoSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EAA774D1BC088E600606C5D /* CryptoSwift.framework */; };
 		2EAA77511BC0892B00606C5D /* CryptoSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EAA774D1BC088E600606C5D /* CryptoSwift.framework */; };
 		2EAA77521BC0892B00606C5D /* CryptoSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2EAA774D1BC088E600606C5D /* CryptoSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		2EAA77571BC0897B00606C5D /* CredentialStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EAA77561BC0897B00606C5D /* CredentialStore.swift */; };
-		2EAA775D1BC0967600606C5D /* IV.secure in Resources */ = {isa = PBXBuildFile; fileRef = 2EAA775C1BC0967600606C5D /* IV.secure */; };
 		2ED1E8C41BA90EC2007F1A90 /* AllClassesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */; };
 		2EE303201BB239DF00FFEA5A /* Grade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE3031F1BB239DF00FFEA5A /* Grade.swift */; };
-		2EF3222A1BC0B2E300D481B4 /* key.secure in Resources */ = {isa = PBXBuildFile; fileRef = 2EF322291BC0B2E300D481B4 /* key.secure */; };
 		2EFA126A1BAE6F48007510A0 /* TSWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFA12691BAE6F48007510A0 /* TSWebView.swift */; };
 /* End PBXBuildFile section */
 
@@ -155,6 +154,8 @@
 		2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpClient.swift; sourceTree = "<group>"; };
 		2E7C6F851B8E70C200E95183 /* OS X Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "OS X Tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreSwift.swift; sourceTree = "<group>"; };
+		2E7F58171BE5913C000590EB /* ZLKeychainService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLKeychainService.swift; sourceTree = "<group>"; };
+		2E7F58191BE59566000590EB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		2E809C141BA51AD0008849FB /* Assignment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Assignment.swift; sourceTree = "<group>"; };
 		2E809C161BA528FC008849FB /* AssignmentsDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssignmentsDelegate.swift; sourceTree = "<group>"; };
 		2E8244811B9A517500236B60 /* Resource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Resource.swift; sourceTree = "<group>"; };
@@ -163,11 +164,8 @@
 		2E9A2D891BA6592200E93BA0 /* AssignmentDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssignmentDelegate.swift; sourceTree = "<group>"; };
 		2E9AF9711BC0E85A0066F91B /* SettingsDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsDelegate.swift; sourceTree = "<group>"; };
 		2EAA77461BC088E600606C5D /* CryptoSwift.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CryptoSwift.xcodeproj; path = CryptoSwift/CryptoSwift.xcodeproj; sourceTree = "<group>"; };
-		2EAA77561BC0897B00606C5D /* CredentialStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialStore.swift; sourceTree = "<group>"; };
-		2EAA775C1BC0967600606C5D /* IV.secure */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = IV.secure; sourceTree = "<group>"; };
 		2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllClassesDelegate.swift; sourceTree = "<group>"; };
 		2EE3031F1BB239DF00FFEA5A /* Grade.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Grade.swift; sourceTree = "<group>"; };
-		2EF322291BC0B2E300D481B4 /* key.secure */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = key.secure; sourceTree = "<group>"; };
 		2EFA12691BAE6F48007510A0 /* TSWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -176,6 +174,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E7F581A1BE59566000590EB /* Security.framework in Frameworks */,
 				2E4B30991BCF5B6700C13222 /* Kanna.framework in Frameworks */,
 				2EAA77501BC0891300606C5D /* CryptoSwift.framework in Frameworks */,
 				2E4207A71B8FB828002B79E6 /* libxml2.2.dylib in Frameworks */,
@@ -215,6 +214,7 @@
 		2E7C6F531B8E6DDE00E95183 = {
 			isa = PBXGroup;
 			children = (
+				2E7F58191BE59566000590EB /* Security.framework */,
 				2E4207A61B8FB828002B79E6 /* libxml2.2.dylib */,
 				2E7C6F5E1B8E6DDE00E95183 /* T-Square */,
 				2E7C6F5D1B8E6DDE00E95183 /* Products */,
@@ -236,8 +236,6 @@
 		2E7C6F5E1B8E6DDE00E95183 /* T-Square */ = {
 			isa = PBXGroup;
 			children = (
-				2EF322291BC0B2E300D481B4 /* key.secure */,
-				2EAA775C1BC0967600606C5D /* IV.secure */,
 				2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */,
 				2E7C6F5F1B8E6DDE00E95183 /* AppDelegate.swift */,
 				2E7C6F631B8E6DDE00E95183 /* Main.storyboard */,
@@ -256,7 +254,6 @@
 				2E8AFE061B92DF5700DE7E28 /* AnouncementDelegate.swift */,
 				2E1288851BB8E10D00B8032E /* GradebookDelegate.swift */,
 				2E9AF9711BC0E85A0066F91B /* SettingsDelegate.swift */,
-				2EAA77561BC0897B00606C5D /* CredentialStore.swift */,
 				2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */,
 				2E4207BC1B8FBA27002B79E6 /* TSReader.swift */,
 				2E4207BE1B9004F7002B79E6 /* Class.swift */,
@@ -264,6 +261,7 @@
 				2E8244811B9A517500236B60 /* Resource.swift */,
 				2E809C141BA51AD0008849FB /* Assignment.swift */,
 				2EE3031F1BB239DF00FFEA5A /* Grade.swift */,
+				2E7F58171BE5913C000590EB /* ZLKeychainService.swift */,
 			);
 			path = "T-Square";
 			sourceTree = "<group>";
@@ -442,9 +440,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2EF3222A1BC0B2E300D481B4 /* key.secure in Resources */,
 				2E7C6F6A1B8E6DDE00E95183 /* LaunchScreen.storyboard in Resources */,
-				2EAA775D1BC0967600606C5D /* IV.secure in Resources */,
 				2E7C6F671B8E6DDE00E95183 /* Assets.xcassets in Resources */,
 				2E7C6F651B8E6DDE00E95183 /* Main.storyboard in Resources */,
 			);
@@ -470,7 +466,6 @@
 				2E809C171BA528FC008849FB /* AssignmentsDelegate.swift in Sources */,
 				2E7C6F8E1B8E94BA00E95183 /* CoreSwift.swift in Sources */,
 				2E1288861BB8E10D00B8032E /* GradebookDelegate.swift in Sources */,
-				2EAA77571BC0897B00606C5D /* CredentialStore.swift in Sources */,
 				2E1A63441B9696A7002D7632 /* TableViewCells.swift in Sources */,
 				2E8E4CCF1B9A6BD800D62A2E /* ResourcesDelegate.swift in Sources */,
 				2E7C6F621B8E6DDE00E95183 /* LoginViewController.swift in Sources */,
@@ -478,6 +473,7 @@
 				2E7C6F801B8E6E5100E95183 /* HttpClient.swift in Sources */,
 				2E7C6F601B8E6DDE00E95183 /* AppDelegate.swift in Sources */,
 				2E809C151BA51AD0008849FB /* Assignment.swift in Sources */,
+				2E7F58181BE5913C000590EB /* ZLKeychainService.swift in Sources */,
 				2E3C4E3C1B99447C00DD0B6B /* ClassDelegate.swift in Sources */,
 				2E4207BD1B8FBA27002B79E6 /* TSReader.swift in Sources */,
 				2E8244821B9A517500236B60 /* Resource.swift in Sources */,

@@ -18,6 +18,9 @@ protocol Scored {
     
     func representAsString() -> String
     
+    var owningGroup: GradeGroup? { get set }
+    var owningGroupName: String? { get set }
+    
 }
 
 func scorefromString(string: String) -> Scored? {
@@ -25,7 +28,7 @@ func scorefromString(string: String) -> Scored? {
         let splits = string.componentsSeparatedByString("~")
         if splits.count != 4 { return nil }
         let grade = Grade(name: splits[2], score: splits[3], weight: nil, comment: nil, isArtificial: true)
-        grade.owningGroup = splits[1]
+        grade.owningGroupName = splits[1]
         return grade
     }
     if string.hasPrefix("GROUP") {
@@ -34,6 +37,18 @@ func scorefromString(string: String) -> Scored? {
         return GradeGroup(name: splits[1], weight: "\(splits[2])%", isArtificial: true)
     }
     return nil
+}
+
+func equalityFunctionForScore(score: Scored) -> (Scored) -> Bool {
+    return { other in
+        if let grade = score as? Grade, let other = other as? Grade {
+            return grade.name == other.name && grade.score == other.score
+        }
+        if let group = score as? GradeGroup, let other = other as? GradeGroup {
+            return group.name == other.name && group.score == other.score && group.scores.count == other.scores.count
+        }
+        return false
+    }
 }
 
 class Grade : Scored, CustomStringConvertible {
@@ -45,7 +60,8 @@ class Grade : Scored, CustomStringConvertible {
     let comment: String?
     
     var isArtificial: Bool = false
-    var owningGroup: String?
+    var owningGroup: GradeGroup?
+    var owningGroupName: String?
     
     var contributesToAverage: Bool = true
     
@@ -87,7 +103,7 @@ class Grade : Scored, CustomStringConvertible {
     }
     
     func representAsString() -> String {
-        return "GRADE~\(owningGroup ?? "")~\(name)~\(scoreString)"
+        return "GRADE~\(owningGroup?.name ?? "")~\(name)~\(scoreString)"
     }
     
 }
@@ -98,6 +114,28 @@ class GradeGroup : Scored, CustomStringConvertible {
     let weight: Double?
     var scores: [Scored] = []
     let isArtificial: Bool
+    var owningGroup: GradeGroup?
+    var owningGroupName: String?
+    
+    ///for N scores, should appear as "Edited" if count of artificial grades is between (0, N)
+    var shouldAppearAsEdited: Bool {
+        var artificialCount = 0
+        var totalCount = 0
+        for score in scores {
+            if score.isArtificial { artificialCount++ }
+            totalCount++
+            
+            if let group = score as? GradeGroup {
+                for score in group.scores {
+                    if score.isArtificial { artificialCount++ }
+                    totalCount++
+                }
+            }
+            
+        }
+    
+        return artificialCount > 0 && artificialCount != totalCount
+    }
     
     init(name: String, weight: String?, isArtificial: Bool = false) {
         self.name = name
@@ -181,6 +219,11 @@ class GradeGroup : Scored, CustomStringConvertible {
                 }
             }
         }
+        
+        if flattenedArray.last?.name == "" {
+            flattenedArray.removeLast() //remove the trailing placeholder if it's empty
+        }
+        
         return flattenedArray
     }
     

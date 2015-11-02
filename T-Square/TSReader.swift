@@ -285,6 +285,50 @@ class TSReader {
     func getGradesForClass(currentClass: Class) -> GradeGroup {
         let rootGroup = GradeGroup(name: currentClass.name, weight: 1.0)
         
+        defer {
+            //load custom grades before exiting scope
+            let data = NSUserDefaults.standardUserDefaults()
+            var dict = data.dictionaryForKey(TSCustomGradesKey) as? [String : [String]] ?? [:]
+            let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
+            
+            if let customGrades = dict[classKey] {
+                var groups: [GradeGroup] = []
+                var grades: [Grade] = []
+                
+                for string in customGrades {
+                    if let score = scorefromString(string) {
+                        if let grade = score as? Grade { grades.append(grade) }
+                        if let group = score as? GradeGroup { groups.append(group) }
+                    }
+                }
+                
+                for group in groups {
+                    rootGroup.scores.append(group)
+                    group.owningGroup = rootGroup
+                }
+                
+                for grade in grades {
+                    let groupName = grade.owningGroupName ?? "ROOT"
+                    var group: GradeGroup?
+                    
+                    if groupName == "ROOT" {
+                        group = rootGroup
+                    } else  {
+                        for score in rootGroup.scores {
+                            if let currentGroup = score as? GradeGroup where currentGroup.name.lowercaseString == groupName.lowercaseString {
+                                group = currentGroup
+                                break
+                            }
+                        }
+                    }
+                    
+                    group?.scores.append(grade)
+                    grade.owningGroup = group
+                }
+                
+            }
+        }
+        
         guard let classPage = currentClass.getClassPage() else { return rootGroup }
         //load page for class announcements
         for link in classPage.css("a, link") {
@@ -324,6 +368,7 @@ class TSReader {
                     let name = (nameIndex != nil ? cols[nameIndex!].text?.cleansed() : nil) ?? "Unnamed Category"
                     let weight = (weightIndex != nil ? cols[weightIndex!].text?.cleansed() : nil)
                     currentGroup = GradeGroup(name: name, weight: weight)
+                    currentGroup.owningGroup = rootGroup
                 }
                 
                 //grade in the existing category
@@ -340,6 +385,7 @@ class TSReader {
                     
                     let grade = Grade(name: name, score: score, weight: weight, comment: comment)
                     currentGroup.scores.append(grade)
+                    grade.owningGroup = currentGroup
                 }
             }
             
@@ -349,48 +395,6 @@ class TSReader {
         }
         
         currentClass.grades = rootGroup
-        
-        //also load custom grades
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict = data.dictionaryForKey(TSCustomGradesKey) as? [String : [String]] ?? [:]
-        let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
-        
-        if let customGrades = dict[classKey] {
-            var groups: [GradeGroup] = []
-            var grades: [Grade] = []
-            
-            for string in customGrades {
-                if let score = scorefromString(string) {
-                    if let grade = score as? Grade { grades.append(grade) }
-                    if let group = score as? GradeGroup { groups.append(group) }
-                }
-            }
-            
-            for group in groups {
-                rootGroup.scores.append(group)
-            }
-            
-            for grade in grades {
-                let groupName = grade.owningGroup ?? "ROOT"
-                var group: GradeGroup!
-                
-                if groupName == "ROOT" {
-                    group = rootGroup
-                } else  {
-                    for score in rootGroup.scores {
-                        if let currentGroup = score as? GradeGroup where currentGroup.name.lowercaseString == groupName.lowercaseString {
-                            group = currentGroup
-                            break
-                        }
-                    }
-                }
-                
-                group.scores.append(grade)
-            }
-            
-        }
-        
-        
         return rootGroup
     }
     

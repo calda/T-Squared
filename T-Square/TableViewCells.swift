@@ -157,8 +157,9 @@ class GradeGroupCell : UITableViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var weightLabel: UILabel!
+    @IBOutlet weak var editButton: UIImageView!
     
-    func decorateForGradeGroup(group: GradeGroup) {
+    func decorateForGradeGroup(group: GradeGroup, inClass displayClass: Class) {
         titleLabel.text = group.name
         scoreLabel.text = group.scoreString
         
@@ -168,6 +169,11 @@ class GradeGroupCell : UITableViewCell {
         else {
             weightLabel.text = "Unspecified Weight"
         }
+        
+        editButton.hidden = !group.isArtificial
+        if !editButton.hidden {
+            editButton.alpha = displayClass.grades?.shouldAppearAsEdited == true ? 1.0 : 0.3
+        }
     }
     
 }
@@ -176,8 +182,9 @@ class GradeCell : UITableViewCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet weak var editButton: UIImageView!
     
-    func decorateForScore(grade: Scored) {
+    func decorateForScore(grade: Scored, inClass displayClass: Class) {
         let name = grade.name.cleansed()
         titleLabel.text = name
         scoreLabel.text = grade.scoreString
@@ -190,6 +197,11 @@ class GradeCell : UITableViewCell {
         else {
             titleLabel.alpha = 1.0
         }
+        
+        editButton.hidden = !grade.isArtificial
+        if !editButton.hidden {
+            editButton.alpha = displayClass.grades?.shouldAppearAsEdited == true ? 1.0 : 0.3
+        }
     }
 }
 
@@ -200,6 +212,10 @@ class BackCell : UITableViewCell {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setActivityIndicatorEnabled:", name: TSSetActivityIndicatorVisibleNotification, object: nil)
+    }
+    
+    override func prepareForReuse() {
+        activityIndicator.alpha = 0.0
     }
     
     func setActivityIndicatorEnabled(notification: NSNotification) {

@@ -61,7 +61,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         if indexPath.item == 1 && scores.count != 0 {
             let cell = tableView.dequeueReusableCellWithIdentifier("classTitle") as! ClassNameCell
             cell.nameLabel.text = displayClass.grades?.scoreString ?? "--%"
-            cell.subjectLabel.text = "Current grade in \(displayClass.name)"
+            cell.subjectLabel.text = "Current grade in \(displayClass.name)\(displayClass.grades?.shouldAppearAsEdited == true ? " (Edited)" : "")"
             cell.hideSeparator()
             return cell
         }
@@ -75,7 +75,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         let score = scores[indexPath.item - 3]
         if let group = score as? GradeGroup {
             let cell = tableView.dequeueReusableCellWithIdentifier("gradeGroup")! as! GradeGroupCell
-            cell.decorateForGradeGroup(group)
+            cell.decorateForGradeGroup(group, inClass: displayClass)
             return cell
         }
         else {
@@ -87,7 +87,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             }
             
             let cell = tableView.dequeueReusableCellWithIdentifier("grade")! as! GradeCell
-            cell.decorateForScore(score)
+            cell.decorateForScore(score, inClass: displayClass)
             if !(score.name == "" && score.scoreString == "") {
                 cell.hideSeparator()
             }
@@ -222,6 +222,26 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - User Interaction
     
+    func gradeTogglePressed(newValue: Bool) {
+        self.displayClass.grades?.useAllSubscores = newValue
+        self.loadCachedData()
+        
+        delay(0.2) {
+            self.controller.tableView.scrollToRowAtIndexPath(NSIndexPath(forItem: 0, inSection: 0), atScrollPosition: .Top, animated: true)
+        }
+        
+        delay(0.6) {
+            self.controller.tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: UITableViewRowAnimation.Fade)
+        }
+        
+        let data = NSUserDefaults.standardUserDefaults()
+        var dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
+        dict[self.displayClass.ID] = newValue
+        data.setValue(dict, forKey: TSGradebookCalculationSettingKey)
+    }
+    
+    //MARK: - Adding Grades and Groups
+    
     func addGradePressed() {
         
         var totalGroupWeight = 0.0
@@ -299,137 +319,82 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     }
     
     func showAddGradeDialog(inGroup group: GradeGroup, name: String? = nil) {
-        
-        var error = ""
-        if name == "" {
-            error = "You must enter a name. "
-        }
-        else if name != nil {
-            error = "Invalid score. "
-        }
-        
-        let alert = UIAlertController(title: "Add a Grade", message: error + "Score must be a percentage (90%) or a fraction (9/10).", preferredStyle: .Alert)
-        var nameField: UITextField!
-        var scoreField: UITextField!
-        
-        alert.addTextFieldWithConfigurationHandler({ textField in
-            nameField = textField
-            nameField.placeholder = "Name"
-            nameField.autocapitalizationType = .Sentences
-            if let name = name where name != "" {
-                nameField.text = name
-            }
-        })
-        alert.addTextFieldWithConfigurationHandler({ textField in
-            scoreField = textField
-            scoreField.placeholder = "Score"
-        })
-        
-        alert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { _ in
-            let name = nameField.text ?? ""
-            if name == "" {
-                self.showAddGradeDialog(inGroup: group, name: name)
-                return
-            }
-            
-            guard var scoreString = scoreField.text else {
-                self.showAddGradeDialog(inGroup: group, name: name)
-                return
-            }
-            if !scoreString.hasSuffix("%") && !scoreString.containsString("/") {
-                scoreString.appendContentsOf("%")
-            }
-            
-            let grade = Grade(name: name, score: scoreString, weight: nil, comment: nil, isArtificial: true)
-            grade.owningGroup = group.name
-            if grade.score == nil {
-                //couldn't parse the score
-                self.showAddGradeDialog(inGroup: group, name: name)
-                return
-            }
-            
-            group.scores.append(grade)
-            self.controller.resignFirstResponder()
+        getValidGradeInput { grade in
+            grade.owningGroup = group
             self.finalizeGradeChanges(add: [grade], remove: [], swap: [])
-        }))
-        
-        controller.presentViewController(alert, animated: true, completion: nil)
+        }
     }
     
     func showAddCategoryDialog(name: String? = nil) {
-        
-        var error = ""
-        if name == "" {
-            error = "You must enter a name. "
-        }
-        else if name != nil {
-            error = "Invalid weight. "
-        }
-        
-        let alert = UIAlertController(title: "Add a Category", message: error + "Weight must be a percentage (90%).", preferredStyle: .Alert)
-        var nameField: UITextField!
-        var weightField: UITextField!
-        
-        alert.addTextFieldWithConfigurationHandler({ textField in
-            nameField = textField
-            nameField.placeholder = "Name"
-            nameField.autocapitalizationType = .Sentences
-            if let name = name where name != "" {
-                nameField.text = name
-            }
-        })
-        alert.addTextFieldWithConfigurationHandler({ textField in
-            weightField = textField
-            weightField.placeholder = "Weight"
-        })
-        
-        alert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { _ in
-            let name = nameField.text ?? ""
-            if name == "" {
-                self.showAddCategoryDialog(name)
-                return
-            }
-            
-            guard var weightString = weightField.text else {
-                self.showAddCategoryDialog(name)
-                return
-            }
-            if !weightString.hasSuffix("%") {
-                weightString.appendContentsOf("%")
-            }
-            
-            let group = GradeGroup(name: name, weight: weightString, isArtificial: true)
-            if group.weight == nil {
-                //couldn't parse the weight
-                self.showAddCategoryDialog(name)
-                return
-            }
-            
+        getValidGroupInput { group in
             let root = self.displayClass.grades ?? GradeGroup(name: "ROOT", weight: 100.0)
-            root.scores.append(group)
-            self.controller.resignFirstResponder()
+            group.owningGroup = root
             self.finalizeGradeChanges(add: [group], remove: [], swap: [])
-        }))
-        
-        controller.presentViewController(alert, animated: true, completion: nil)
-        
+        }
     }
     
-    func finalizeGradeChanges(add add: [Scored], remove: [Scored], swap: [(add: Scored, remove: Scored)]) {
-        scores = flattenedGrades(displayClass.grades)
-        controller.tableView.reloadData()
+    //MARK: - Editing or Deleting existing scores
+    
+    func scorePressed(score: Scored) {
+        //show dialog to delete or edit
+        let alert = UIAlertController(title: "Edit \(score is Grade ? "Grade" : "Category")", message: nil, preferredStyle: .Alert)
         
+        alert.addAction(UIAlertAction(title: "Edit", style: .Default, handler: editScoreHandler(score)))
+        alert.addAction(UIAlertAction(title: "Delete", style: .Destructive, handler: deleteScoreHandler(score)))
+        alert.addAction(UIAlertAction(title: "Nevermind", style: .Default, handler: nil))
+        
+        controller.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func deleteScoreHandler(score: Scored) -> (UIAlertAction) -> () {
+        return { _ in
+            
+            var toRemove = [score]
+            if let group = score as? GradeGroup {
+                toRemove.appendContentsOf(group.scores)
+            }
+            
+            self.finalizeGradeChanges(add: [], remove: toRemove, swap: [])
+        }
+    }
+    
+    func editScoreHandler(score: Scored) -> (UIAlertAction) -> () {
+        return { _ in
+            
+            func closure(var new: Scored) {
+                new.owningGroup = score.owningGroup
+                self.finalizeGradeChanges(add: [], remove: [], swap: [(new, score)])
+            }
+            
+            if score is Grade {
+                self.getValidGradeInput(score.name, completion: closure)
+            } else {
+                self.getValidGroupInput(score.name, completion: closure)
+            }
+            
+        }
+    }
+    
+    //MARK: - Validate and Finalize changes
+    
+    func finalizeGradeChanges(add add: [Scored], remove: [Scored], swap: [(add: Scored, remove: Scored)]) {
         let data = NSUserDefaults.standardUserDefaults()
         var dict = data.dictionaryForKey(TSCustomGradesKey) as? [String : [String]] ?? [:]
         let classKey = TSAuthenticatedReader.username + "~" + displayClass.ID
         var customScores = dict[classKey] ?? []
         
         for score in add {
+            score.owningGroup?.scores.append(score)
+            
             let string = score.representAsString()
             customScores.append(string)
         }
         
         for score in remove {
+            if let index = score.owningGroup?.scores.indexOf(equalityFunctionForScore(score)) {
+                score.owningGroup?.scores.removeAtIndex(index)
+            }
+            
             let string = score.representAsString()
             if let index = customScores.indexOf(string) {
                 customScores.removeAtIndex(index)
@@ -437,6 +402,10 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
         
         for (add, remove) in swap {
+            if let removeIndex = remove.owningGroup?.scores.indexOf(equalityFunctionForScore(remove)) {
+                remove.owningGroup?.scores[removeIndex] = add
+            }
+            
             if let index = customScores.indexOf(remove.representAsString()) {
                 customScores[index] = add.representAsString()
             } else {
@@ -447,28 +416,103 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         dict[classKey] = customScores
         data.setValue(dict, forKey: TSCustomGradesKey)
         
+        //update on screen
+        scores = flattenedGrades(displayClass.grades)
+        controller.tableView.reloadData()
     }
     
-    func scorePressed(score: Scored) {
+    func getValidGradeInput(initialName: String? = nil, completion: (Grade) -> ()) {
+        let title = "\(initialName != nil ? "Edit" : "Add") a Grade"
+        self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: true, previousNameInput: initialName, performingEdit: initialName != nil, completion: { name, scoreInput in
+            
+            var scoreString = scoreInput
+            if !scoreString.containsString("/") && !scoreString.hasSuffix("%") {
+                scoreString.appendContentsOf("%")
+            }
+            
+            let grade = Grade(name: name, score: scoreString, weight: nil, comment: nil, isArtificial: true)
+            if grade.score == nil {
+                //couldn't parse the score
+                return false
+            }
+            
+            completion(grade)
+            return true
+        })
         
     }
     
-    func gradeTogglePressed(newValue: Bool) {
-        self.displayClass.grades?.useAllSubscores = newValue
-        self.loadCachedData()
-        
-        delay(0.2) {
-            self.controller.tableView.scrollToRowAtIndexPath(NSIndexPath(forItem: 0, inSection: 0), atScrollPosition: .Top, animated: true)
+    func getValidGroupInput(initialName: String? = nil, completion: (GradeGroup) -> ()) {
+        let title = "\(initialName != nil ? "Edit" : "Add") a Category"
+        self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: false, previousNameInput: initialName, performingEdit: initialName != nil, completion: { name, weightInput in
+            
+            var weightString = weightInput
+            if !weightString.hasSuffix("%") {
+                weightString.appendContentsOf("%")
+            }
+            
+            let group = GradeGroup(name: name, weight: weightString, isArtificial: true)
+            if group.weight == nil {
+                //couldn't parse the weight
+                return false
+            }
+            
+            completion(group)
+            return true
+        })
+    }
+    
+    func showDialogForMultipleInputWithTitle(title: String, shouldAllowFractions: Bool, previousNameInput: String? = nil, performingEdit: Bool = false, completion: (String, String) -> (Bool)) {
+        var error = ""
+        if previousNameInput == "" {
+            error = "You must enter a name. "
+        }
+        else if previousNameInput != nil && !performingEdit {
+            error = "Invalid score. "
         }
         
-        delay(0.6) {
-            self.controller.tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: UITableViewRowAnimation.Fade)
-        }
+        let message = error + "Score must be a percentage (90%)" + (shouldAllowFractions ? " or a fraction (9/10)" : "") + "."
         
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
-        dict[self.displayClass.ID] = newValue
-        data.setValue(dict, forKey: TSGradebookCalculationSettingKey)
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        var nameField: UITextField!
+        var scoreField: UITextField!
+        
+        alert.addTextFieldWithConfigurationHandler({ textField in
+            nameField = textField
+            nameField.placeholder = "Name"
+            nameField.autocapitalizationType = .Sentences
+            if let name = previousNameInput where name != "" {
+                nameField.text = name
+            }
+        })
+        alert.addTextFieldWithConfigurationHandler({ textField in
+            scoreField = textField
+            scoreField.placeholder = shouldAllowFractions ? "Score" : "Weight"
+        })
+        
+        alert.addAction(UIAlertAction(title: performingEdit ? "Edit" : "Add", style: .Default, handler: { _ in
+            let name = nameField.text ?? ""
+            if name == "" {
+                self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: shouldAllowFractions, previousNameInput: name, completion: completion)
+                return
+            }
+            
+            guard let scoreString = scoreField.text else {
+                self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: shouldAllowFractions, previousNameInput: name, completion: completion)
+                return
+            }
+            
+            let success = completion(name, scoreString)
+            if !success {
+                self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: shouldAllowFractions, previousNameInput: name, completion: completion)
+            }
+            else {
+                self.controller.resignFirstResponder()
+            }
+            
+        }))
+        
+        controller.presentViewController(alert, animated: true, completion: nil)
     }
     
 }

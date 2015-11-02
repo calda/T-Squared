@@ -183,7 +183,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         let scoreIndex = index.item - 3
         if scoreIndex >= 0 {
             let score = scores[scoreIndex]
-            return score.isArtificial
+            return score.isArtificial || score is GradeGroup
         }
         return false
     }
@@ -283,7 +283,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             self.showAddCategoryDialog()
         }))
         
-        alert.addAction(UIAlertAction(title: "Nevermind", style: .Destructive, handler: nil))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         controller.presentViewController(alert, animated: true, completion: nil)
     }
     
@@ -304,7 +304,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
                     self.showAddGradeDialog(inGroup: group)
                 }))
             }
-            alert.addAction(UIAlertAction(title: "Nevermind", style: .Destructive, handler: nil))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
             controller.presentViewController(alert, animated: true, completion: nil)
         }
     }
@@ -339,10 +339,18 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         //show dialog to delete or edit
         let alert = UIAlertController(title: "Edit \(score is Grade ? "Grade" : "Category")", message: nil, preferredStyle: .Alert)
         
-        alert.addAction(UIAlertAction(title: "Edit", style: .Default, handler: editScoreHandler(score)))
-        alert.addAction(UIAlertAction(title: "Delete", style: .Destructive, handler: deleteScoreHandler(score)))
-        alert.addAction(UIAlertAction(title: "Nevermind", style: .Default, handler: nil))
+        if let group = score as? GradeGroup {
+            alert.addAction(UIAlertAction(title: "Add Grade\(group.isArtificial ? "" : " to Category")", style: .Default, handler: { _ in
+                self.showAddGradeDialog(inGroup: group)
+            }))
+        }
         
+        if score.isArtificial {
+            alert.addAction(UIAlertAction(title: "Edit", style: .Default, handler: editScoreHandler(score)))
+            alert.addAction(UIAlertAction(title: "Delete", style: .Destructive, handler: deleteScoreHandler(score)))
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         controller.presentViewController(alert, animated: true, completion: nil)
     }
     
@@ -512,6 +520,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             
         }))
         
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         controller.presentViewController(alert, animated: true, completion: nil)
     }
     

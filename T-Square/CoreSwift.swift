@@ -598,7 +598,7 @@ extension NSDate {
 }
 
 extension UITableViewCell {
-    //hides the line seperator the sell
+    //hides the line seperator the cell
     func hideSeparator() {
         self.separatorInset = UIEdgeInsetsMake(0, self.frame.size.width * 2.0, 0, 0)
     }

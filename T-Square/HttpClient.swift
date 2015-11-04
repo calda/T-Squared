@@ -68,7 +68,7 @@ class HttpClient {
             }
             
             task.resume()
-            while !ready && !failed {
+            while !ready && !failed && !stopTrying {
                 usleep(10)
             }
             
@@ -120,7 +120,7 @@ class HttpClient {
             }
             
             task.resume()
-            while !ready && !failed {
+            while !ready && !failed && !stopTrying {
                 usleep(10)
             }
             

@@ -81,7 +81,10 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("View More Options", hideSeparator: true), onTap: { controller, displayClass in
             
-            let link = displayClass.link
+            var link = displayClass.link
+            if iPad() {
+                link += "?force.classic=yes"
+            }
             controller.openLinkInSafari(link, title: displayClass.name)
             
         }),

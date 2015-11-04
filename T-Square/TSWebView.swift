@@ -31,7 +31,25 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     var goingForwards = false
     var refreshing = false
     var scrollToBottomWhenDoneLoading = false
+    
+    var performAfterNextLoad: (() -> ())?
 
+    func setActivityCircleVisible(visible: Bool) {
+        let scale: CGFloat = visible ? 1.0 : 0.1
+        let transform = CGAffineTransformMakeScale(scale, scale)
+        
+        UIView.animateWithDuration(visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+            self.loginController.activityCircle.transform = transform
+            self.loginController.activityCircle.alpha = visible ? 1.0 : 0.0
+        }, completion: nil)
+    }
+    
+    func setContentVisible(visible: Bool) {
+        delay(0.2) {
+            self.webView.hidden = !visible
+        }
+    }
+    
     override func viewDidLoad() {
         webView.scalesPageToFit = true
     }
@@ -45,14 +63,27 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     }
     
     func openLink(link: String, reset: Bool = true) {
-        backStack = Stack()
-        forwardStack = Stack()
-        updateNavButtons()
+        if reset {
+            customHTML = nil
+            backStack = Stack()
+            forwardStack = Stack()
+            updateNavButtons()
+        }
+        
         guard let url = NSURL(string: link) else { return }
         let request = NSMutableURLRequest(URL: url)
         webView.loadRequest(request)
-        webView.hidden = true
-        if reset { customHTML = nil }
+        self.webView.hidden = true
+        
+        //on the t-square site, using force.classic also redirects you back to the home page
+        if link.containsString("?force.classic=yes") && link.containsString("gatech") {
+            performAfterNextLoad = {
+                self.setContentVisible(false)
+                var newLink = link.stringByReplacingOccurrencesOfString("?force.classic=yes", withString: "")
+                newLink = newLink.stringByReplacingOccurrencesOfString("/pda/", withString: "/site/")
+                self.openLink(newLink, reset: reset)
+            }
+        }
     }
     
     func renderText(text: String, resetView: Bool = true) {
@@ -77,7 +108,7 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         customHTML = html
         
         if resetView {
-            webView.hidden = true
+            self.setContentVisible(false)
             
             //if there is only one link on the page, and that link is the entire contents of the page
             //then open that page
@@ -99,11 +130,11 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     }
     
     func webViewDidStartLoad(webView: UIWebView) {
-        loginController.setActivityCircleVisible(true)
+        setActivityCircleVisible(true)
     }
     
     func webViewDidFinishLoad(webView: UIWebView) {
-        webView.hidden = false
+        self.setContentVisible(true)
         
         if !goingBackwards && !goingForwards {
             if let previousURL = previousURL {
@@ -123,7 +154,7 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         }
         
         updateNavButtons()
-        loginController.setActivityCircleVisible(false)
+        setActivityCircleVisible(false)
         webView.scrollView.contentOffset = CGPointMake(0, 0)
         
         if scrollToBottomWhenDoneLoading {
@@ -137,8 +168,10 @@ class TSWebView : UIViewController, UIWebViewDelegate {
             UIView.animateWithDuration(1.2, delay: 0.5, usingSpringWithDamping: 0.75) {
                 scrollView.contentOffset = CGPointMake(0, contentHeight - viewHeight)
             }
-            
         }
+        
+        performAfterNextLoad?()
+        performAfterNextLoad = nil
     }
 
     //MARK: - User Interaction
@@ -206,7 +239,7 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         NSNotificationCenter.defaultCenter().postNotificationName(TSDismissWebViewNotification, object: nil)
     }
     
-    @IBAction func openShareSheet(sender: AnyObject) {
+    @IBAction func openShareSheet(sender: UIButton) {
         var shareItems: [AnyObject] = []
         var activities: [UIActivity] = []
         
@@ -219,7 +252,13 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         }
         
         let shareSheet = UIActivityViewController(activityItems: shareItems, applicationActivities: activities)
-        self.presentViewController(shareSheet, animated: true, completion: nil)
+        if iPad() {
+            let popup = UIPopoverController(contentViewController: shareSheet)
+            popup.presentPopoverFromRect(sender.frame, inView: sender.superview!, permittedArrowDirections: .Up, animated: true)
+        } else {
+            self.presentViewController(shareSheet, animated: true, completion: nil)
+        }
+        
     }
     
 }

@@ -24,6 +24,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     var classes: [Class]?
     var loadingAnnouncements: Bool = true
     var announcements: [Announcement] = []
+    var recentAnnouncementsCell: TitleWithButtonCell?
     var announcementIndexOffset: Int {
         get {
             return (announcements.count == 0 ? 2 : 1)
@@ -103,6 +104,16 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             if index == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("titleWithButton") as! TitleWithButtonCell
                 cell.decorate("Recent Announcements", buttonText: "mark all read")
+                recentAnnouncementsCell = cell
+                
+                //only show button if there is an unread announcement
+                cell.button.hidden = true
+                for ann in self.announcements {
+                    if !ann.hasBeenRead() {
+                        recentAnnouncementsCell?.button?.hidden = false
+                        break
+                    }
+                }
                 return cell
             }
             if index == 1 && announcements.count == 0 {
@@ -155,7 +166,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         })
         
         //trim to most recent
-        let recentCount = iPad() ? 9 : 5
+        let recentCount = iPad() ? 10 : 5
         
         if announcements.count > recentCount {
             let first = announcements.indices.first!
@@ -524,6 +535,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
         }
         self.reloadTable()
+        recentAnnouncementsCell?.button?.hidden = true
     }
     
     func presentDocumentFromURL(webURL: NSURL) {
@@ -617,7 +629,13 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func setActivityIndicatorVisible(visible: Bool) {
-        loginController.setActivityCircleVisible(visible)
+        let scale: CGFloat = visible ? 1.0 : 0.1
+        let transform = CGAffineTransformMakeScale(scale, scale)
+        
+        UIView.animateWithDuration(visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+            self.loginController.activityCircle.transform = transform
+            self.loginController.activityCircle.alpha = visible ? 1.0 : 0.0
+        }, completion: nil)
     }
     
     func pushSettingsDelegate() {

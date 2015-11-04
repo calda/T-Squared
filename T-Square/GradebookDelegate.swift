@@ -385,17 +385,31 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Validate and Finalize changes
     
-    func finalizeGradeChanges(add add: [Scored], remove: [Scored], swap: [(add: Scored, remove: Scored)]) {
+    func finalizeGradeChanges(var add add: [Scored], var remove: [Scored], swap: [(add: Scored, remove: Scored)]) {
         let data = NSUserDefaults.standardUserDefaults()
         var dict = data.dictionaryForKey(TSCustomGradesKey) as? [String : [String]] ?? [:]
         let classKey = TSAuthenticatedReader.username + "~" + displayClass.ID
         var customScores = dict[classKey] ?? []
         
-        for score in add {
-            score.owningGroup?.scores.append(score)
+        for (addScore, removeScore) in swap {
             
-            let string = score.representAsString()
-            customScores.append(string)
+            if let removeGroup = removeScore as? GradeGroup, let addGroup = addScore as? GradeGroup {
+                for var score in removeGroup.scores {
+                    remove.append(score)
+                    add.append(score)
+                    score.owningGroup = addGroup
+                }
+            }
+            
+            if let removeIndex = removeScore.owningGroup?.scores.indexOf(equalityFunctionForScore(removeScore)) {
+                removeScore.owningGroup?.scores[removeIndex] = addScore
+            }
+            
+            if let index = customScores.indexOf(removeScore.representAsString()) {
+                customScores[index] = addScore.representAsString()
+            } else {
+                customScores.append(addScore.representAsString())
+            }
         }
         
         for score in remove {
@@ -409,16 +423,11 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             }
         }
         
-        for (add, remove) in swap {
-            if let removeIndex = remove.owningGroup?.scores.indexOf(equalityFunctionForScore(remove)) {
-                remove.owningGroup?.scores[removeIndex] = add
-            }
+        for score in add {
+            score.owningGroup?.scores.append(score)
             
-            if let index = customScores.indexOf(remove.representAsString()) {
-                customScores[index] = add.representAsString()
-            } else {
-                customScores.append(add.representAsString())
-            }
+            let string = score.representAsString()
+            customScores.append(string)
         }
         
         dict[classKey] = customScores
@@ -495,10 +504,11 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         })
         alert.addTextFieldWithConfigurationHandler({ textField in
             scoreField = textField
+            scoreField.keyboardType = UIKeyboardType.NumbersAndPunctuation
             scoreField.placeholder = shouldAllowFractions ? "Score" : "Weight"
         })
         
-        alert.addAction(UIAlertAction(title: performingEdit ? "Edit" : "Add", style: .Default, handler: { _ in
+        alert.addAction(UIAlertAction(title: performingEdit ? "Save" : "Add", style: .Default, handler: { _ in
             let name = nameField.text ?? ""
             if name == "" {
                 self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: shouldAllowFractions, previousNameInput: name, completion: completion)

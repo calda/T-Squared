@@ -56,26 +56,28 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         //double check we aren't already authenticated
         let rootPage = "http://t-square.gatech.edu/portal/pda/"
         let pageContents = HttpClient.contentsOfPage(rootPage, postNotificationOnError: false)?.toHTML
+        var validConnection = true
         
-        guard let contents = pageContents else {
-            networkErrorRecieved()
-            return
-        }
-        if contents.containsString("Log Out") {
-            //we're still on a valid connection, but the authenticated reader doesn't exist
-            //recreate the reader
-            if let (username, password) = savedCredentials() {
-                TSAuthenticatedReader = TSReader(username: username, password: password, initialPage: nil)
-                return
+        if let contents = pageContents {
+            if contents.containsString("Log Out") {
+                //we're still on a valid connection, but the authenticated reader doesn't exist
+                //recreate the reader
+                if let (username, password) = savedCredentials() {
+                    TSAuthenticatedReader = TSReader(username: username, password: password, initialPage: nil)
+                    return
+                }
+                else {
+                    //the reader doesn't exist, but we don't have stored credentials
+                    //clear cookies and then prompt for login again
+                    HttpClient.clearCookies()
+                }
             }
-            else {
-                //the reader doesn't exist, but we don't have stored credentials
-                //clear cookies and then prompt for login again
-                HttpClient.clearCookies()
-            }
+        } else {
+            //there were no page contents, meaning the network is unavailable
+            validConnection = false
+            delay(0.5) { self.syncronizedNetworkErrorRecieved() }
         }
         
-        //if no valid connections, prompt for login
         self.formCenter.constant = self.view.frame.height / 2.0
         self.webViewTop.constant = UIScreen.mainScreen().bounds.height
         self.containerLeading.constant = UIScreen.mainScreen().bounds.width
@@ -84,11 +86,14 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         originalLoggingInText = loggingInText.attributedText!
         
         if let (savedUsername, savedPassword) = savedCredentials() {
-            animateFormSubviewsWithDuration(0.0, hidden: true)
-            animateActivityIndicator(on: true)
             usernameField.text = savedUsername
             passwordField.text = savedPassword
-            doLogin(newLogin: false)
+            
+            if validConnection {
+                animateFormSubviewsWithDuration(0.0, hidden: true)
+                animateActivityIndicator(on: true)
+                doLogin(newLogin: false)
+            }
         }
         
         UIView.animateWithDuration(0.7, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
@@ -209,16 +214,20 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     func networkErrorRecieved() {
         sync {
-            self.animateFormSubviewsWithDuration(0.5, hidden: false)
-            self.animateActivityIndicator(on: false)
-            
-            let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Are you connected to the internet?", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
-            alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
-            self.presentViewController(alert, animated: true, completion: nil)
-            
-            self.classesViewController.DISABLE_PUSHES = true
+            self.syncronizedNetworkErrorRecieved()
         }
+    }
+    
+    func syncronizedNetworkErrorRecieved() {
+        self.animateFormSubviewsWithDuration(0.5, hidden: false)
+        self.animateActivityIndicator(on: false)
+        
+        let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Are you connected to the internet?", preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
+        alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
+        self.presentViewController(alert, animated: true, completion: nil)
+        
+        self.classesViewController.DISABLE_PUSHES = true
     }
     
     func setSavedCredentials(correct correct: Bool) {
@@ -372,24 +381,23 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-        if self.containerLeading.constant == 0 { return }
-        delay(0.01) {
-            self.containerLeading.constant = self.view.frame.width
-            self.view.layoutIfNeeded()
+        
+        if self.containerLeading.constant != 0 {
+            delay(0.01) {
+                self.containerLeading.constant = self.view.frame.width
+                self.view.layoutIfNeeded()
+            }
+        }
+        
+        if self.webViewTop.constant != 0 {
+            delay(0.01) {
+                self.webViewTop.constant = self.view.frame.height
+                self.view.layoutIfNeeded()
+            }
         }
     }
     
     //MARK: - Methods that shouldn't be in this View Controller
-    
-    func setActivityCircleVisible(visible: Bool) {
-        let scale: CGFloat = visible ? 1.0 : 0.1
-        let transform = CGAffineTransformMakeScale(scale, scale)
-        
-        UIView.animateWithDuration(visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
-            self.activityCircle.transform = transform
-            self.activityCircle.alpha = visible ? 1.0 : 0.0
-        }, completion: nil)
-    }
     
     var webViewVisible = false
     

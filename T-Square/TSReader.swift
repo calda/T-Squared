@@ -283,7 +283,7 @@ class TSReader {
     }
     
     func getGradesForClass(currentClass: Class) -> GradeGroup {
-        let rootGroup = GradeGroup(name: currentClass.name, weight: 1.0)
+        let rootGroup = GradeGroup(name: "ROOT", weight: 1.0)
         
         defer {
             //load custom grades before exiting scope

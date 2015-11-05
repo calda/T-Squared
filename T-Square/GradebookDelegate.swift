@@ -62,7 +62,12 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             let cell = tableView.dequeueReusableCellWithIdentifier("classTitle") as! ClassNameCell
             cell.nameLabel.text = displayClass.grades?.scoreString ?? "--%"
             cell.subjectLabel.text = "Current grade in \(displayClass.name)\(displayClass.grades?.shouldAppearAsEdited == true ? " (Edited)" : "")"
-            cell.hideSeparator()
+            
+            //only hide seperator if scores[0] is not Grade
+            if !(scores.count > 0 && scores[0] is Grade) {
+                cell.hideSeparator()
+            }
+            
             return cell
         }
         
@@ -88,8 +93,11 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             
             let cell = tableView.dequeueReusableCellWithIdentifier("grade")! as! GradeCell
             cell.decorateForScore(score, inClass: displayClass)
-            if !(score.name == "" && score.scoreString == "") {
+            let isBlank = (score.name == "" && score.scoreString == "")
+            if !isBlank || (isBlank && indexPath.item - 3 == 0) {
                 cell.hideSeparator()
+            } else {
+                cell.showSeparator()
             }
             return cell
         }

@@ -68,7 +68,7 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
             let cell = tableView.dequeueReusableCellWithIdentifier("attachment") as! AttachmentCell
             let file = files[indexPath.item]
             cell.decorate(file.name)
-            cell.hideSeparator()
+            //cell.hideSeparator()
             return cell
         }
         

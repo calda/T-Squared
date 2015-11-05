@@ -201,6 +201,10 @@ class GradeGroup : Scored, CustomStringConvertible {
     var flattened: [Scored] {
         var flattenedArray: [Scored] = []
         
+        if self.name == "ROOT" && (scores.count > 0 && scores[0] is Grade) {
+            flattenedArray.append(Grade(name: "", score: "", weight: nil, comment: nil))
+        }
+        
         for score in scores {
             if let group = score as? GradeGroup {
                 flattenedArray.append(group)
@@ -210,6 +214,7 @@ class GradeGroup : Scored, CustomStringConvertible {
                 else {
                     flattenedArray.appendContentsOf(group.flattened)
                 }
+                
                 flattenedArray.append(Grade(name: "", score: "", weight: nil, comment: nil))
             }
             else {

@@ -641,6 +641,20 @@ extension String {
         //http://www.fileformat.info/info/unicode/char/00a0/index.htm
     }
     
+    mutating func prepareForURL() {
+        //strip out ?, &, %, and =
+        let specialCharacters = [
+            "?" : "%3F",
+            "&" : "%26",
+            "%" : "%25",
+            "=" : "%3D",
+        ]
+        
+        for (special, replace) in specialCharacters {
+            self = self.stringByReplacingOccurrencesOfString(special, withString: replace)
+        }
+    }
+    
 }
 
 extension NSString {

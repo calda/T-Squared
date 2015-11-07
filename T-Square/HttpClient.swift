@@ -171,7 +171,7 @@ class HttpClient {
     static var previous: String?
     static var isRunningInBackground = false
     
-    static func authenticateWithUsername(user: String, password: String, completion: (Bool, HTMLDocument?) -> ()) {
+    static func authenticateWithUsername(var user: String, var password: String, completion: (Bool, HTMLDocument?) -> ()) {
         var didCompletion = false
         
         //request the login page
@@ -214,6 +214,9 @@ class HttpClient {
         else {
             return
         }
+        
+        user.prepareForURL()
+        password.prepareForURL()
         
         //send HTTP POST for login
         let loginClient = HttpClient(url: "https://login.gatech.edu/\(formPost)")

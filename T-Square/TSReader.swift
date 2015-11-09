@@ -16,6 +16,7 @@ class TSReader {
     
     let username: String
     let password: String
+    var actuallyHasNoClasses = false
     var initialPage: HTMLDocument? = nil
     
     init(username: String, password: String, initialPage: HTMLDocument?) {
@@ -85,6 +86,9 @@ class TSReader {
         }
         
         self.classes = classes
+        if classes.count == 0 {
+            actuallyHasNoClasses = true
+        }
         return classes
     }
     

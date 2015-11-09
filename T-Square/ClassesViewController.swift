@@ -46,6 +46,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Table View cell arrangement
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        reloadClassesIfDroppedFromMemory()
+        
         if section == 0 { return (classes?.count ?? 0) + 2 }
         else { return announcements.count + (announcements.count == 0 ? 2 : 1) }
     }
@@ -497,6 +499,26 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         loadAnnouncements()
     }
     
+    func loadCachedData() {
+        self.classes = TSAuthenticatedReader.classes ?? []
+        reloadClassesIfDroppedFromMemory()
+    }
+    
+    func reloadClassesIfDroppedFromMemory() {
+        if TSAuthenticatedReader == nil { return }
+        let noClassesLoaded = TSAuthenticatedReader.classes == nil || TSAuthenticatedReader.classes!.count == 0 || classes?.count == 0
+        let shouldHaveClasses = !TSAuthenticatedReader.actuallyHasNoClasses
+        
+        if noClassesLoaded && shouldHaveClasses && !loadingAnnouncements {
+            print("RELOADING CLASSES")
+            loadAnnouncements() //restart the loading process, because we somehow dropped the classes from memory
+        }
+    }
+    
+    func isFirstLoad() -> Bool {
+        return TSAuthenticatedReader.classes == nil
+    }
+    
     func loadAnnouncements() {
         self.classes = TSAuthenticatedReader.getClasses()
         
@@ -513,14 +535,6 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
             sync() { self.doneLoadingAnnoucements() }
         })
-    }
-    
-    func loadCachedData() {
-        self.classes = TSAuthenticatedReader.classes ?? []
-    }
-    
-    func isFirstLoad() -> Bool {
-        return TSAuthenticatedReader.classes == nil
     }
     
     //MARK: - Auxillary Functions

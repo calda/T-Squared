@@ -101,7 +101,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
             self.view.layoutIfNeeded()
         }, completion: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "logout", name: TSLogoutNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showLogoutAlert", name: TSLogoutNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dismissWebView", name: TSDismissWebViewNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardHeightChanged:", name: UIKeyboardWillChangeFrameNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "centerForm", name: UIKeyboardWillHideNotification, object: nil)
@@ -359,6 +359,13 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     //logout from gatech login service and trash saved passwords
+    func showLogoutAlert() {
+        let alert = UIAlertController(title: nil, message: "Are you sure you want to log out?", preferredStyle: .ActionSheet)
+        alert.addAction(UIAlertAction(title: "Log out", style: .Destructive, handler: { _ in self.logout() }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
     func logout() {
         self.classesViewController.announcements = []
         self.classesViewController.classes = nil

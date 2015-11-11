@@ -1,9 +1,9 @@
 //
-//  StackableTableDelegates.swift
-//  T-Square
+//  AssignmentDelegate.swift
+//  T-Squared for Georgia Tech
 //
 //  Created by Cal on 8/30/15.
-//  Copyright © 2015 Georgia Tech. All rights reserved.
+//  Copyright © 2015 Cal Stephens. All rights reserved.
 //
 
 import Foundation

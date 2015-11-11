@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  T-Square
+//  GradebookDelegate.swift
+//  T-Squared for Georgia Tech
 //
 //  Created by Cal on 9/27/15.
-//  Copyright © 2015 Georgia Tech. All rights reserved.
+//  Copyright © 2015 Cal Stephens. All rights reserved.
 //
 
 import Foundation

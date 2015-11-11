@@ -1,6 +1,6 @@
 //
 //  ZLKeychainService.swift
-//  T-Square
+//  T-Squared for Georgia Tech
 //
 //  Sourced from Stack Overflow
 //  http://stackoverflow.com/questions/25513106/trying-to-use-keychainitemwrapper-by-apple-translated-to-swift

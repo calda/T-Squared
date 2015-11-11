@@ -11,6 +11,7 @@ import UIKit
 
 let TSGradebookCalculationSettingKey = "edu.gatech.cal.gradebookCalculationSetting"
 let TSCustomGradesKey = "edu.gatech.cal.customGrades"
+let TSDroppedGradesKey = "edu.gatech.cal.droppedGrades"
 
 class GradebookDelegate : NSObject, StackableTableDelegate {
     
@@ -191,7 +192,14 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         let scoreIndex = index.item - 3
         if scoreIndex >= 0 {
             let score = scores[scoreIndex]
-            return score.isArtificial || score is GradeGroup
+            
+            if score is GradeGroup { return true}
+            
+            let isDroppable = !score.scoreString.hasPrefix("(")
+            if !isDroppable { return false }
+            
+            let isPlaceholder = score.scoreString == "" || score.scoreString == "COMMENT_PLACEHOLDER" || score.score == nil && score is Grade
+            return !isPlaceholder
         }
         return false
     }
@@ -344,7 +352,15 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     //MARK: - Editing or Deleting existing scores
     
     func scorePressed(score: Scored) {
-        //show dialog to delete or edit
+        
+        if let grade = score as? Grade where !score.isArtificial {
+            //authentic grades from T-Square can only be dropped and picked up
+            (grade.contributesToAverage ? showDropPopupForGrade : showPickUpPopupForGrade)(grade)
+            //alertFunction(grade)
+            return
+        }
+        
+        //show dialog to delete or edit if score is artificial
         let alert = UIAlertController(title: "Edit \(score is Grade ? "Grade" : "Category")", message: nil, preferredStyle: .Alert)
         
         if let group = score as? GradeGroup {
@@ -540,6 +556,54 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         controller.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    //MARK: - Dropping and Undropping grades from T-Square
+    
+    func showDropPopupForGrade(grade: Grade) {
+        let alert = UIAlertController(title: "Drop grade?", message: "This grade would no longer contribute to your average.", preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "Drop", style: .Default, handler: { _ in
+            self.setDropStatus(true, forGrade: grade)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        controller.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func showPickUpPopupForGrade(grade: Grade) {
+        let alert = UIAlertController(title: "Pick up grade?", message: "This grade would contribute to your average again.", preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "Pick up", style: .Default, handler: { _ in
+            self.setDropStatus(false, forGrade: grade)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        controller.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func setDropStatus(dropped: Bool, forGrade grade: Grade) {
+        //update in memory
+        grade.contributesToAverage = !dropped
+        
+        //update on disk
+        let data = NSUserDefaults.standardUserDefaults()
+        var dict = data.dictionaryForKey(TSDroppedGradesKey) as? [String : [String]] ?? [:]
+        let classKey = TSAuthenticatedReader.username + "~" + displayClass.ID
+        var droppedScores = dict[classKey] ?? []
+        
+        if grade.contributesToAverage {
+            //remove from array
+            if let index = droppedScores.indexOf(grade.representAsString()) {
+                droppedScores.removeAtIndex(index)
+            }
+        } else {
+            //add to array
+            droppedScores.append(grade.representAsString())
+        }
+        
+        dict[classKey] = droppedScores
+        data.setValue(dict, forKey: TSDroppedGradesKey)
+        
+        //update on screen
+        scores = flattenedGrades(displayClass.grades)
+        controller.tableView.reloadData()
     }
     
 }

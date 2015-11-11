@@ -186,22 +186,31 @@ class GradeCell : UITableViewCell {
     
     func decorateForScore(grade: Scored, inClass displayClass: Class) {
         let name = grade.name.cleansed()
+        let scoreString = grade.scoreString
+        
         titleLabel.text = name
-        scoreLabel.text = grade.scoreString
-        if grade.scoreString == "-" {
+        scoreLabel.text = scoreString
+        editButton.alpha = 0.0
+        
+        editButton.hidden = !grade.isArtificial
+        editButton.alpha = displayClass.grades?.shouldAppearAsEdited == true ? 1.0 : 0.3
+        
+        if grade.scoreString == "-" || scoreString.hasPrefix("(") && scoreString.hasSuffix(")")  {
             titleLabel.alpha = 0.5
+            scoreLabel.alpha = 0.7
         }
-        else if name.hasPrefix("(") && name.hasSuffix("(") {
+        else if (grade as? Grade)?.contributesToAverage == false && grade.score != nil {
+            //the grade doesn't contribute to the average (artifically dropped)
             titleLabel.alpha = 0.5
+            scoreLabel.alpha = 0.7
+            editButton.hidden = false
+            scoreLabel.text = "(\(scoreLabel.text!))"
         }
         else {
             titleLabel.alpha = 1.0
+            scoreLabel.alpha = 1.5
         }
         
-        editButton.hidden = !grade.isArtificial
-        if !editButton.hidden {
-            editButton.alpha = displayClass.grades?.shouldAppearAsEdited == true ? 1.0 : 0.3
-        }
     }
 }
 

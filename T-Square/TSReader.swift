@@ -390,6 +390,16 @@ class TSReader {
                     let grade = Grade(name: name, score: score, weight: weight, comment: comment)
                     currentGroup.scores.append(grade)
                     grade.owningGroup = currentGroup
+                    
+                    //check if this grade has been artificially dropped by the user
+                    let data = NSUserDefaults.standardUserDefaults()
+                    var dict = data.dictionaryForKey(TSDroppedGradesKey) as? [String : [String]] ?? [:]
+                    let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
+                    let droppedClasses = dict[classKey] ?? []
+                    
+                    if droppedClasses.contains(grade.representAsString()) {
+                        grade.contributesToAverage = false
+                    }
                 }
             }
             

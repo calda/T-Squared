@@ -122,12 +122,24 @@ class GradeGroup : Scored, CustomStringConvertible {
         var artificialCount = 0
         var totalCount = 0
         for score in scores {
-            if score.isArtificial { artificialCount++ }
+            
+            //a grade counts as edited if it is
+            // (1) created artificially
+            // (2) dropped by the user, meaning !isArtificial and !contributesToAverage
+            func countsAsEdit(scored: Scored) -> Bool {
+                var isEdit = scored.isArtificial
+                if let grade = scored as? Grade {
+                    isEdit = isEdit || (!grade.contributesToAverage && grade.score != nil)
+                }
+                return isEdit
+            }
+            
+            if countsAsEdit(score) { artificialCount++ }
             totalCount++
             
             if let group = score as? GradeGroup {
                 for score in group.scores {
-                    if score.isArtificial { artificialCount++ }
+                    if countsAsEdit(score) { artificialCount++ }
                     totalCount++
                 }
             }

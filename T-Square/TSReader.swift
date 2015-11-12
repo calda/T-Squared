@@ -16,8 +16,8 @@ class TSReader {
     
     let username: String
     let password: String
-    var actuallyHasNoClasses = false
     var initialPage: HTMLDocument? = nil
+    var actuallyHasNoClasses = false
     
     init(username: String, password: String, initialPage: HTMLDocument?) {
         self.username = username
@@ -86,10 +86,40 @@ class TSReader {
         }
         
         self.classes = classes
-        if classes.count == 0 {
-            actuallyHasNoClasses = true
-        }
         return classes
+    }
+    
+    func checkIfHasNoClasses() {
+        
+        //the thought process here is that the list of classes goes between "My Workspace" and "Switch to Full View".
+        //if those two are sequential, then there are no classes.
+        
+        guard let doc = initialPage ?? HttpClient.contentsOfPage("https://t-square.gatech.edu/portal/pda/") else { return }
+        let links = doc.css("a, link")
+        let count = links.count
+        let anchorLinks = [
+            ("Log Out", count - 3),
+            ("My Workspace", count - 2),
+            //classes normally go here
+            ("Switch to Full View", count - 1)
+        ]
+        
+        var hasClasses = false
+        
+        for (text, index) in anchorLinks {
+            if index < 0 {
+                hasClasses = true
+                break
+            }
+            
+            let actual = links[index].text?.cleansed() ?? ""
+            if text != actual {
+                hasClasses = true
+                break
+            }
+        }
+        
+        self.actuallyHasNoClasses = !hasClasses
     }
     
     var allClasses: [Class]?

@@ -300,11 +300,15 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         tapRecognizer.enabled = false
         var classes: [Class] = []
         var loadAttempt = 0
-        while classes.count == 0 && loadAttempt < 15 {
+        while classes.count == 0 && loadAttempt < 15 && !reader.actuallyHasNoClasses {
             loadAttempt++
             classes = reader.getClasses()
             
-            if loadAttempt > 10 {
+            if classes.count == 0 {
+                reader.checkIfHasNoClasses()
+            }
+            
+            if loadAttempt > 4 {
                 HttpClient.clearCookies()
             }
         }
@@ -313,7 +317,8 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
             //present an alert and then exit the app if the classes aren't loading
             //this means a failed authentication looked like it passed
             //AKA I have no idea what happened
-            let alert = UIAlertController(title: "There was a problem logging you in.", message: "This happens every now and then. Please restart T-Squared and try again.", preferredStyle: .Alert)
+            let message = "This happens every now and then. Please restart T-Squared and try again. If this keeps happening, please send an email to cal@calstephens.tech"
+            let alert = UIAlertController(title: "There was a problem logging you in.", message: message, preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "Restart", style: .Default, handler: { _ in
                 //crash
                 let null: Int! = nil

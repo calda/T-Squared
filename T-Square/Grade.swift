@@ -23,19 +23,26 @@ protocol Scored {
     
 }
 
-func scorefromString(string: String) -> Scored? {
+func scorefromString(string: String, isArtificial: Bool) -> Scored? {
+    
     if string.hasPrefix("GRADE") {
         let splits = string.componentsSeparatedByString("~")
-        if splits.count != 4 { return nil }
-        let grade = Grade(name: splits[2], score: splits[3], weight: nil, comment: nil, isArtificial: true)
+        if splits.count != 4 && splits.count != 5 { return nil }
+        
+        //comment (index 4) may or may not exist
+        let comment: String? = splits.count >= 5 ? splits[4] : nil
+        
+        let grade = Grade(name: splits[2], score: splits[3], weight: nil, comment: comment, isArtificial: isArtificial)
         grade.owningGroupName = splits[1]
         return grade
     }
+    
     if string.hasPrefix("GROUP") {
         let splits = string.componentsSeparatedByString("~")
         if splits.count != 3 { return nil }
-        return GradeGroup(name: splits[1], weight: "\(splits[2])%", isArtificial: true)
+        return GradeGroup(name: splits[1], weight: "\(splits[2])%", isArtificial: isArtificial)
     }
+    
     return nil
 }
 
@@ -103,7 +110,12 @@ class Grade : Scored, CustomStringConvertible {
     }
     
     func representAsString() -> String {
-        return "GRADE~\(owningGroup?.name ?? "")~\(name)~\(scoreString)"
+        var string = "GRADE~\(owningGroup?.name ?? "")~\(name)~\(scoreString)"
+        if let comment = comment {
+            let strippedComment = comment.stringByReplacingOccurrencesOfString("~", withString: "-")
+            string.appendContentsOf("~\(strippedComment)")
+        }
+        return string
     }
     
 }

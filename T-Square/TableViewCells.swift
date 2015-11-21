@@ -214,17 +214,24 @@ class GradeCell : UITableViewCell {
     }
 }
 
+let TSSetActivityIndicatorEnabledNotification = "edu.gatech.cal.setActivityIndicatorEnabled"
+
 class BackCell : UITableViewCell {
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setActivityIndicatorEnabled:", name: TSSetActivityIndicatorVisibleNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setActivityIndicatorEnabled:", name: TSSetActivityIndicatorEnabledNotification, object: nil)
     }
     
     override func prepareForReuse() {
-        activityIndicator.alpha = 0.0
+        if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
+            activityIndicator.alpha = appDelegate.networkActivityCount > 0 ? 1.0 : 0.0
+        }
+        else {
+            activityIndicator.alpha = 0.0
+        }
     }
     
     func setActivityIndicatorEnabled(notification: NSNotification) {

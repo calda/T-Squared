@@ -17,11 +17,37 @@ var TSQueuedShortcutItem: UIApplicationShortcutItem?
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    
+    //MARK: Tracking Network Activity
 
+    var networkActivityCount = 0
+    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "networkActivityEvent:", name: TSPerformingNetworkActivityNotification, object: nil)
         return true
     }
+    
+    func networkActivityEvent(notification: NSNotification) {
+        guard let activityToggle = notification.object as? Bool else { return }
+        
+        //update count
+        networkActivityCount += activityToggle ? 1 : -1
+        networkActivityCount = max(0, networkActivityCount)
+        
+        let notificationBool: Bool?
+        if networkActivityCount == 0 { notificationBool = false }
+        else if networkActivityCount == 1 { notificationBool = true }
+        else { notificationBool = nil }
+        
+        if let notificationBool = notificationBool {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSSetActivityIndicatorEnabledNotification, object: notificationBool, userInfo: nil)
+        }
 
+    }
+    
+    //MARK: Disable selection for cells when the app resigns active
+    //like when a notification is tapped on
+    
     func applicationWillResignActive(application: UIApplication) {
         
         if TSAuthenticatedReader == nil { return }
@@ -38,6 +64,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
+    
+    //MARK: Make sure we have an active connection once the app is opened again
     
     func applicationDidBecomeActive(application: UIApplication) {
         
@@ -83,6 +111,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+    //MARK: Open from Springboard 3D Touch shortcut
+    
     func openShortcutItemIfPresent() {
         if #available(iOS 9.0, *) {
             guard let item = TSQueuedShortcutItem else { return }
@@ -118,17 +148,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        super.touchesBegan(touches, withEvent: event)
-        guard let window = self.window else { return }
-        guard let touch = touches.first else { return }
-        let location = touch.locationInView(window)
-        let statusBarFrame = UIApplication.sharedApplication().statusBarFrame
-        if CGRectContainsPoint(statusBarFrame, location) {
-            postNotification(TSStatusBarTappedNotification, object: nil)
-        }
-    }
-    
     @available(iOS 9.0, *)
     func application(application: UIApplication, performActionForShortcutItem shortcutItem: UIApplicationShortcutItem, completionHandler: (Bool) -> Void) {
         
@@ -148,6 +167,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             loginController.dismissWebView(0.0)
             loginController.animateFormSubviewsWithDuration(0.0, hidden: true)
             delay(0.2) { loginController.animateActivityIndicator(on: true) }
+        }
+    }
+    
+    //MARK: Check if a touch happens in the status bar
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        super.touchesBegan(touches, withEvent: event)
+        guard let window = self.window else { return }
+        guard let touch = touches.first else { return }
+        let location = touch.locationInView(window)
+        let statusBarFrame = UIApplication.sharedApplication().statusBarFrame
+        if CGRectContainsPoint(statusBarFrame, location) {
+            postNotification(TSStatusBarTappedNotification, object: nil)
         }
     }
 

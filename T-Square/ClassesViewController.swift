@@ -14,7 +14,7 @@ import MessageUI
 //MARK: View Controller and initial Delegate
 
 let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled"
-let TSSetActivityIndicatorVisibleNotification = "edu.gatech.cal.activityIndicatorVisible"
+let TSPerformingNetworkActivityNotification = "edu.gatech.cal.activityIndicatorVisible"
 let TSBackNotification = "edu.gatech.cal.backTriggered"
 let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 let TSShowSettingsNotification = "edu.gatech.cal.showSettings"
@@ -206,7 +206,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func doneLoadingAnnoucements() {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSSetActivityIndicatorVisibleNotification, object: false)
+        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
         loadingAnnouncements = false
         reloadTable()
     }
@@ -521,6 +521,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     func loadAnnouncements() {
         self.classes = TSAuthenticatedReader.getClasses()
+        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true, userInfo: nil)
         
         self.announcements = []
         self.loadingAnnouncements = true
@@ -677,6 +678,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
 
 extension StackableTableDelegate {
     
+    var indexPathsForHeader: [NSIndexPath] {
+        return [NSIndexPath(forItem: 0, inSection: 0)]
+    }
+    
     func loadDataAndPushInController(controller: ClassesViewController) {
         let previousDelegate: UITableViewDelegate! = controller.tableView.delegate
         
@@ -689,7 +694,7 @@ extension StackableTableDelegate {
         if !firstLoad {
             self.loadCachedData()
             controller.pushDelegate(self)
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetActivityIndicatorVisibleNotification, object: true)
+            NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true)
         }
         
         dispatch_async(TSNetworkQueue, {
@@ -700,7 +705,7 @@ extension StackableTableDelegate {
                 if controller.activityIndicator.alpha == 1.0 && !(self is AnnouncementDelegate) {
                     controller.setActivityIndicatorVisible(false)
                 }
-                NSNotificationCenter.defaultCenter().postNotificationName(TSSetActivityIndicatorVisibleNotification, object: false)
+                NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
                 
                 if firstLoad {
                     controller.pushDelegate(self, ifCurrentMatchesExpected: previousDelegate)

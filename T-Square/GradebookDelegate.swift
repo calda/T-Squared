@@ -11,6 +11,7 @@ import UIKit
 
 let TSGradebookCalculationSettingKey = "edu.gatech.cal.gradebookCalculationSetting"
 let TSCustomGradesKey = "edu.gatech.cal.customGrades"
+let TSCachedGradesKey = "edu.gatech.cal.cachedGrades"
 let TSDroppedGradesKey = "edu.gatech.cal.droppedGrades"
 
 class GradebookDelegate : NSObject, StackableTableDelegate {
@@ -137,7 +138,17 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     //MARK: - Stackable Table Delegate methods
     
     func loadCachedData() {
-        scores = flattenedGrades(displayClass.grades) ?? []
+        
+        if let scoresInMemory = displayClass.grades {
+            self.scores = flattenedGrades(scoresInMemory)
+        }
+        
+        else {
+            let cached = TSAuthenticatedReader.getCachedGradesForClass(displayClass)
+            displayClass.grades = cached
+            self.scores = flattenedGrades(cached)
+        }
+
     }
     
     func loadData() {
@@ -177,7 +188,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     }
     
     func isFirstLoad() -> Bool {
-        return displayClass.grades == nil
+        return displayClass.grades == nil && !TSAuthenticatedReader.classHasCachedGrades(displayClass)
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {

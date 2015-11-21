@@ -445,7 +445,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     func dismissWebView(duration: Double) {
         webViewVisible = false
-        postNotification(TSSetActivityIndicatorVisibleNotification, object: false)
+        postNotification(TSPerformingNetworkActivityNotification, object: false)
         
         UIView.animateWithDuration(duration, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
             self.webViewTop.constant = self.view.frame.height

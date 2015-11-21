@@ -14,6 +14,8 @@ let TSLastLoadDate = "edu.gatech.cal.lastLoadDate"
 
 class TSReader {
     
+    //MARK: - Creating the TSAuthenticatedReader
+    
     let username: String
     let password: String
     var initialPage: HTMLDocument? = nil
@@ -37,6 +39,8 @@ class TSReader {
             data.setValue(NSDate(), forKey: TSInstallDateKey)
         }
     }
+    
+    //MARK: - Loading Classes
     
     var classes: [Class]?
     func getClasses() -> [Class] {
@@ -166,6 +170,7 @@ class TSReader {
         return classes ?? []
     }
     
+    //MARK: - Loading Announcements
     
     func getAnnouncementsForClass(currentClass: Class) -> [Announcement] {
         guard let classPage = currentClass.getClassPage() else { return [] }
@@ -209,6 +214,8 @@ class TSReader {
         
         return announcements
     }
+    
+    //MARK: - Loading Resources
     
     func getResourcesInRoot(currentClass: Class) -> [Resource] {
         if let root = getResourceRootForClass(currentClass) {
@@ -273,6 +280,8 @@ class TSReader {
         return resources
     }
     
+    //MARK: - Loading Assignments
+    
     func getAssignmentsForClass(currentClass: Class) -> [Assignment] {
         guard let classPage = currentClass.getClassPage() else { return [] }
         
@@ -316,51 +325,15 @@ class TSReader {
         return assignments
     }
     
+    //MARK: - Loading Grades
+    
     func getGradesForClass(currentClass: Class) -> GradeGroup {
         let rootGroup = GradeGroup(name: "ROOT", weight: 1.0)
         
         defer {
             //load custom grades before exiting scope
-            let data = NSUserDefaults.standardUserDefaults()
-            var dict = data.dictionaryForKey(TSCustomGradesKey) as? [String : [String]] ?? [:]
-            let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
-            
-            if let customGrades = dict[classKey] {
-                var groups: [GradeGroup] = []
-                var grades: [Grade] = []
-                
-                for string in customGrades {
-                    if let score = scorefromString(string) {
-                        if let grade = score as? Grade { grades.append(grade) }
-                        if let group = score as? GradeGroup { groups.append(group) }
-                    }
-                }
-                
-                for group in groups {
-                    rootGroup.scores.append(group)
-                    group.owningGroup = rootGroup
-                }
-                
-                for grade in grades {
-                    let groupName = grade.owningGroupName ?? "ROOT"
-                    var group: GradeGroup?
-                    
-                    if groupName == "ROOT" {
-                        group = rootGroup
-                    } else  {
-                        for score in rootGroup.scores {
-                            if let currentGroup = score as? GradeGroup where currentGroup.name.lowercaseString == groupName.lowercaseString {
-                                group = currentGroup
-                                break
-                            }
-                        }
-                    }
-                    
-                    group?.scores.append(grade)
-                    grade.owningGroup = group
-                }
-                
-            }
+            let (customGrades, customGroups) = getGradesAtKey(TSCustomGradesKey, inClass: currentClass)
+            addFlatGradeListToRoot(rootGroup, groups: customGroups, grades: customGrades)
         }
         
         guard let classPage = currentClass.getClassPage() else { return rootGroup }
@@ -439,7 +412,103 @@ class TSReader {
         }
         
         currentClass.grades = rootGroup
+        cacheGradesForClass(currentClass, rootGroup: rootGroup)
         return rootGroup
+    }
+    
+    func classHasCachedGrades(currentClass: Class) -> Bool {
+        let data = NSUserDefaults.standardUserDefaults()
+        let dict = data.dictionaryForKey(TSCachedGradesKey) as? [String : [String]] ?? [:]
+        let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
+        return dict[classKey] != nil
+    }
+    
+    func getCachedGradesForClass(currentClass: Class) -> GradeGroup {
+        let rootGroup = GradeGroup(name: "ROOT", weight: 1.0)
+        
+        //load cached
+        let (cachedGrades, cachedGroups) = getGradesAtKey(TSCachedGradesKey, inClass: currentClass)
+        addFlatGradeListToRoot(rootGroup, groups: cachedGroups, grades: cachedGrades)
+        //load cutsom
+        let (customGrades, customGroups) = getGradesAtKey(TSCustomGradesKey, inClass: currentClass)
+        addFlatGradeListToRoot(rootGroup, groups: customGroups, grades: customGrades)
+        
+        return rootGroup
+    }
+    
+    func cacheGradesForClass(currentClass: Class, rootGroup: GradeGroup) {
+        var gradesToCache: [String] = []
+        
+        for score in rootGroup.scores {
+            
+            if let grade = score as? Grade where !grade.isArtificial {
+                gradesToCache.append(grade.representAsString())
+            }
+            if let group = score as? GradeGroup where !group.isArtificial {
+                gradesToCache.append(group.representAsString())
+                
+                for grade in group.scores where grade is Grade && !grade.isArtificial {
+                    gradesToCache.append(grade.representAsString())
+                }
+            }
+        }
+        
+        let data = NSUserDefaults.standardUserDefaults()
+        var dict = data.dictionaryForKey(TSCachedGradesKey) as? [String : [String]] ?? [:]
+        let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
+        
+        dict[classKey] = gradesToCache
+        data.setValue(dict, forKey: TSCachedGradesKey)
+    }
+    
+    func getGradesAtKey(key: String, inClass currentClass: Class) -> (grades: [Grade], groups: [GradeGroup]) {
+        let data = NSUserDefaults.standardUserDefaults()
+        let dict = data.dictionaryForKey(key) as? [String : [String]] ?? [:]
+        let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
+        
+        if let customGrades = dict[classKey] {
+            var groups: [GradeGroup] = []
+            var grades: [Grade] = []
+            
+            for string in customGrades {
+                if let score = scorefromString(string, isArtificial: key == TSCustomGradesKey) {
+                    if let grade = score as? Grade { grades.append(grade) }
+                    if let group = score as? GradeGroup { groups.append(group) }
+                }
+            }
+            
+            return (grades, groups)
+        }
+        
+        return ([], [])
+    }
+    
+    func addFlatGradeListToRoot(rootGroup: GradeGroup, groups: [GradeGroup], grades: [Grade]) {
+        
+        for group in groups {
+            rootGroup.scores.append(group)
+            group.owningGroup = rootGroup
+        }
+        
+        for grade in grades {
+            let groupName = grade.owningGroupName ?? "ROOT"
+            var group: GradeGroup?
+            
+            if groupName == "ROOT" {
+                group = rootGroup
+            } else  {
+                for score in rootGroup.scores {
+                    if let currentGroup = score as? GradeGroup where currentGroup.name.lowercaseString == groupName.lowercaseString {
+                        group = currentGroup
+                        break
+                    }
+                }
+            }
+            
+            group?.scores.append(grade)
+            grade.owningGroup = group
+        }
+        
     }
     
 }

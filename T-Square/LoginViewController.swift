@@ -166,6 +166,9 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     func doLogin(newLogin newLogin: Bool) {
         if usernameField.text! == "" || passwordField.text! == "" {
             shakeView(formView)
+            self.animateFormSubviewsWithDuration(0.5, hidden: false)
+            self.animateActivityIndicator(on: false)
+            self.setSavedCredentials(correct: false)
             return
         }
         
@@ -221,6 +224,15 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     func syncronizedNetworkErrorRecieved() {
         self.animateFormSubviewsWithDuration(0.5, hidden: false)
         self.animateActivityIndicator(on: false)
+        
+        let existingUsername = self.usernameField.text
+        let existingPassword = self.passwordField.text
+        
+        //prevent the username and password from being cleared out
+        delay(0.5) {
+            self.usernameField.text = existingUsername
+            self.passwordField.text = existingPassword
+        }
         
         let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Are you connected to the internet?", preferredStyle: .Alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))

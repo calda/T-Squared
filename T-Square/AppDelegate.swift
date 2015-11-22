@@ -19,7 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     //MARK: Tracking Network Activity
-
     var networkActivityCount = 0
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
@@ -87,6 +86,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return
             }
             
+            if contents.containsString("Georgia Tech :: LAWN :: Login Redirect Page") {
+                let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Your login with GTother has expired.", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "Nevermind", style: .Destructive, handler: nil))
+                alert.addAction(UIAlertAction(title: "Log In", style: .Default, handler: { _ in
+                    UIApplication.sharedApplication().openURL(NSURL(string: "http://t2.gatech.edu")!)
+                }))
+                loginController.presentViewController(alert, animated: true, completion: nil)
+                return
+            }
+            
             if !contents.containsString("Log Out") {
                 //"Cookies invalid. Attempting to reconnect.
                 HttpClient.isRunningInBackground = true
@@ -98,9 +107,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                     else {
                         loginController.unpresentClassesView()
-                        let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Your login credentials have changed since the last time you logged in.", preferredStyle: .Alert)
+                        let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Either the network connection is unavailable, or your login credentials have changed since the last time you logged in.", preferredStyle: .Alert)
                         alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                        alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
                         loginController.presentViewController(alert, animated: true, completion: nil)
+                        TSAuthenticatedReader = nil
                     }
                 })
                 HttpClient.isRunningInBackground = false

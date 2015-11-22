@@ -8,6 +8,7 @@
 
 import Foundation
 import Kanna
+import UIKit
 
 let TSNetworkQueue = dispatch_queue_create("edu.gatech.cal.network-queue", DISPATCH_QUEUE_CONCURRENT)
 
@@ -69,10 +70,10 @@ class HttpClient {
             
             task.resume()
             while !ready && !failed && !stopTrying {
-                usleep(10)
+                usleep(100000)
             }
             
-            if content != nil {
+            if content != nil || failed || stopTrying {
                 return content
             }
         
@@ -98,6 +99,8 @@ class HttpClient {
         
         while !stopTrying && !ready {
             
+            print("Starting new task at attempt \(attempts)")
+            
             let task = session.dataTaskWithRequest(request) {
                 (data, response, error) -> Void in
                 
@@ -121,10 +124,10 @@ class HttpClient {
             
             task.resume()
             while !ready && !failed && !stopTrying {
-                usleep(10)
+                usleep(100000)
             }
             
-            if content != nil {
+            if content != nil || failed || stopTrying {
                 return content
             }
             
@@ -174,19 +177,25 @@ class HttpClient {
     static func authenticateWithUsername(var user: String, var password: String, completion: (Bool, HTMLDocument?) -> ()) {
         var didCompletion = false
         
+        //call the completion before exiting scope
+        defer {
+            if !didCompletion {
+                if isRunningInBackground {
+                    completion(false, nil)
+                } else {
+                    sync() { completion(false, nil) }
+                }
+            }
+        }
+        
         //request the login page
         let client = HttpClient(url: "https://login.gatech.edu/cas/login?service=https%3A%2F%2Ft-square.gatech.edu%2Fsakai-login-tool%2Fcontainer")
         guard let loginScreenText = client.sendGet() else {
+            if self.isRunningInBackground { return }
             NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
             return
         }
         let loginScreen = loginScreenText as NSString
-        
-        defer {
-            if !didCompletion {
-                sync() { completion(true, nil) }
-            }
-        }
         
         var formPost: String
         var LT: String
@@ -221,6 +230,7 @@ class HttpClient {
         //send HTTP POST for login
         let loginClient = HttpClient(url: "https://login.gatech.edu/\(formPost)")
         guard let response = loginClient.sendPost("warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)") else {
+            //(UIApplication.sharedApplication().windows[0].rootViewController as? LoginViewController)?.networkErrorRecieved()
             NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
             return
         }

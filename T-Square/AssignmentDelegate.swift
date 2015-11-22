@@ -253,7 +253,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         if index.section == 1 {
             attachment = assignment.attachments![index.item]
         }
-        if index.section == 2 {
+        if index.section == 2 && index.item > 0 {
             attachment = assignment.submissions![index.item - 1]
         }
         

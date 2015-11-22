@@ -179,6 +179,13 @@ class GradeGroup : Scored, CustomStringConvertible {
         self.isArtificial = isArtificial
     }
     
+    func asRootGroupForClass(currentClass: Class) -> GradeGroup {
+        let data = NSUserDefaults.standardUserDefaults()
+        let dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
+        useAllSubscores = dict[currentClass.ID] ?? false
+        return self
+    }
+    
     var useAllSubscores = false {
         didSet {
             for score in scores {

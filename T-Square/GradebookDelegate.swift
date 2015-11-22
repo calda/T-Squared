@@ -253,12 +253,22 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         self.displayClass.grades?.useAllSubscores = newValue
         self.loadCachedData()
         
-        delay(0.2) {
-            self.controller.tableView.scrollToRowAtIndexPath(NSIndexPath(forItem: 0, inSection: 0), atScrollPosition: .Top, animated: true)
+        let animateScrollUp = self.controller.tableView.contentOffset.y > 40.0
+        let paths = [NSIndexPath(forItem: 1, inSection: 0)]
+        let animation: UITableViewRowAnimation = newValue ? .Right : .Left
+        
+        if animateScrollUp {
+            delay(0.2) {
+                self.controller.tableView.scrollToRowAtIndexPath(NSIndexPath(forItem: 0, inSection: 0), atScrollPosition: .Top, animated: true)
+            }
+            
+            delay(0.6) {
+                self.controller.tableView.reloadRowsAtIndexPaths(paths, withRowAnimation: animation)
+            }
         }
         
-        delay(0.6) {
-            self.controller.tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: UITableViewRowAnimation.Fade)
+        else {
+            self.controller.tableView.reloadRowsAtIndexPaths(paths, withRowAnimation: animation)
         }
         
         let data = NSUserDefaults.standardUserDefaults()
@@ -354,7 +364,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     
     func showAddCategoryDialog(name: String? = nil) {
         getValidGroupInput { group in
-            let root = self.displayClass.grades ?? GradeGroup(name: "ROOT", weight: 100.0)
+            let root = self.displayClass.grades ?? GradeGroup(name: "ROOT", weight: 100.0).asRootGroupForClass(self.displayClass)
             group.owningGroup = root
             self.finalizeGradeChanges(add: [group], remove: [], swap: [])
         }

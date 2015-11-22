@@ -411,7 +411,7 @@ class TSReader {
             }
         }
         
-        currentClass.grades = rootGroup
+        currentClass.grades = rootGroup.asRootGroupForClass(currentClass)
         cacheGradesForClass(currentClass, rootGroup: rootGroup)
         return rootGroup
     }
@@ -424,7 +424,7 @@ class TSReader {
     }
     
     func getCachedGradesForClass(currentClass: Class) -> GradeGroup {
-        let rootGroup = GradeGroup(name: "ROOT", weight: 1.0)
+        let rootGroup = GradeGroup(name: "ROOT", weight: 1.0).asRootGroupForClass(currentClass)
         
         //load cached
         let (cachedGrades, cachedGroups) = getGradesAtKey(TSCachedGradesKey, inClass: currentClass)

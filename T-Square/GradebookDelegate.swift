@@ -577,6 +577,13 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         controller.presentViewController(alert, animated: true, completion: nil)
+        
+        delay(0.1) {
+            if nameField.text != "" {
+                scoreField.becomeFirstResponder()
+            }
+        }
+        
     }
     
     //MARK: - Dropping and Undropping grades from T-Square

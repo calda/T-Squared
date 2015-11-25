@@ -93,6 +93,13 @@ class Grade : Scored, CustomStringConvertible {
             let splits = scoreToParse.componentsSeparatedByString("/")
             if splits.count >= 2 {
                 if let points = splits[0].asDouble(), let total = splits[1].asDouble() {
+                    
+                    if total == 0 { //prevent divide by zero
+                        self.score = nil
+                        self.weight = nil
+                        return
+                    }
+                    
                     self.score = points / total
                     self.weight = total
                     return

@@ -50,6 +50,8 @@ class HttpClient {
             
             failed = false
             
+            print("starting new request with count \(attempts)")
+            
             let task = session.dataTaskWithRequest(request) {
                 (data, response, error) -> Void in
                 if let data = data {
@@ -70,10 +72,11 @@ class HttpClient {
             
             task.resume()
             while !ready && !failed && !stopTrying {
+                print("sleeping")
                 usleep(100000)
             }
             
-            if content != nil || failed || stopTrying {
+            if content != nil || stopTrying {
                 return content
             }
         
@@ -127,7 +130,7 @@ class HttpClient {
                 usleep(100000)
             }
             
-            if content != nil || failed || stopTrying {
+            if content != nil || stopTrying {
                 return content
             }
             

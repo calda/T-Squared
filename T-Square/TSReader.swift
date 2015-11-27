@@ -349,7 +349,10 @@ class TSReader {
             var weightIndex: Int?
             var commentIndex: Int?
             
-            let thead = gradebookPage.css("thead")[0]
+            let theads = gradebookPage.css("thead")
+            if theads.count < 1 { return rootGroup }
+            let thead = theads[0]
+            
             let thArray = thead.css("th")
             for i in 0 ..< thArray.count {
                 let text = thArray[i].text!.lowercaseString

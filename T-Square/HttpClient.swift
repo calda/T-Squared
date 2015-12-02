@@ -50,8 +50,6 @@ class HttpClient {
             
             failed = false
             
-            print("starting new request with count \(attempts)")
-            
             let task = session.dataTaskWithRequest(request) {
                 (data, response, error) -> Void in
                 if let data = data {
@@ -72,7 +70,6 @@ class HttpClient {
             
             task.resume()
             while !ready && !failed && !stopTrying {
-                print("sleeping")
                 usleep(100000)
             }
             
@@ -101,8 +98,6 @@ class HttpClient {
         //request.HTTPShouldHandleCookies = true
         
         while !stopTrying && !ready {
-            
-            print("Starting new task at attempt \(attempts)")
             
             let task = session.dataTaskWithRequest(request) {
                 (data, response, error) -> Void in

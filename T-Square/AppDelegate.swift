@@ -12,19 +12,27 @@ let TSStatusBarTappedNotification = "edu.gatech.cal.statusBarTapped"
 
 @available(iOS 9.0, *)
 var TSQueuedShortcutItem: UIApplicationShortcutItem?
+var TSLaunchedUsername: String?
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
-    //MARK: Tracking Network Activity
-    var networkActivityCount = 0
-    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "networkActivityEvent:", name: TSPerformingNetworkActivityNotification, object: nil)
+        
+        //check for launch from tsquared:// url
+        if let launchURL = launchOptions?[UIApplicationLaunchOptionsURLKey] as? NSURL {
+            TSLaunchedUsername = "\(launchURL)".stringByReplacingOccurrencesOfString("tsquared://", withString: "")
+            if TSLaunchedUsername == "" { TSLaunchedUsername = nil }
+        }
+        
         return true
     }
+    
+    //MARK: Tracking Network Activity
+    var networkActivityCount = 0
     
     func networkActivityEvent(notification: NSNotification) {
         guard let activityToggle = notification.object as? Bool else { return }

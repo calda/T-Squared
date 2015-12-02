@@ -84,8 +84,10 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.layoutIfNeeded()
         
         originalLoggingInText = loggingInText.attributedText!
+        let currentUsername = TSLaunchedUsername
+        usernameField.text = currentUsername
         
-        if let (savedUsername, savedPassword) = savedCredentials() {
+        if let (savedUsername, savedPassword) = savedCredentials() where currentUsername == nil || currentUsername == "" || currentUsername == savedUsername {
             usernameField.text = savedUsername
             passwordField.text = savedPassword
             

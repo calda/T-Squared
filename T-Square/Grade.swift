@@ -259,7 +259,7 @@ class GradeGroup : Scored, CustomStringConvertible {
         for score in scores {
             if let group = score as? GradeGroup {
                 flattenedArray.append(group)
-                if group.scores.count == 0 && intrinsicScore == nil {
+                if group.scores.count == 0 && intrinsicScore != nil {
                     flattenedArray.append(Grade(name: "Nothing here yet.", score: "", weight: nil, comment: nil))
                 }
                 else {

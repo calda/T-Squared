@@ -99,10 +99,10 @@ class HttpClient {
         
         while !stopTrying && !ready {
             
+            failed = false
+            
             let task = session.dataTaskWithRequest(request) {
                 (data, response, error) -> Void in
-                
-                failed = false
                 
                 if let data = data {
                     if let loadedContent = NSString(data: data, encoding: NSASCIIStringEncoding) {
@@ -114,7 +114,7 @@ class HttpClient {
                 
                 attempts++
                 failed = true
-                if attempts >= 3 {
+                if attempts >= 1 {
                     stopTrying = true
                 }
                 

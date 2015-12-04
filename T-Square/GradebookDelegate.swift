@@ -46,7 +46,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             
             let data = NSUserDefaults.standardUserDefaults()
             let dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
-            cell.decorateWithText("Count grades with parenthesis in calculation", initialValue: dict[displayClass.ID] ?? false, handler: gradeTogglePressed)
+            cell.decorateWithText("Grades with parenthesis are considered dropped. Count in calculations?", initialValue: dict[displayClass.ID] ?? false, handler: gradeTogglePressed)
             
             return cell
         }

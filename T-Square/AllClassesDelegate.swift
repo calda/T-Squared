@@ -46,7 +46,7 @@ class AllClassesDelegate : NSObject, StackableTableDelegate {
             return cell
         }
         let displayClass = allClasses[indexPath.item - 3]
-        let cell = tableView.dequeueReusableCellWithIdentifier("class") as! ClassNameCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("classWithIcon") as! ClassNameCellWithIcon
         cell.decorate(displayClass)
         return cell
     }

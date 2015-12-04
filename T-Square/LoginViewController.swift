@@ -379,7 +379,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     //logout from gatech login service and trash saved passwords
     func showLogoutAlert() {
-        let alert = UIAlertController(title: nil, message: "Are you sure you want to log out?", preferredStyle: .ActionSheet)
+        let alert = UIAlertController(title: nil, message: "Are you sure you want to log out?", preferredStyle: iPad() ? .Alert : .ActionSheet)
         alert.addAction(UIAlertAction(title: "Log out", style: .Destructive, handler: { _ in self.logout() }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)

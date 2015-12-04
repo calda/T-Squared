@@ -39,8 +39,19 @@ func scorefromString(string: String, isArtificial: Bool) -> Scored? {
     
     if string.hasPrefix("GROUP") {
         let splits = string.componentsSeparatedByString("~")
-        if splits.count != 3 { return nil }
-        return GradeGroup(name: splits[1], weight: "\(splits[2])%", isArtificial: isArtificial)
+        if splits.count != 3 && splits.count != 4 { return nil }
+        
+        let group = GradeGroup(name: splits[1], weight: "\(splits[2])%", isArtificial: isArtificial)
+        
+        //intrinsic grade (index 4) may or may not exist
+        let intrinsicGradeString: String? = splits.count >= 4 ? splits[3] : nil
+        //use Grade to parse
+        let parser = Grade(name: "parse", score: intrinsicGradeString, weight: nil, comment: nil)
+        if let intrinsicGrade = parser.score {
+            group.intrinsicScore = intrinsicGrade
+        }
+        
+        return group
     }
     
     return nil
@@ -132,6 +143,7 @@ class GradeGroup : Scored, CustomStringConvertible {
     let name: String
     let weight: Double?
     var scores: [Scored] = []
+    var intrinsicScore: Double?
     let isArtificial: Bool
     var owningGroup: GradeGroup?
     var owningGroupName: String?
@@ -204,7 +216,8 @@ class GradeGroup : Scored, CustomStringConvertible {
     }
     
     var score: Double? {
-        if scores.count == 0 { return nil }
+        
+        if scores.count == 0 { return intrinsicScore }
         var totalPoints = 0.0
         var totalWeight = 0.0
         
@@ -246,7 +259,7 @@ class GradeGroup : Scored, CustomStringConvertible {
         for score in scores {
             if let group = score as? GradeGroup {
                 flattenedArray.append(group)
-                if group.scores.count == 0 {
+                if group.scores.count == 0 && intrinsicScore == nil {
                     flattenedArray.append(Grade(name: "Nothing here yet.", score: "", weight: nil, comment: nil))
                 }
                 else {
@@ -271,7 +284,11 @@ class GradeGroup : Scored, CustomStringConvertible {
     }
     
     func representAsString() -> String {
-        return "GROUP~\(name)~\(weight ?? 0.0)"
+        var string = "GROUP~\(name)~\(weight ?? 0.0)"
+        if self.scores.count == 0 && self.score != nil { //has an intrinsic grade
+            string += "~\(self.scoreString)"
+        }
+        return string
     }
     
 }

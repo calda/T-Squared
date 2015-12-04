@@ -378,6 +378,17 @@ class TSReader {
                     let name = (nameIndex != nil ? cols[nameIndex!].text?.cleansed() : nil) ?? "Unnamed Category"
                     let weight = (weightIndex != nil ? cols[weightIndex!].text?.cleansed() : nil)
                     currentGroup = GradeGroup(name: name, weight: weight)
+                    
+                    //check if the group has an intrinsic grade
+                    if let scoreIndex = scoreIndex where scoreIndex < cols.count {
+                        let possibleGrade = cols[scoreIndex].text ?? "-"
+                        //reuse parsing code within Grade.swift
+                        let parsedGrade = Grade(name: "parser", score: possibleGrade, weight: nil, comment: nil)
+                        if let intrinsicGrade = parsedGrade.score {
+                            currentGroup.intrinsicScore = intrinsicGrade
+                        }
+                    }
+                    
                     currentGroup.owningGroup = rootGroup
                 }
                 

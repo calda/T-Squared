@@ -245,7 +245,7 @@ class BackCell : UITableViewCell {
     }
     
     @IBAction func backButtonPressed(sender: UIButton) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSBackNotification, object: nil)
+        NSNotificationCenter.defaultCenter().postNotificationName(TSBackPressedNotification, object: nil)
     }
     
 }

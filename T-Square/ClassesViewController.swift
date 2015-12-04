@@ -15,7 +15,8 @@ import MessageUI
 
 let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled"
 let TSPerformingNetworkActivityNotification = "edu.gatech.cal.activityIndicatorVisible"
-let TSBackNotification = "edu.gatech.cal.backTriggered"
+let TSBackPressedNotification = "edu.gatech.cal.backTriggered"
+let TSBackButtonPressCountKey = "edu.gatech.cal.backButtonCount"
 let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 let TSShowSettingsNotification = "edu.gatech.cal.showSettings"
 
@@ -227,7 +228,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         tableViewRestingPosition = tableView.frame.origin
         updateBottomView()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setTouchDelegateEnabled:", name: TSSetTouchDelegateEnabledNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "backTriggered", name: TSBackNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "backTriggeredFromButtonPress", name: TSBackPressedNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "scrollToTop", name: TSStatusBarTappedNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "pushSettingsDelegate", name: TSShowSettingsNotification, object: nil)
     }
@@ -321,6 +322,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             
             if endPosition > tableViewRestingPosition.x + 10.0 {
                 self.popDelegate()
+                
+                //stop the "you can swipe" popup from ever showing up
+                //because the user clearly knows it's possible
+                let data = NSUserDefaults.standardUserDefaults()
+                data.setInteger(11, forKey: TSBackButtonPressCountKey)
             }
             else {
                 self.unhighlightAllCells()
@@ -384,6 +390,23 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     @IBAction func backTriggered() {
         popDelegate()
+    }
+    
+    func backTriggeredFromButtonPress() {
+     
+        let data = NSUserDefaults.standardUserDefaults()
+        let pressCount = min(data.integerForKey(TSBackButtonPressCountKey) + 1, 11)
+        data.setInteger(pressCount, forKey: TSBackButtonPressCountKey)
+        
+        if pressCount == 10 {
+            let alert = UIAlertController(title: "", message: "Did you know you can swipe right at any time to go back?", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "Awesome!", style: .Default, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+        
+        else {
+            backTriggered()
+        }
     }
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {

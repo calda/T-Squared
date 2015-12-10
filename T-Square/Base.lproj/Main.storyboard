@@ -1731,7 +1731,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                             </view>
                         </subviews>
                         <animations/>
-                        <color key="backgroundColor" red="0.086274509799999996" green="0.30980392159999998" blue="0.52549019610000003" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.97983889436208915" green="0.98871713723340782" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="TjS-JT-ILn" firstAttribute="leading" secondItem="dQK-sp-grQ" secondAttribute="leading" id="DJ7-0d-2PG"/>
                             <constraint firstItem="7bg-uP-HRH" firstAttribute="top" secondItem="inq-AA-zwf" secondAttribute="bottom" id="E8b-bY-GIK"/>

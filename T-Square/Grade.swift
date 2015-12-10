@@ -60,10 +60,10 @@ func scorefromString(string: String, isArtificial: Bool) -> Scored? {
 func equalityFunctionForScore(score: Scored) -> (Scored) -> Bool {
     return { other in
         if let grade = score as? Grade, let other = other as? Grade {
-            return grade.name == other.name && grade.score == other.score
+            return grade.name == other.name && grade.score == other.score && grade.isArtificial == other.isArtificial
         }
         if let group = score as? GradeGroup, let other = other as? GradeGroup {
-            return group.name == other.name && group.score == other.score && group.scores.count == other.scores.count
+            return group.name == other.name && group.score == other.score && group.scores.count == other.scores.count && group.isArtificial == other.isArtificial
         }
         return false
     }
@@ -134,6 +134,18 @@ class Grade : Scored, CustomStringConvertible {
             string.appendContentsOf("~\(strippedComment)")
         }
         return string
+    }
+    
+    func performDropCheckWithClass(owningClass: Class) {
+        //check if this grade has been artificially dropped by the user
+        let data = NSUserDefaults.standardUserDefaults()
+        var dict = data.dictionaryForKey(TSDroppedGradesKey) as? [String : [String]] ?? [:]
+        let classKey = TSAuthenticatedReader.username + "~" + owningClass.ID
+        let droppedClasses = dict[classKey] ?? []
+        
+        if droppedClasses.contains(self.representAsString()) {
+            self.contributesToAverage = false
+        }
     }
     
 }
@@ -259,7 +271,7 @@ class GradeGroup : Scored, CustomStringConvertible {
         for score in scores {
             if let group = score as? GradeGroup {
                 flattenedArray.append(group)
-                if group.scores.count == 0 && intrinsicScore != nil {
+                if group.scores.count == 0 && group.intrinsicScore == nil {
                     flattenedArray.append(Grade(name: "Nothing here yet.", score: "", weight: nil, comment: nil))
                 }
                 else {

@@ -580,7 +580,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         self.setActivityIndicatorVisible(true)
         
         dispatch_async(TSNetworkQueue, {
-            let data = NSData(contentsOfURL: webURL)!
+            guard let data = NSData(contentsOfURL: webURL) else {
+                NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+                self.setActivityIndicatorVisible(false)
+                return
+            }
             
             //get the URL's file extension
             let splits = webURL.path!.componentsSeparatedByString(".")

@@ -11,7 +11,7 @@ import UIKit
 
 let TSDisclaimerText = "Cal is a freshman at Georgia Tech. He is in no way affiliated with campus officials. This app is an unofficial service provided at user discretion. Saved account information is encrypted, and only leaves the device to authenticate with Georgia Tech's official login service."
 let TSLicenseText = "T-Squared is licensed under the GNU General Public License v2.0. Source Code is provided for those interested in validating the security of their credentials. "
-let TSEmailText = "Please feel free to send an email with any feeback, issues, or requests! T-Sqaured can only get better with the help of people like you!"
+let TSEmailText = "Please feel free to send an email with any feedback, issues, or requests. T-Sqaured can only get better with the help of people like you!"
 let TSAvailableWidth = UIScreen.mainScreen().bounds.width - 24.0
 
 
@@ -56,25 +56,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
             }
         }, onTap: nil),
         
-        //website title
-        (identifier: "boldTitle", height: 30.0, onDisplay: { cell in
-            if let cell = cell as? TitleCell {
-                cell.decorate("Website")
-            }
-        }, onTap: nil),
         
-        //website link
-        (identifier: "subtitle", height: 30.0, onDisplay: { cell in
-            if let cell = cell as? TitleCell {
-                cell.decorate("http://calstephens.tech")
-            }
-        }, onTap: { controller in
-            controller.openLinkInSafari("http://calstephens.tech", title: "Developer Website")
-        }),
-        
-        //blank
-        (identifier: "blank", height: 15.0, onDisplay: nil, onTap: nil),
- 
         //email title
         (identifier: "boldTitle", height: 30.0, onDisplay: { cell in
             if let cell = cell as? TitleCell {
@@ -98,6 +80,25 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
                 cell.titleLabel.alpha = 0.45
             }
         }, onTap: nil),
+        
+        //blank
+        (identifier: "blank", height: 15.0, onDisplay: nil, onTap: nil),
+ 
+        //website title
+        (identifier: "boldTitle", height: 30.0, onDisplay: { cell in
+            if let cell = cell as? TitleCell {
+                cell.decorate("Website")
+            }
+        }, onTap: nil),
+        
+        //website link
+        (identifier: "subtitle", height: 30.0, onDisplay: { cell in
+            if let cell = cell as? TitleCell {
+                cell.decorate("http://calstephens.tech")
+            }
+        }, onTap: { controller in
+            controller.openLinkInSafari("http://calstephens.tech", title: "Developer Website")
+        }),
         
         //blank
         (identifier: "blank", height: 15.0, onDisplay: nil, onTap: nil),

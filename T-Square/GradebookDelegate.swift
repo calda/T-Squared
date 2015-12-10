@@ -436,6 +436,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         let classKey = TSAuthenticatedReader.username + "~" + displayClass.ID
         var customScores = dict[classKey] ?? []
         
+        //swap grades with new versions
         for (addScore, removeScore) in swap {
             
             if let removeGroup = removeScore as? GradeGroup, let addGroup = addScore as? GradeGroup {
@@ -457,6 +458,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             }
         }
         
+        //remove grades
         for score in remove {
             if let index = score.owningGroup?.scores.indexOf(equalityFunctionForScore(score)) {
                 score.owningGroup?.scores.removeAtIndex(index)
@@ -468,6 +470,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             }
         }
         
+        //add grades
         for score in add {
             score.owningGroup?.scores.append(score)
             
@@ -525,15 +528,18 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     }
     
     func showDialogForMultipleInputWithTitle(title: String, shouldAllowFractions: Bool, previousNameInput: String? = nil, performingEdit: Bool = false, completion: (String, String) -> (Bool)) {
+        
+        let inputNumberName = shouldAllowFractions ? "Score" : "Weight"
+        
         var error = ""
         if previousNameInput == "" {
             error = "You must enter a name. "
         }
         else if previousNameInput != nil && !performingEdit {
-            error = "Invalid score. "
+            error = "Invalid \(inputNumberName.lowercaseString). "
         }
         
-        let message = error + "Score must be a percentage (90%)" + (shouldAllowFractions ? " or a fraction (9/10)" : "") + "."
+        let message = error + "\(inputNumberName) must be a percentage (90%)" + (shouldAllowFractions ? " or a fraction (9/10)" : "") + "."
         
         let alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
         var nameField: UITextField!
@@ -550,7 +556,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         alert.addTextFieldWithConfigurationHandler({ textField in
             scoreField = textField
             scoreField.keyboardType = UIKeyboardType.NumbersAndPunctuation
-            scoreField.placeholder = shouldAllowFractions ? "Score" : "Weight"
+            scoreField.placeholder = inputNumberName
         })
         
         alert.addAction(UIAlertAction(title: performingEdit ? "Save" : "Add", style: .Default, handler: { _ in

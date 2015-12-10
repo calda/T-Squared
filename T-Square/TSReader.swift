@@ -333,7 +333,7 @@ class TSReader {
         defer {
             //load custom grades before exiting scope
             let (customGrades, customGroups) = getGradesAtKey(TSCustomGradesKey, inClass: currentClass)
-            addFlatGradeListToRoot(rootGroup, groups: customGroups, grades: customGrades)
+            addFlatGradeListToRoot(rootGroup, inClass: currentClass, groups: customGroups, grades: customGrades)
         }
         
         guard let classPage = currentClass.getClassPage() else { return rootGroup }
@@ -407,16 +407,7 @@ class TSReader {
                     let grade = Grade(name: name, score: score, weight: weight, comment: comment)
                     currentGroup.scores.append(grade)
                     grade.owningGroup = currentGroup
-                    
-                    //check if this grade has been artificially dropped by the user
-                    let data = NSUserDefaults.standardUserDefaults()
-                    var dict = data.dictionaryForKey(TSDroppedGradesKey) as? [String : [String]] ?? [:]
-                    let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
-                    let droppedClasses = dict[classKey] ?? []
-                    
-                    if droppedClasses.contains(grade.representAsString()) {
-                        grade.contributesToAverage = false
-                    }
+                    grade.performDropCheckWithClass(currentClass)
                 }
             }
             
@@ -442,10 +433,10 @@ class TSReader {
         
         //load cached
         let (cachedGrades, cachedGroups) = getGradesAtKey(TSCachedGradesKey, inClass: currentClass)
-        addFlatGradeListToRoot(rootGroup, groups: cachedGroups, grades: cachedGrades)
+        addFlatGradeListToRoot(rootGroup, inClass: currentClass, groups: cachedGroups, grades: cachedGrades)
         //load cutsom
         let (customGrades, customGroups) = getGradesAtKey(TSCustomGradesKey, inClass: currentClass)
-        addFlatGradeListToRoot(rootGroup, groups: customGroups, grades: customGrades)
+        addFlatGradeListToRoot(rootGroup, inClass: currentClass, groups: customGroups, grades: customGrades)
         
         return rootGroup
     }
@@ -497,7 +488,7 @@ class TSReader {
         return ([], [])
     }
     
-    func addFlatGradeListToRoot(rootGroup: GradeGroup, groups: [GradeGroup], grades: [Grade]) {
+    func addFlatGradeListToRoot(rootGroup: GradeGroup, inClass currentClass: Class, groups: [GradeGroup], grades: [Grade]) {
         
         for group in groups {
             rootGroup.scores.append(group)
@@ -521,6 +512,7 @@ class TSReader {
             
             group?.scores.append(grade)
             grade.owningGroup = group
+            grade.performDropCheckWithClass(currentClass)
         }
         
     }

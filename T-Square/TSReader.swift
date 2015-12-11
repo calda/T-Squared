@@ -138,8 +138,8 @@ class TSReader {
 
             for worksiteLink in workspace.css("a, link") {
                 if worksiteLink["title"] != "Worksite Setup" { continue }
-                let worksiteURL = worksiteLink["href"]!
-                guard let worksite = HttpClient.contentsOfPage(worksiteURL) else { return classes ?? [] }
+                let worksiteURL = worksiteLink["href"]!.stringByReplacingOccurrencesOfString("tool-reset", withString: "tool")
+                guard let worksite = HttpClient.getPageWith100Count(worksiteURL) else { return classes ?? [] }
                 
                 var allClasses: [Class] = []
                 
@@ -172,7 +172,7 @@ class TSReader {
     
     //MARK: - Loading Announcements
     
-    func getAnnouncementsForClass(currentClass: Class) -> [Announcement] {
+    func getAnnouncementsForClass(currentClass: Class, loadAll: Bool = false) -> [Announcement] {
         guard let classPage = currentClass.getClassPage() else { return [] }
         
         var announcements: [Announcement] = []
@@ -180,7 +180,15 @@ class TSReader {
         //load page for class announcements
         for link in classPage.css("a, link") {
             if link.text != "Announcements" { continue }
-            guard let announcementsPage = HttpClient.contentsOfPage(link["href"]!) else { return [] }
+            
+            let announcementsURL = link["href"]!
+            var announcementsPage: HTMLDocument!
+            if !loadAll {
+                announcementsPage = HttpClient.contentsOfPage(announcementsURL)
+            }
+            else {
+                announcementsPage = HttpClient.getPageWith100Count(announcementsURL)
+            }
             
             //load announcements
             for row in announcementsPage.css("tr") {
@@ -290,7 +298,7 @@ class TSReader {
         //load page for class announcements
         for link in classPage.css("a, link") {
             if link.text != "Assignments" { continue }
-            guard let assignmentsPage = HttpClient.contentsOfPage(link["href"]!) else { return [] }
+            guard let assignmentsPage = HttpClient.getPageWith100Count(link["href"]!) else { return [] }
             
             //load announcements
             for row in assignmentsPage.css("tr") {
@@ -515,6 +523,41 @@ class TSReader {
             grade.performDropCheckWithClass(currentClass)
         }
         
+    }
+    
+    //MARK: - Getting Resource for Syllabus
+    
+    func getSyllabusURLForClass(currentClass: Class) -> (rawSyllabusLink: String?, document: String?) {
+        
+        guard let classPage = currentClass.getClassPage() else { return (nil, nil) }
+        //load page for class announcements
+        for link in classPage.css("a, link") {
+            if link.text != "Syllabus" { continue }
+            let syllabusLink = link["href"]!
+            guard let syllabusPage = HttpClient.contentsOfPage(syllabusLink) else { return (nil, nil) }
+            
+            //check if the syllabus is hiding in an iframe
+            let iframes = syllabusPage.css("iframe")
+            if iframes.count > 0 {
+                let iframe = iframes[0]
+                if let src = iframe["src"] {
+                    return (syllabusLink, src)
+                }
+            }
+            
+            let ignore = ["Sites", "?", "Log Out", "Switch to Full View", "", currentClass.ID]
+            var notIgnore: XMLElement? = nil
+            
+            for link in syllabusPage.css("a") {
+                if let linkText = link.text?.cleansed() where !ignore.contains(linkText) {
+                    //not a link to ignore
+                    if notIgnore == nil { notIgnore = link }
+                    else { return (syllabusLink, nil) } //multiple links worth keeping, won't pick and choose
+                }
+            }
+            return (syllabusLink, notIgnore?["href"])
+        }
+        return (nil, nil)
     }
     
 }

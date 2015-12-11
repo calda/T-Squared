@@ -79,6 +79,42 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             
         }),
         
+        (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Syllabus"), onTap: { controller, displayClass in
+            
+            controller.setActivityIndicatorVisible(true)
+            dispatch_async(TSNetworkQueue) {
+                let (syllabusLink, documentLink) = TSAuthenticatedReader.getSyllabusURLForClass(displayClass)
+                sync {
+                    if let documentLink = documentLink {
+                        
+                        var fixedLink = documentLink
+                        if !fixedLink.containsString("http") {
+                            fixedLink = "https://files.t-square.gatech.edu\(documentLink)"
+                        }
+                        
+                        if let url = NSURL(string: fixedLink) {
+                            controller.presentDocumentFromURL(url, name: "Syllabus")
+                            return
+                        }
+                        
+                    }
+                    
+                    if let syllabusLink = syllabusLink {
+                        controller.openLinkInSafari(syllabusLink, title: "Syllabus")
+                        return
+                    }
+                    
+                    //no return, meaning none of the expecting links worked
+                    controller.setActivityIndicatorVisible(false)
+                    let alert = UIAlertController(title: "Syllabus not available", message: "The syllabus got away from us somehow. Has it been posted?", preferredStyle: .Alert)
+                    alert.addAction(UIAlertAction(title: "ok", style: UIAlertActionStyle.Default, handler: nil))
+                    controller.presentViewController(alert, animated: true, completion: nil)
+
+                }
+            }
+            
+        }),
+        
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("View More Options", hideSeparator: true), onTap: { controller, displayClass in
             
             var link = displayClass.link
@@ -101,7 +137,8 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             return cells.count
         }
         else if section == 1 {
-            return max(2, displayClass.announcements.count + 1)
+            let count = displayClass.announcements.count
+            return max(2, count + 1 + (count == 10 ? 1 : 0))
         }
         else { return 0 }
     }
@@ -128,6 +165,13 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             }
             
             let index = indexPath.item - 1
+            
+            if index >= displayClass.announcements.count { //Load More Announcements
+                let cell = tableView.dequeueReusableCellWithIdentifier("subtitle") as! TitleCell
+                cell.decorate("Load more announcements...")
+                return cell
+            }
+            
             let cell = tableView.dequeueReusableCellWithIdentifier("announcement") as! AnnouncementCell
             cell.decorate(displayClass.announcements[index])
             return cell
@@ -179,14 +223,31 @@ class ClassDelegate : NSObject, StackableTableDelegate {
     }
     
     func processSelectedCell(index: NSIndexPath) {
+        //announcements
         if index.section == 1 {
             if index.item == 0 { return }
             if index.item == 1 && displayClass.announcements.count == 0 { return }
+            
+            if index.item - 1 >= displayClass.announcements.count {
+                //load more announcements
+                controller.setActivityIndicatorVisible(true)
+                dispatch_async(TSNetworkQueue) {
+                    let allAnnouncements = TSAuthenticatedReader.getAnnouncementsForClass(self.displayClass, loadAll: true)
+                    self.displayClass.announcements = allAnnouncements
+                    sync {
+                        self.controller.reloadTable()
+                        self.controller.setActivityIndicatorVisible(false)
+                    }
+                }
+                return
+            }
+            
             let announcement = displayClass.announcements[index.item - 1]
             let delegate = AnnouncementDelegate(announcement: announcement, controller: controller)
             delegate.loadDataAndPushInController(controller)
         }
         
+        //assignments
         if index.section == 0 {
             if let onTap = cells[index.item].onTap {
                 onTap(controller, displayClass)

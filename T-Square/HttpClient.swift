@@ -284,6 +284,16 @@ class HttpClient {
         return Kanna.HTML(html: pageText, encoding: NSUTF8StringEncoding)
     }
     
+    static func getPageWith100Count(originalLink: String) -> HTMLDocument? {
+        let postString = "?selectPageSize=100&eventSubmit_doChange_pagesize=changepagesize"
+        let client = HttpClient(url: "\(originalLink)\(postString)")
+        guard let pageText = client.sendGet() else {
+            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            return nil
+        }
+        return Kanna.HTML(html: pageText, encoding: NSUTF8StringEncoding)
+     }
+    
 }
 
 extension String {
@@ -309,7 +319,7 @@ extension String {
         }
         
         //trailing spaces
-        while text.length > 1 && text.stringAtIndex(text.length - 1).isWhitespace() {
+        while text.length > 0 && text.stringAtIndex(text.length - 1).isWhitespace() {
             text = text.substringToIndex(text.length - 1)
         }
         

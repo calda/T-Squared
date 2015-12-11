@@ -203,13 +203,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let countAfter = announcements.count
         let cellHeight: CGFloat = 60.0
         updateBottomView(offset: CGFloat(countAfter - countBefore) * cellHeight)
-        
     }
     
     func doneLoadingAnnoucements() {
         NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
         loadingAnnouncements = false
-        reloadTable()
     }
     
     //MARK: - Customization of the view
@@ -576,7 +574,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         recentAnnouncementsCell?.button?.hidden = true
     }
     
-    func presentDocumentFromURL(webURL: NSURL) {
+    func presentDocumentFromURL(webURL: NSURL, name: String = "Attachment") {
         self.setActivityIndicatorVisible(true)
         
         dispatch_async(TSNetworkQueue, {
@@ -593,7 +591,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             //get URL to save to
             let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
             let documents = paths[0] as NSString
-            let fileURLpath = documents.stringByAppendingPathComponent("Attachment.\(fileType)")
+            let fileURLpath = documents.stringByAppendingPathComponent("\(name).\(fileType)")
             data.writeToFile(fileURLpath, atomically: false)
             let fileURL = NSURL(fileURLWithPath: fileURLpath)
             

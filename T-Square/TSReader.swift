@@ -43,7 +43,7 @@ class TSReader {
     //MARK: - Loading Classes
     
     var classes: [Class]?
-    func getClasses() -> [Class] {
+    func getActiveClasses() -> [Class] {
         
         guard let doc = initialPage ?? HttpClient.contentsOfPage("https://t-square.gatech.edu/portal/pda/") else {
             initialPage = nil
@@ -78,10 +78,11 @@ class TSReader {
                     
                     //show the short-form name unless there would be duplicates
                     let newClass = Class(fromElement: link)
+                    newClass.isActive = true
                     for otherClass in classes {
                         if otherClass.name.hasPrefix(newClass.name) {
-                            newClass.useSectionName()
-                            otherClass.useSectionName()
+                            newClass.useFullName()
+                            otherClass.useFullName()
                         }
                     }
                     classes.append(newClass)
@@ -126,20 +127,37 @@ class TSReader {
         self.actuallyHasNoClasses = !hasClasses
     }
     
-    var allClasses: [Class]?
-    func getAllClasses() -> [Class] {
+    var allClassesCached: (classes: [Class], preferencesLink: String?)?
+    func getAllClasses() -> (classes: [Class], preferencesLink: String?) {
         
-        guard let doc = HttpClient.contentsOfPage("https://t-square.gatech.edu/portal/pda/") else { return classes ?? [] }
+        guard let doc = HttpClient.contentsOfPage("https://t-square.gatech.edu/portal/pda/") else { return (classes ?? [], nil) }
         
         for workspaceLink in doc.css("a, link") {
             if workspaceLink["title"] != "My Workspace" { continue }
             let workspaceURL = workspaceLink["href"]!
-            guard let workspace = HttpClient.contentsOfPage(workspaceURL) else { return classes ?? [] }
+            
+            guard let workspace = HttpClient.contentsOfPage(workspaceURL) else { return (classes ?? [], nil) }
 
             for worksiteLink in workspace.css("a, link") {
                 if worksiteLink["title"] != "Worksite Setup" { continue }
                 let worksiteURL = worksiteLink["href"]!.stringByReplacingOccurrencesOfString("tool-reset", withString: "tool")
-                guard let worksite = HttpClient.getPageWith100Count(worksiteURL) else { return classes ?? [] }
+                
+                //find preferencesLink
+                var preferencesLink: String?
+                for link in workspace.css("a, link") {
+                    if link["title"] != "Preferences" { continue }
+                    if let mainPreferencesLink = link["href"],
+                       //pull from the page's form
+                       let mainPreferencesPage = HttpClient.contentsOfPage(mainPreferencesLink) {
+                        
+                        let forms = mainPreferencesPage.css("form")
+                        if forms.count > 0 {
+                            preferencesLink = forms[0]["action"]?.stringByReplacingOccurrencesOfString("/tool-reset/", withString: "/tool/")
+                        }
+                    }
+                }
+                
+                guard let worksite = HttpClient.getPageWith100Count(worksiteURL) else { return (classes ?? [], preferencesLink) }
                 
                 var allClasses: [Class] = []
                 
@@ -155,19 +173,26 @@ class TSReader {
                     let newClass = Class(fromElement: classLink)
                     for otherClass in allClasses {
                         if otherClass.name.hasPrefix(newClass.name) {
-                            newClass.useSectionName()
-                            otherClass.useSectionName()
+                            newClass.useFullName()
+                            otherClass.useFullName()
                         }
                     }
+                    
+                    //check if this class is an active class
+                    if self.classes == nil { self.getActiveClasses() }
+                    if let activeClasses = self.classes where activeClasses.contains(newClass) {
+                        newClass.isActive = true
+                    }
+                    
                     allClasses.append(newClass)
                 }
                 
-                self.allClasses = allClasses
-                return allClasses
+                self.allClassesCached = (allClasses, preferencesLink)
+                return (allClasses, preferencesLink)
             }
         }
         
-        return classes ?? []
+        return (classes ?? [], nil)
     }
     
     //MARK: - Loading Announcements
@@ -432,7 +457,7 @@ class TSReader {
     func classHasCachedGrades(currentClass: Class) -> Bool {
         let data = NSUserDefaults.standardUserDefaults()
         let dict = data.dictionaryForKey(TSCachedGradesKey) as? [String : [String]] ?? [:]
-        let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
+        let classKey = TSAuthenticatedReader.username + "~" + currentClass.permanentID
         return dict[classKey] != nil
     }
     
@@ -468,7 +493,7 @@ class TSReader {
         
         let data = NSUserDefaults.standardUserDefaults()
         var dict = data.dictionaryForKey(TSCachedGradesKey) as? [String : [String]] ?? [:]
-        let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
+        let classKey = TSAuthenticatedReader.username + "~" + currentClass.permanentID
         
         dict[classKey] = gradesToCache
         data.setValue(dict, forKey: TSCachedGradesKey)
@@ -477,7 +502,7 @@ class TSReader {
     func getGradesAtKey(key: String, inClass currentClass: Class) -> (grades: [Grade], groups: [GradeGroup]) {
         let data = NSUserDefaults.standardUserDefaults()
         let dict = data.dictionaryForKey(key) as? [String : [String]] ?? [:]
-        let classKey = TSAuthenticatedReader.username + "~" + currentClass.ID
+        let classKey = TSAuthenticatedReader.username + "~" + currentClass.permanentID
         
         if let customGrades = dict[classKey] {
             var groups: [GradeGroup] = []
@@ -545,7 +570,7 @@ class TSReader {
                 }
             }
             
-            let ignore = ["Sites", "?", "Log Out", "Switch to Full View", "", currentClass.ID]
+            let ignore = ["Sites", "?", "Log Out", "Switch to Full View", "", currentClass.fullName]
             var notIgnore: XMLElement? = nil
             
             for link in syllabusPage.css("a") {

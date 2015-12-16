@@ -33,6 +33,118 @@ class ClassNameCellWithIcon : ClassNameCell {
     
 }
 
+class ClassNameCellWithSwitch : ClassNameCellWithIcon {
+    
+    @IBOutlet weak var toggleSwitch: UISwitch!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    var displayClass: Class?
+    var preferencesLink: String?
+    var controller: ClassesViewController?
+    
+    func decorate(displayClass: Class, preferencesLink: String?, controller: ClassesViewController) {
+        self.displayClass = displayClass
+        self.preferencesLink = preferencesLink
+        self.controller = controller
+        
+        super.decorate(displayClass)
+        self.toggleSwitch.on = displayClass.isActive
+        
+        //if there is a toggle in the queue
+        if let index = ClassNameCellWithSwitch.activeToggleQueue.indexOf({ return $0.displayClass == displayClass }) {
+            let (_, newStatus, _, _) = ClassNameCellWithSwitch.activeToggleQueue[index]
+            self.toggleSwitch.on = newStatus
+            self.toggleSwitch.alpha = 0.0
+            self.activityIndicator.alpha = 1.0
+            self.activityIndicator.startAnimating()
+        }
+        
+        self.toggleSwitch.hidden = preferencesLink == nil
+    }
+    
+    @IBAction func switchToggled(sender: UISwitch) {
+        if let preferencesLink = preferencesLink,
+           let displayClass = displayClass,
+           let controller = controller {
+            
+            let newStatus = sender.on
+            
+            //animate indicator visible
+            self.activityIndicator.startAnimating()
+            UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+                self.activityIndicator.alpha = 1.0
+                self.toggleSwitch.alpha = 0.0
+            }, completion: nil)
+            
+            ClassNameCellWithSwitch.activeToggleQueue.append((displayClass: displayClass, newStatus: newStatus, activityIndicator: activityIndicator, toggleSwitch: toggleSwitch))
+            if ClassNameCellWithSwitch.activeToggleQueue.count == 1 {
+                ClassNameCellWithSwitch.performActiveToggle(displayClass, newStatus: newStatus, preferencesLink: preferencesLink, controller: controller, activityIndicator: activityIndicator, toggleSwitch: toggleSwitch)
+            }
+            
+            displayClass.isActive = newStatus
+            
+        } else {
+            sender.on = !sender.on
+        }
+        
+    }
+    
+    static var activeToggleQueue: [(displayClass: Class, newStatus: Bool, activityIndicator: UIActivityIndicatorView?, toggleSwitch: UISwitch?)] = []
+    
+    static func performActiveToggle(displayClass: Class, newStatus: Bool, preferencesLink: String, controller: ClassesViewController,
+        activityIndicator: UIActivityIndicatorView?, toggleSwitch: UISwitch?) {
+            
+        //make network call
+        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true)
+        dispatch_async(TSNetworkQueue) {
+            
+            HttpClient.markClassActive(displayClass, active: newStatus, atPreferencesLink: preferencesLink)
+            
+            sync {
+                NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
+                //animate switch visible
+                UIView.animateWithDuration(0.8, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+                    activityIndicator?.alpha = 0.0
+                    toggleSwitch?.alpha = 1.0
+                }, completion: { _ in
+                        activityIndicator?.stopAnimating()
+                })
+                
+                //add or remove from arrays representing active classes
+                if newStatus {
+                    controller.classes?.append(displayClass)
+                    TSAuthenticatedReader.classes?.append(displayClass)
+                } else {
+                    if let index = controller.classes?.indexOf(displayClass) {
+                        controller.classes?.removeAtIndex(index)
+                    }
+                    if let index = TSAuthenticatedReader.classes?.indexOf(displayClass) {
+                        TSAuthenticatedReader.classes?.removeAtIndex(index)
+                    }
+                }
+                
+                //reload if the user already went back to the Classes View Controller
+                if controller.tableView.delegate is ClassesViewController {
+                    controller.reloadTable()
+                }
+                
+                //done, pull from queue and continue with next
+                if let index = activeToggleQueue.indexOf({ return $0.displayClass == displayClass }) {
+                    activeToggleQueue.removeAtIndex(index)
+                }
+                
+                if activeToggleQueue.count > 0 {
+                    if let (nextDisplayClass, nextNewStatus, newActivityIndicator, newToggleSwitch) = activeToggleQueue.first {
+                        performActiveToggle(nextDisplayClass, newStatus: nextNewStatus, preferencesLink: preferencesLink, controller: controller, activityIndicator: newActivityIndicator, toggleSwitch: newToggleSwitch)
+                    }
+                }
+                
+            }
+        }
+
+    }
+    
+}
+
 class AnnouncementCell : UITableViewCell {
     
     var announcement: Announcement!

@@ -292,7 +292,37 @@ class HttpClient {
             return nil
         }
         return Kanna.HTML(html: pageText, encoding: NSUTF8StringEncoding)
-     }
+    }
+    
+    /*
+    POST///make active
+    prefs_form:numtabs:20
+    prefs_form:_id43:gtc-3248-ad8f-5f07-8d4d-aa83ebdedd48
+    prefs_form:prefs_form
+    prefs_form:_idcl:prefs_form:remove
+    prefs_form:submit:Update Preferences
+
+    POST///make inactve
+    prefs_form:numtabs:20
+    prefs_form:_id35:gtc-0eff-f218-57ec-88bc-566361a0fe33
+    prefs_form:prefs_form
+    prefs_form:_idcl:prefs_form:add
+    prefs_form:submit:Update Preferences
+    */
+    static func markClassActive(currentClass: Class, active: Bool, atPreferencesLink link: String) {
+        
+        var postString = "?prefs_form:numtabs=20"
+        postString += "&prefs_form:_id\(active ? 43 : 35)=\(currentClass.permanentID)"
+        postString += "&prefs_form=prefs_form"
+        postString += "&prefs_form:_idcl=prefs_form:\(active ? "remove" : "add")"
+        postString += "&prefs_form:submit=Update%20Preferences"
+        
+        let finalLink = "\(link)\(postString)"
+        let client = HttpClient(url: finalLink)
+        //double up on requests because they get lost sometimes
+        client.sendGet()
+        client.sendGet()
+    }
     
 }
 

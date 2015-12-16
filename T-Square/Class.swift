@@ -12,14 +12,21 @@ import Kanna
 
 let TSClassOpenCountKey = "edu.gatech.cal.classOpenCount"
 
-class Class : CustomStringConvertible {
+func == (lhs: Class, rhs: Class) -> Bool {
+    return lhs.permanentID == rhs.permanentID
+}
+
+class Class : CustomStringConvertible, Equatable {
     
-    let ID: String
+    let permanentID: String
+    let fullName: String
     let subjectID: String?
     let subjectName: String?
     let subjectIcon: String
     var name: String
     let link: String
+    var isActive: Bool = false
+    
     var classPage: HTMLDocument?
     var announcements: [Announcement] = []
     var rootResource: ResourceFolder?
@@ -31,17 +38,18 @@ class Class : CustomStringConvertible {
     }
     
     convenience init(fromElement element: XMLElement) {
-        let ID = element.text!.cleansed()
+        let fullName = element.text!.cleansed()
         let link = element["href"]!.stringByReplacingOccurrencesOfString("site", withString: "pda")
-        self.init(withID: ID, link: link)
+        self.init(withFullName: fullName, link: link)
     }
     
-    init(withID ID: String, link: String) {
-        self.ID = ID
+    init(withFullName fullName: String, link: String) {
+        self.fullName = fullName
         self.link = link
+        self.permanentID = link.componentsSeparatedByString("/").last ?? fullName
         
         //create user-facing name
-        let nameParts = ID.componentsSeparatedByString("-")
+        let nameParts = fullName.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString: "- "))
         if nameParts.count >= 2 {
             self.name = nameParts[0] + " " + nameParts[1]
             self.subjectID = nameParts[0]
@@ -51,7 +59,7 @@ class Class : CustomStringConvertible {
             self.subjectIcon = subjectInfo != nil ? "class-" + subjectInfo!.image : "class-language"
         }
         else {
-            self.name = ID
+            self.name = fullName
             let nsname = name as NSString
             
             //attempt to find the subject name from the first few characters
@@ -75,10 +83,10 @@ class Class : CustomStringConvertible {
     }
     
     func verifySingleSubjectName() {
-        if let subjectID = subjectID where (ID as NSString).countOccurancesOfString(subjectID) > 1 {
+        if let subjectID = subjectID where (fullName as NSString).countOccurancesOfString(subjectID) > 1 {
             var subs: [String] = []
             
-            let subNames = ID.componentsSeparatedByString(" ")
+            let subNames = fullName.componentsSeparatedByString(" ")
             for sub in subNames {
                 let nameParts = sub.componentsSeparatedByString("-")
                 if nameParts.count >= 2 {
@@ -101,8 +109,8 @@ class Class : CustomStringConvertible {
         
     }
     
-    func useSectionName() {
-        self.name = (ID as NSString).stringByReplacingOccurrencesOfString("-", withString: " ")
+    func useFullName() {
+        self.name = (fullName as NSString).stringByReplacingOccurrencesOfString("-", withString: " ")
     }
     
     func getClassPage() ->  HTMLDocument? {
@@ -110,6 +118,8 @@ class Class : CustomStringConvertible {
         classPage = HttpClient.contentsOfPage(self.link)
         return classPage
     }
+    
+    //MARK: - Tracking for 3D Touch Shortcut items
     
     func markClassOpened() {
         offsetOpenCount(1)
@@ -120,7 +130,7 @@ class Class : CustomStringConvertible {
         //update open count on disk
         let data = NSUserDefaults.standardUserDefaults()
         var dict: [String : Int] = data.dictionaryForKey(TSClassOpenCountKey) as? [String : Int] ?? [:]
-        let key = "\(self.ID)~~\(self.subjectIcon)~~\(self.name)~~\(self.link)"
+        let key = "\(self.permanentID)~~\(self.subjectIcon)~~\(self.name)~~\(self.link)"
         let previousCount = dict[key] ?? 0
         dict.updateValue(previousCount + offset, forKey: key)
         data.setValue(dict, forKey: TSClassOpenCountKey)

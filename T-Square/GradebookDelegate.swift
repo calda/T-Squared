@@ -46,7 +46,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             
             let data = NSUserDefaults.standardUserDefaults()
             let dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
-            cell.decorateWithText("Grades with parenthesis are considered dropped. Count in calculations?", initialValue: dict[displayClass.ID] ?? false, handler: gradeTogglePressed)
+            cell.decorateWithText("Grades with parenthesis are considered dropped. Count in calculations?", initialValue: dict[displayClass.permanentID] ?? false, handler: gradeTogglePressed)
             
             return cell
         }
@@ -62,8 +62,15 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
         if indexPath.item == 1 && scores.count != 0 {
             let cell = tableView.dequeueReusableCellWithIdentifier("classTitle") as! ClassNameCell
-            cell.nameLabel.text = displayClass.grades?.scoreString ?? "--%"
-            cell.subjectLabel.text = "Current grade in \(displayClass.name)\(displayClass.grades?.shouldAppearAsEdited == true ? " (Edited)" : "")"
+            cell.nameLabel.text = displayClass.grades?.scoreString ?? "-"
+            
+            cell.subjectLabel.text = "Grade in \(displayClass.name)"
+            if let fractionScore = displayClass.grades?.fractionString {
+                cell.subjectLabel.text = "\(cell.subjectLabel.text!) (\(fractionScore))"
+            }
+            if displayClass.grades?.shouldAppearAsEdited == true {
+                cell.subjectLabel.text = "\(cell.subjectLabel.text!) (Edited)"
+            }
             
             //only hide seperator if scores[0] is not Grade
             if !(scores.count > 0 && scores[0] is Grade) {
@@ -176,7 +183,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         if gradesWithParenthesis == totalGrades {
             let data = NSUserDefaults.standardUserDefaults()
             var dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
-            dict[displayClass.ID] = true
+            dict[displayClass.permanentID] = true
             data.setValue(TSGradebookCalculationSettingKey, forKey: TSGradebookCalculationSettingKey)
             displayClass.grades?.useAllSubscores = true
         }
@@ -273,7 +280,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         let data = NSUserDefaults.standardUserDefaults()
         var dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
-        dict[self.displayClass.ID] = newValue
+        dict[self.displayClass.permanentID] = newValue
         data.setValue(dict, forKey: TSGradebookCalculationSettingKey)
     }
     
@@ -392,6 +399,13 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         if score.isArtificial {
             alert.addAction(UIAlertAction(title: "Edit", style: .Default, handler: editScoreHandler(score)))
+            
+            if let grade = score as? Grade {
+                alert.addAction(UIAlertAction(title: grade.contributesToAverage ? "Drop" : "Pick Up", style: .Default, handler: { _ in
+                    self.setDropStatus(grade.contributesToAverage, forGrade: grade)
+                }))
+            }
+            
             alert.addAction(UIAlertAction(title: "Delete", style: .Destructive, handler: deleteScoreHandler(score)))
         }
         
@@ -433,7 +447,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     func finalizeGradeChanges(var add add: [Scored], var remove: [Scored], swap: [(add: Scored, remove: Scored)]) {
         let data = NSUserDefaults.standardUserDefaults()
         var dict = data.dictionaryForKey(TSCustomGradesKey) as? [String : [String]] ?? [:]
-        let classKey = TSAuthenticatedReader.username + "~" + displayClass.ID
+        let classKey = TSAuthenticatedReader.username + "~" + displayClass.permanentID
         var customScores = dict[classKey] ?? []
         
         //swap grades with new versions
@@ -619,7 +633,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         //update on disk
         let data = NSUserDefaults.standardUserDefaults()
         var dict = data.dictionaryForKey(TSDroppedGradesKey) as? [String : [String]] ?? [:]
-        let classKey = TSAuthenticatedReader.username + "~" + displayClass.ID
+        let classKey = TSAuthenticatedReader.username + "~" + displayClass.permanentID
         var droppedScores = dict[classKey] ?? []
         
         if grade.contributesToAverage {

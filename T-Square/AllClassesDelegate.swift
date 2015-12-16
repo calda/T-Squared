@@ -13,6 +13,7 @@ class AllClassesDelegate : NSObject, StackableTableDelegate {
     
     let controller: ClassesViewController
     var allClasses: [Class] = []
+    var preferencesLink: String?
     
     init(controller: ClassesViewController) {
         self.controller = controller
@@ -45,9 +46,10 @@ class AllClassesDelegate : NSObject, StackableTableDelegate {
             cell.decorate("You aren't in any classes yet.")
             return cell
         }
+        
         let displayClass = allClasses[indexPath.item - 3]
-        let cell = tableView.dequeueReusableCellWithIdentifier("classWithIcon") as! ClassNameCellWithIcon
-        cell.decorate(displayClass)
+        let cell = tableView.dequeueReusableCellWithIdentifier("classWithSwitch") as! ClassNameCellWithSwitch
+        cell.decorate(displayClass, preferencesLink: self.preferencesLink, controller: self.controller)
         return cell
     }
     
@@ -60,15 +62,15 @@ class AllClassesDelegate : NSObject, StackableTableDelegate {
     //MARK: - Stackable Table Delegate Methods
     
     func loadData() {
-        self.allClasses = TSAuthenticatedReader.getAllClasses()
+        (self.allClasses, self.preferencesLink) = TSAuthenticatedReader.getAllClasses()
     }
     
     func loadCachedData() {
-        self.allClasses = TSAuthenticatedReader.allClasses ?? []
+        (self.allClasses, self.preferencesLink) = TSAuthenticatedReader.allClassesCached ?? ([], nil)
     }
     
     func isFirstLoad() -> Bool {
-        return TSAuthenticatedReader.allClasses == nil
+        return TSAuthenticatedReader.allClassesCached == nil
     }
     
     func processSelectedCell(index: NSIndexPath) {
@@ -96,6 +98,16 @@ class AllClassesDelegate : NSObject, StackableTableDelegate {
         delay(0.5) {
             NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
         }
+    }
+    
+    func shouldIgnoreTouch(location: CGPoint, inCell: UITableViewCell) -> Bool {
+        if let cell = inCell as? ClassNameCellWithSwitch {
+            let switchFrame = cell.toggleSwitch.frame
+            let minX = CGRectGetMinX(switchFrame) - 10
+            let maxX = CGRectGetMaxX(switchFrame) + 10
+            return location.x > minX && location.x < maxX
+        }
+        return false
     }
     
 }

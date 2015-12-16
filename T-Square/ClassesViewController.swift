@@ -153,6 +153,50 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     //MARK: - Handle announcements as they're loaded
     
+    func loadAnnouncements(reloadClasses reloadClasses: Bool = true) {
+        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true, userInfo: nil)
+        if reloadClasses { self.classes = TSAuthenticatedReader.getActiveClasses() }
+        
+        self.announcements = []
+        self.loadingAnnouncements = true
+        
+        var doneLoadingCount = 0
+        let necessaryCount = self.classes!.count
+        var previousTimeComplete = NSDate()
+        
+        for currentClass in self.classes! {
+            if TSAuthenticatedReader == nil { break }
+            //load announcements as fast as possible
+            dispatch_async(TSNetworkQueue) {
+                let announcements = TSAuthenticatedReader.getAnnouncementsForClass(currentClass)
+                if announcements.count == 0 { return }
+                
+                //but only play animation once every 0.5 seconds at most
+                sync() {
+                    let timeComplete = NSDate()
+                    let timeDifference = timeComplete.timeIntervalSinceDate(previousTimeComplete)
+                    previousTimeComplete = timeComplete
+                    
+                    func performAdd() {
+                        self.addAnnouncements(announcements)
+                        doneLoadingCount += 1
+                        if doneLoadingCount == necessaryCount {
+                            self.doneLoadingAnnoucements()
+                        }
+                    }
+                    
+                    let delayDuration = max(0.0, 0.5 - timeDifference)
+                    if delayDuration == 0.0 { performAdd() }
+                    else {
+                        previousTimeComplete = NSDate().dateByAddingTimeInterval(delayDuration)
+                        delay(delayDuration) { performAdd() }
+                    }
+                }
+            }
+        }
+        
+    }
+    
     func addAnnouncements(newAnnouncements: [Announcement]) {
         let previous = self.announcements
         
@@ -179,7 +223,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         //don't animate if this delegate isn't visible anymore
         if delegateStack.count != 0 { return }
-        
+    
         tableView.beginUpdates()
         
         if previous.count == 0 && announcements.count != 0 {
@@ -197,17 +241,26 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 tableView.insertRowsAtIndexPaths([NSIndexPath(forItem: i + 1, inSection: 1)], withRowAnimation:  UITableViewRowAnimation.Middle)
             }
         }
-
+        
         tableView.endUpdates()
-        let countBefore = previous.count == 0 ? 1 : previous.count
-        let countAfter = announcements.count
+        let countBefore = max(1, previous.count)
+        let countAfter = max(1, announcements.count)
         let cellHeight: CGFloat = 60.0
-        updateBottomView(offset: CGFloat(countAfter - countBefore) * cellHeight)
+        
+        let offsetCount = countAfter - countBefore
+        if offsetCount != 0 {
+            updateBottomView(offset: CGFloat(offsetCount) * cellHeight)
+        }
+    
+        //reload Recent Announcements cell
+        //so that "mark all read" can appear if necessary
+        tableView.reloadRowsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 1)], withRowAnimation: UITableViewRowAnimation.None)
     }
     
     func doneLoadingAnnoucements() {
         NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
         loadingAnnouncements = false
+        if announcements.count == 0 { self.reloadTable() }
     }
     
     //MARK: - Customization of the view
@@ -282,6 +335,17 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
         
         if sender.state == .Began {
+            
+            //don't start a pan if this touch is ignored by the delegate
+            let touch = sender.locationInView(tableView)
+            if let indexPath = tableView.indexPathForRowAtPoint(touch),
+               let cell = tableView.cellForRowAtIndexPath(indexPath) {
+                
+                if (tableView.delegate as? StackableTableDelegate)?.shouldIgnoreTouch?(touch, inCell: cell) == true {
+                    return
+                }
+            }
+            
             panning = true
             NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
             tableViewRestingPosition = tableView.frame.origin
@@ -438,7 +502,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             if index.item == 0 { return }
             if index.item == (classes?.count ?? 0) + 1 {
                 //load extra classes
-                if TSAuthenticatedReader.allClasses == nil {
+                if TSAuthenticatedReader.allClassesCached == nil {
                     setActivityIndicatorVisible(true)
                 }
                 
@@ -531,32 +595,13 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let shouldHaveClasses = !TSAuthenticatedReader.actuallyHasNoClasses
         
         if noClassesLoaded && shouldHaveClasses && !loadingAnnouncements {
-            print("RELOADING CLASSES")
+            print("RELOADING CLASSES (dropped from memory)")
             loadAnnouncements() //restart the loading process, because we somehow dropped the classes from memory
         }
     }
     
     func isFirstLoad() -> Bool {
         return TSAuthenticatedReader.classes == nil
-    }
-    
-    func loadAnnouncements() {
-        self.classes = TSAuthenticatedReader.getClasses()
-        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true, userInfo: nil)
-        
-        self.announcements = []
-        self.loadingAnnouncements = true
-        
-        dispatch_async(TSNetworkQueue, {
-            for currentClass in self.classes! {
-                if TSAuthenticatedReader == nil { break }
-                let announcements = TSAuthenticatedReader.getAnnouncementsForClass(currentClass)
-                sync() {
-                    self.addAnnouncements(announcements)
-                }
-            }
-            sync() { self.doneLoadingAnnoucements() }
-        })
     }
     
     //MARK: - Auxillary Functions

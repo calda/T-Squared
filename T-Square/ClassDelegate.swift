@@ -169,6 +169,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             if index >= displayClass.announcements.count { //Load More Announcements
                 let cell = tableView.dequeueReusableCellWithIdentifier("subtitle") as! TitleCell
                 cell.decorate("Load more announcements...")
+                cell.backgroundColor = UIColor(red: 0.43, green: 0.69, blue: 1.0, alpha: 0.4)
                 return cell
             }
             

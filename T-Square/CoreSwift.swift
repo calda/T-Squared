@@ -443,19 +443,25 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
     func processTouchInTableView(touch: CGPoint, state: UIGestureRecognizerState) {
         for cell in tableView.visibleCells {
             let delegate = tableView.delegate as? StackableTableDelegate
+            
             if let index = tableView.indexPathForCell(cell) {
                 if cell.frame.contains(touch) {
                     
-                    if state == .Ended {
-                        delegate?.processSelectedCell(index)
-                        delegate?.animateSelection(cell, indexPath: index, selected: false)
-                        return
-                    }
-                    else {
-                        if delegate?.canHighlightCell(index) == true {
-                            delegate?.animateSelection(cell, indexPath: index, selected: true)
-                            continue
+                    //ignore touch is commanded by the delagate
+                    if delegate?.shouldIgnoreTouch?(touch, inCell: cell) != true {
+                    
+                        if state == .Ended {
+                            delegate?.processSelectedCell(index)
+                            delegate?.animateSelection(cell, indexPath: index, selected: false)
+                            return
                         }
+                        else {
+                            if delegate?.canHighlightCell(index) == true {
+                                delegate?.animateSelection(cell, indexPath: index, selected: true)
+                                continue
+                            }
+                        }
+                        
                     }
                 }
                 
@@ -486,6 +492,7 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
     func loadCachedData()
     func loadData()
     func isFirstLoad() -> Bool
+    optional func shouldIgnoreTouch(location: CGPoint, inCell: UITableViewCell) -> Bool
     optional func getTitle() -> String
     optional func getBackButtonImage() -> UIImage
     optional func scrollViewDidScroll(scrollView: UIScrollView)

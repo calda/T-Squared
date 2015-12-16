@@ -316,7 +316,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         var loadAttempt = 0
         while classes.count == 0 && loadAttempt < 15 && !reader.actuallyHasNoClasses {
             loadAttempt++
-            classes = reader.getClasses()
+            classes = reader.getActiveClasses()
             
             if classes.count == 0 {
                 reader.checkIfHasNoClasses()
@@ -352,7 +352,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         
         animatePresentClassesView()
-        classesViewController.loadAnnouncements()
+        classesViewController.loadAnnouncements(reloadClasses: false)
     }
     
     func animatePresentClassesView() {

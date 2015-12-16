@@ -23,7 +23,6 @@
 		2E7C6F671B8E6DDE00E95183 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */; };
 		2E7C6F6A1B8E6DDE00E95183 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F681B8E6DDE00E95183 /* LaunchScreen.storyboard */; };
 		2E7C6F801B8E6E5100E95183 /* HttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */; };
-		2E7C6F8C1B8E70C900E95183 /* HttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */; };
 		2E7C6F8E1B8E94BA00E95183 /* CoreSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */; };
 		2E7F58181BE5913C000590EB /* ZLKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7F58171BE5913C000590EB /* ZLKeychainService.swift */; };
 		2E7F581A1BE59566000590EB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E7F58191BE59566000590EB /* Security.framework */; };
@@ -85,15 +84,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		2E7C6F831B8E70C200E95183 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 		2EAA77551BC0892B00606C5D /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -126,7 +116,6 @@
 		2E7C6F6B1B8E6DDE00E95183 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E7C6F701B8E6DDE00E95183 /* T-SquareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "T-SquareTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpClient.swift; sourceTree = "<group>"; };
-		2E7C6F851B8E70C200E95183 /* OS X Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "OS X Tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreSwift.swift; sourceTree = "<group>"; };
 		2E7F58171BE5913C000590EB /* ZLKeychainService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLKeychainService.swift; sourceTree = "<group>"; };
 		2E7F58191BE59566000590EB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -154,13 +143,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2E7C6F6D1B8E6DDE00E95183 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2E7C6F821B8E70C200E95183 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -197,7 +179,6 @@
 			children = (
 				2E7C6F5C1B8E6DDE00E95183 /* T-Squared.app */,
 				2E7C6F701B8E6DDE00E95183 /* T-SquareTests.xctest */,
-				2E7C6F851B8E70C200E95183 /* OS X Tests */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -213,10 +194,9 @@
 				2E7C6F6B1B8E6DDE00E95183 /* Info.plist */,
 				2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */,
 				2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */,
-				2EFA12691BAE6F48007510A0 /* TSWebView.swift */,
 				2E1A63431B9696A7002D7632 /* TableViewCells.swift */,
-				2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */,
 				2E3C4E3B1B99447C00DD0B6B /* ClassDelegate.swift */,
+				2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */,
 				2E809C161BA528FC008849FB /* AssignmentsDelegate.swift */,
 				2E9A2D891BA6592200E93BA0 /* AssignmentDelegate.swift */,
 				2E8E4CCE1B9A6BD800D62A2E /* ResourcesDelegate.swift */,
@@ -231,6 +211,7 @@
 				2E809C141BA51AD0008849FB /* Assignment.swift */,
 				2EE3031F1BB239DF00FFEA5A /* Grade.swift */,
 				2E7F58171BE5913C000590EB /* ZLKeychainService.swift */,
+				2EFA12691BAE6F48007510A0 /* TSWebView.swift */,
 			);
 			path = "T-Square";
 			sourceTree = "<group>";
@@ -275,23 +256,6 @@
 			productReference = 2E7C6F701B8E6DDE00E95183 /* T-SquareTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		2E7C6F841B8E70C200E95183 /* OS X Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2E7C6F891B8E70C200E95183 /* Build configuration list for PBXNativeTarget "OS X Tests" */;
-			buildPhases = (
-				2E7C6F811B8E70C200E95183 /* Sources */,
-				2E7C6F821B8E70C200E95183 /* Frameworks */,
-				2E7C6F831B8E70C200E95183 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "OS X Tests";
-			productName = "OS X Tests";
-			productReference = 2E7C6F851B8E70C200E95183 /* OS X Tests */;
-			productType = "com.apple.product-type.tool";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -313,9 +277,6 @@
 					2E7C6F6F1B8E6DDE00E95183 = {
 						CreatedOnToolsVersion = 7.0;
 						TestTargetID = 2E7C6F5B1B8E6DDE00E95183;
-					};
-					2E7C6F841B8E70C200E95183 = {
-						CreatedOnToolsVersion = 7.0;
 					};
 				};
 			};
@@ -340,7 +301,6 @@
 			targets = (
 				2E7C6F5B1B8E6DDE00E95183 /* T-Squared */,
 				2E7C6F6F1B8E6DDE00E95183 /* T-SquareTests */,
-				2E7C6F841B8E70C200E95183 /* OS X Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -430,14 +390,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2E7C6F811B8E70C200E95183 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				2E7C6F8C1B8E70C900E95183 /* HttpClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -615,24 +567,6 @@
 			};
 			name = Release;
 		};
-		2E7C6F8A1B8E70C200E95183 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		2E7C6F8B1B8E70C200E95183 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -659,15 +593,6 @@
 			buildConfigurations = (
 				2E7C6F7D1B8E6DDE00E95183 /* Debug */,
 				2E7C6F7E1B8E6DDE00E95183 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2E7C6F891B8E70C200E95183 /* Build configuration list for PBXNativeTarget "OS X Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2E7C6F8A1B8E70C200E95183 /* Debug */,
-				2E7C6F8B1B8E70C200E95183 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -140,7 +140,7 @@ class Grade : Scored, CustomStringConvertible {
         //check if this grade has been artificially dropped by the user
         let data = NSUserDefaults.standardUserDefaults()
         var dict = data.dictionaryForKey(TSDroppedGradesKey) as? [String : [String]] ?? [:]
-        let classKey = TSAuthenticatedReader.username + "~" + owningClass.ID
+        let classKey = TSAuthenticatedReader.username + "~" + owningClass.permanentID
         let droppedClasses = dict[classKey] ?? []
         
         if droppedClasses.contains(self.representAsString()) {
@@ -213,7 +213,7 @@ class GradeGroup : Scored, CustomStringConvertible {
     func asRootGroupForClass(currentClass: Class) -> GradeGroup {
         let data = NSUserDefaults.standardUserDefaults()
         let dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
-        useAllSubscores = dict[currentClass.ID] ?? false
+        useAllSubscores = dict[currentClass.permanentID] ?? false
         return self
     }
     
@@ -227,9 +227,7 @@ class GradeGroup : Scored, CustomStringConvertible {
         }
     }
     
-    var score: Double? {
-        
-        if scores.count == 0 { return intrinsicScore }
+    var scoreFraction: (totalPoints: Double, totalWeight: Double) {
         var totalPoints = 0.0
         var totalWeight = 0.0
         
@@ -241,6 +239,13 @@ class GradeGroup : Scored, CustomStringConvertible {
             }
         }
         
+        return (totalPoints, totalWeight)
+    }
+    
+    var score: Double? {
+        if scores.count == 0 { return intrinsicScore }
+        
+        let (totalPoints, totalWeight) = scoreFraction
         if totalWeight == 0.0 { return nil }
         return totalPoints / totalWeight
     }
@@ -255,6 +260,23 @@ class GradeGroup : Scored, CustomStringConvertible {
             return "\(roundedString)%"
         }
         return "-"
+    }
+    
+    var fractionString: String? {
+        //decide if the fractionString should ber used
+        var subcountWithFraction = 0
+        for score in scores {
+            if score.scoreString.containsString("/") || score.score == nil {
+                subcountWithFraction += 1
+            }
+        }
+        
+        if subcountWithFraction == scores.count && scores.count > 0 {
+            let (totalPoints, totalWeight) = scoreFraction
+            let fractionString = "\(totalPoints) / \(totalWeight)".stringByReplacingOccurrencesOfString(".0", withString: "")
+            return fractionString
+        }
+        return nil
     }
     
     var description: String {

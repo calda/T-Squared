@@ -47,7 +47,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Table View cell arrangement
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        reloadClassesIfDroppedFromMemory()
+        //this feature has been transitioned in to a the reloadDataIfNecessary method on StackableTableDelegate
+        //it is not applicable to all Delegates instead of just this one
+        //reloadClassesIfDroppedFromMemory()
         
         if section == 0 { return (classes?.count ?? 0) + 2 }
         else { return announcements.count + (announcements.count == 0 ? 2 : 1) }
@@ -160,16 +162,35 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         self.announcements = []
         self.loadingAnnouncements = true
         
+        if self.classes == nil || self.classes?.count == 0 {
+            //no classes to load from
+            //there are systems in place that *should* prevent the code from
+            //reaching this far when the classes aren't loaded out of error
+            
+            self.doneLoadingAnnoucements()
+        }
+        
         var doneLoadingCount = 0
         let necessaryCount = self.classes!.count
         var previousTimeComplete = NSDate()
         
-        for currentClass in self.classes! {
+        for currentClass in self.classes ?? [] {
             if TSAuthenticatedReader == nil { break }
             //load announcements as fast as possible
             dispatch_async(TSNetworkQueue) {
                 let announcements = TSAuthenticatedReader.getAnnouncementsForClass(currentClass)
-                if announcements.count == 0 { return }
+                
+                func markLoadedAndCheckIfDone() -> Bool {
+                    doneLoadingCount += 1
+                    return doneLoadingCount == necessaryCount
+                }
+                
+                if announcements.count == 0 {
+                    if markLoadedAndCheckIfDone() {
+                        sync { self.doneLoadingAnnoucements() }
+                    }
+                    return
+                }
                 
                 //but only play animation once every 0.5 seconds at most
                 sync() {
@@ -179,10 +200,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                     
                     func performAdd() {
                         self.addAnnouncements(announcements)
-                        doneLoadingCount += 1
-                        if doneLoadingCount == necessaryCount {
-                            self.doneLoadingAnnoucements()
-                        }
+                        self.doneLoadingAnnoucements()
                     }
                     
                     let delayDuration = max(0.0, 0.5 - timeDifference)
@@ -566,13 +584,16 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     override func popDelegate() {
+        
+        self.setActivityIndicatorVisible(false) //terminate any other loading (even though it'll continue in the background)
+        
         super.popDelegate()
         let delegate = tableView.delegate!
+        (delegate as? StackableTableDelegate)?.reloadDataIfNecessary(self)
         bottomView.hidden = !(usesBottomView(delegate))
         updateBottomView()
         let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)
         playTransitionForView(bottomView, duration: 0.4, transition: kCATransitionPush, subtype: kCATransitionFromLeft, timingFunction: timingFunction)
-        self.setActivityIndicatorVisible(false)
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
@@ -601,7 +622,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func isFirstLoad() -> Bool {
-        return TSAuthenticatedReader.classes == nil
+        return TSAuthenticatedReader.classes == nil || (TSAuthenticatedReader.classes?.count == 0 && !TSAuthenticatedReader.actuallyHasNoClasses)
     }
     
     //MARK: - Auxillary Functions
@@ -788,6 +809,22 @@ extension StackableTableDelegate {
             }
         })
         
+    }
+    
+    func reloadDataIfNecessary(controller: ClassesViewController) {
+        if isFirstLoad() {
+            print("RELOADING DATA for the popped delegate. Something went missing.")
+            
+            controller.setActivityIndicatorVisible(true)
+            dispatch_async(TSNetworkQueue) {
+                self.loadData()
+                sync() {
+                    controller.reloadTable()
+                    controller.setActivityIndicatorVisible(false)
+                }
+            }
+            
+        }
     }
     
 }

@@ -43,7 +43,7 @@ class Class : CustomStringConvertible, Equatable {
         self.init(withFullName: fullName, link: link)
     }
     
-    init(withFullName fullName: String, link: String) {
+    init(withFullName fullName: String, link: String, displayName: String? = nil) {
         self.fullName = fullName
         self.link = link
         self.permanentID = link.componentsSeparatedByString("/").last ?? fullName
@@ -51,7 +51,13 @@ class Class : CustomStringConvertible, Equatable {
         //create user-facing name
         let nameParts = fullName.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString: "- "))
         if nameParts.count >= 2 {
-            self.name = nameParts[0] + " " + nameParts[1]
+            
+            if let displayName = displayName {
+                self.name = displayName
+            } else {
+               self.name = nameParts[0] + " " + nameParts[1]
+            }
+            
             self.subjectID = nameParts[0]
             
             let subjectInfo = GTSubjects[nameParts[0]]
@@ -59,7 +65,7 @@ class Class : CustomStringConvertible, Equatable {
             self.subjectIcon = subjectInfo != nil ? "class-" + subjectInfo!.image : "class-language"
         }
         else {
-            self.name = fullName
+            self.name = displayName ?? fullName
             let nsname = name as NSString
             
             //attempt to find the subject name from the first few characters
@@ -111,6 +117,7 @@ class Class : CustomStringConvertible, Equatable {
     
     func useFullName() {
         self.name = (fullName as NSString).stringByReplacingOccurrencesOfString("-", withString: " ")
+        offsetOpenCount(0)
     }
     
     func getClassPage() ->  HTMLDocument? {
@@ -130,8 +137,20 @@ class Class : CustomStringConvertible, Equatable {
         //update open count on disk
         let data = NSUserDefaults.standardUserDefaults()
         var dict: [String : Int] = data.dictionaryForKey(TSClassOpenCountKey) as? [String : Int] ?? [:]
-        let key = "\(self.permanentID)~~\(self.subjectIcon)~~\(self.name)~~\(self.link)"
-        let previousCount = dict[key] ?? 0
+        let key = "\(self.fullName)~~\(self.subjectIcon)~~\(self.name)~~\(self.link)"
+        var previousCount = dict[key] ?? 0
+        
+        
+        for otherKey in dict.keys {
+            //remove any duplicates from a name change out of my control
+            if otherKey.containsString(self.link) && otherKey != key {
+                let otherCount = dict[otherKey]!
+                previousCount += otherCount
+                
+                dict.removeValueForKey(otherKey)
+            }
+        }
+        
         dict.updateValue(previousCount + offset, forKey: key)
         data.setValue(dict, forKey: TSClassOpenCountKey)
         
@@ -170,13 +189,14 @@ class Class : CustomStringConvertible, Equatable {
                 let splits = key.componentsSeparatedByString("~~")
                 
                 if splits.count != 4 { continue }
-                let ID = splits[0]
+                let fullName = splits[0] //currently don't actually use the ID since it is also saved as part of the link itself
                 let icon = splits[1]
                 let name = splits[2]
                 let link = splits[3]
                 
                 let shortcutIcon = UIApplicationShortcutIcon(templateImageName: icon)
-                let shortcut = UIApplicationShortcutItem(type: "openClass", localizedTitle: name,   localizedSubtitle: nil, icon: shortcutIcon, userInfo: ["URL" : link, "ID" : ID])
+                let info = ["URL" : link, "FULL_NAME" : fullName, "DISPLAY_NAME" : name]
+                let shortcut = UIApplicationShortcutItem(type: "openClass", localizedTitle: name, localizedSubtitle: nil, icon: shortcutIcon, userInfo: info)
                 shortcuts.append(shortcut)
             }
             

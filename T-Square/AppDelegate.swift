@@ -139,10 +139,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             guard let info = item.userInfo else { return }
             guard let URL = info["URL"] as? String else { return }
-            guard let ID = info["ID"] as? String else { return }
-            let openedClass = Class(withFullName: ID, link: URL)
+            guard let fullName = info["FULL_NAME"] as? String else { return }
+            guard let displayName = info["DISPLAY_NAME"] as? String else { return }
+            let openedClass = Class(withFullName: fullName, link: URL, displayName: displayName)
             
-            print("Opening \(openedClass.fullName) from Shortcut Item")
+            print("Opening \(openedClass.name) from Shortcut Item")
             guard let loginController = window?.rootViewController as? LoginViewController else { return }
             guard let classesController = loginController.classesViewController else { return }
             

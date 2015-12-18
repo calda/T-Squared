@@ -223,7 +223,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    func syncronizedNetworkErrorRecieved() {
+    func syncronizedNetworkErrorRecieved(showAlert showAlert: Bool = true) {
         self.animateFormSubviewsWithDuration(0.5, hidden: false)
         self.animateActivityIndicator(on: false)
         
@@ -236,10 +236,12 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
             self.passwordField.text = existingPassword
         }
         
-        let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Are you connected to the internet?", preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
-        alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
-        self.presentViewController(alert, animated: true, completion: nil)
+        if showAlert {
+            let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Are you connected to the internet?", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
+            alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
         
         self.classesViewController.DISABLE_PUSHES = true
     }

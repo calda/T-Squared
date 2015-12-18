@@ -207,13 +207,15 @@ class TSReader {
             if link.text != "Announcements" { continue }
             
             let announcementsURL = link["href"]!
-            var announcementsPage: HTMLDocument!
+            var announcementsPageOpt: HTMLDocument?
             if !loadAll {
-                announcementsPage = HttpClient.contentsOfPage(announcementsURL)
+                announcementsPageOpt = HttpClient.contentsOfPage(announcementsURL)
             }
             else {
-                announcementsPage = HttpClient.getPageWith100Count(announcementsURL)
+                announcementsPageOpt = HttpClient.getPageWith100Count(announcementsURL)
             }
+            
+            guard let announcementsPage = announcementsPageOpt else { return [] }
             
             //load announcements
             for row in announcementsPage.css("tr") {

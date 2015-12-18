@@ -72,64 +72,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    //MARK: Make sure we have an active connection once the app is opened again
-    
-    func applicationDidBecomeActive(application: UIApplication) {
-        
-        //verify authentication
-        delay(0.1) {
-            guard let _ = TSAuthenticatedReader else { return }
-            guard let loginController = self.window?.rootViewController as? LoginViewController else { return }
-            
-            print("Validating connection")
-            let rootPage = "http://t-square.gatech.edu/portal/pda/"
-            let pageContents = HttpClient.contentsOfPage(rootPage, postNotificationOnError: false)?.toHTML
-            
-            guard let contents = pageContents else {
-                //"Network unavailable."
-                let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Network connection is unavailable.", preferredStyle: .Alert)
-                alert.addAction(UIAlertAction(title: "Nevermind", style: .Destructive, handler: nil))
-                alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
-                loginController.presentViewController(alert, animated: true, completion: nil)
-                return
-            }
-            
-            if contents.containsString("Georgia Tech :: LAWN :: Login Redirect Page") {
-                let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Your login with GTother has expired.", preferredStyle: .Alert)
-                alert.addAction(UIAlertAction(title: "Nevermind", style: .Destructive, handler: nil))
-                alert.addAction(UIAlertAction(title: "Log In", style: .Default, handler: { _ in
-                    UIApplication.sharedApplication().openURL(NSURL(string: "http://t2.gatech.edu")!)
-                }))
-                loginController.presentViewController(alert, animated: true, completion: nil)
-                return
-            }
-            
-            if !contents.containsString("Log Out") {
-                //"Cookies invalid. Attempting to reconnect.
-                HttpClient.isRunningInBackground = true
-                TSReader.authenticatedReader(user: TSAuthenticatedReader.username, password: TSAuthenticatedReader.password, isNewLogin: false, completion: { reader in
-                    if let reader = reader {
-                        TSAuthenticatedReader = reader
-                        //Successfully reconnected to T-Square
-                        self.openShortcutItemIfPresent()
-                    }
-                    else {
-                        loginController.unpresentClassesView()
-                        let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Either the network connection is unavailable, or your login credentials have changed since the last time you logged in.", preferredStyle: .Alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-                        alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
-                        loginController.presentViewController(alert, animated: true, completion: nil)
-                        TSAuthenticatedReader = nil
-                    }
-                })
-                HttpClient.isRunningInBackground = false
-            }
-            else {
-                self.openShortcutItemIfPresent()
-            }
-        }
-    }
-    
     //MARK: Open from Springboard 3D Touch shortcut
     
     func openShortcutItemIfPresent() {
@@ -187,6 +129,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             loginController.dismissWebView(0.0)
             loginController.animateFormSubviewsWithDuration(0.0, hidden: true)
             delay(0.2) { loginController.animateActivityIndicator(on: true) }
+            
+            if TSAuthenticatedReader != nil {
+                openShortcutItemIfPresent()
+            }
         }
     }
     

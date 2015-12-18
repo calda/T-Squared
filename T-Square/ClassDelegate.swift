@@ -31,9 +31,8 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             if let cell = cell as? TitleCell {
                 cell.decorate(text)
             }
-            if hideSeparator {
-                cell.hideSeparator()
-            }
+            
+            (hideSeparator ? cell.hideSeparator : cell.showSeparator)()
         }
     }
     

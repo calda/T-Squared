@@ -703,7 +703,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             let alert = UIAlertController(title: "Open link?", message: websiteForLink(links[0]), preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
             alert.addAction(UIAlertAction(title: "Open", style: .Default, handler: { _ in
-                self.openLinkInSafari(links[0], title: websiteForLink(links[0]))
+                self.openLinkInWebView(links[0], title: websiteForLink(links[0]))
             }))
             self.presentViewController(alert, animated: true, completion: nil)
             return
@@ -712,14 +712,14 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let alert = UIAlertController(title: "Open link?", message: "There are multiple links in this message. Which would you like to open?", preferredStyle: .Alert)
         for link in links {
             alert.addAction(UIAlertAction(title: shortSiteForLink(link), style: .Default, handler: { _ in
-                self.openLinkInSafari(link, title: websiteForLink(link))
+                self.openLinkInWebView(link, title: websiteForLink(link))
             }))
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
-    func openLinkInSafari(link: String, title: String) {
+    func openLinkInWebView(link: String, title: String) {
         guard let URL = NSURL(string: link) else {
             let alert = UIAlertController(title: "Could not open link.", message: "We had a problem opening that link. (\(link))", preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))

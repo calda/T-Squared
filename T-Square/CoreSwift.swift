@@ -648,18 +648,31 @@ extension String {
         //http://www.fileformat.info/info/unicode/char/00a0/index.htm
     }
     
-    mutating func prepareForURL() {
-        //strip out ?, &, %, and =
-        let specialCharacters = [
+    mutating func prepareForURL(isFullURL isFullURL: Bool = false) {
+        self = self.preparedForURL(isFullURL: isFullURL)
+    }
+    
+    func preparedForURL(isFullURL isFullURL: Bool = false) -> String {
+        var specialCharacters = [
             "?" : "%3F",
             "&" : "%26",
             "%" : "%25",
             "=" : "%3D",
+            " " : "%20"
         ]
         
-        for (special, replace) in specialCharacters {
-            self = self.stringByReplacingOccurrencesOfString(special, withString: replace)
+        //if this isn't a full URL (ex: a post argument), then also strip out some special URL characters
+        if !isFullURL {
+            specialCharacters.updateValue("%2F", forKey: "/")
+            specialCharacters.updateValue("%2E", forKey: ".")
+            specialCharacters.updateValue("%3A", forKey: ":")
         }
+        
+        var currentString = self
+        for (special, replace) in specialCharacters {
+            currentString = currentString.stringByReplacingOccurrencesOfString(special, withString: replace)
+        }
+        return currentString
     }
     
 }

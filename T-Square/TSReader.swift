@@ -185,6 +185,11 @@ class TSReader {
                     }
                     
                     allClasses.append(newClass)
+                    
+                    //kick off the process to download the class's specific subject name
+                    dispatch_async(TSNetworkQueue) {
+                        newClass.pullSpecificSubjectNameIfNotCached()
+                    }
                 }
                 
                 self.allClassesCached = (allClasses, preferencesLink)
@@ -193,6 +198,43 @@ class TSReader {
         }
         
         return (classes ?? [], nil)
+    }
+    
+    func getSpecificSubjectNameForClass(currentClass: Class) -> String? {
+        guard let classPage = currentClass.getClassPage() else { return nil }
+        
+        //load page for class information display
+        for link in classPage.css("a, link") {
+            if link.text != "Site Information Display" { continue }
+            
+            let url = link["href"]!
+            guard let page = HttpClient.contentsOfPage(url) else { return nil }
+            
+            for div in page.css("div") {
+                if div["class"]?.containsString("siteDescription") == true {
+                    let text = div.text?.stringByReplacingOccurrencesOfString("\n", withString: " ").cleansed()
+                    
+                    //sometimes there's a paragraph of text instead of just the subject name
+                    //try to filter those out
+                    let wordCount = text?.componentsSeparatedByString(" ").count ?? 0
+                    if wordCount >= 10 {
+                        return nil
+                    }
+                    
+                    if text?.containsString("--NO TITLE--") == true {
+                        return nil
+                    }
+                    
+                    if text?.lowercaseString.containsString("welcome") == true {
+                        return nil
+                    }
+                    
+                    return text
+                }
+            }
+        }
+        
+        return nil
     }
     
     //MARK: - Loading Announcements

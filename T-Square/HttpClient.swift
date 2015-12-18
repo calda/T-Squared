@@ -16,7 +16,7 @@ class HttpClient {
     
     //MARK: - HTTP implementation
     
-    private var url: NSURL!
+    private var url: NSURL?
     private var session: NSURLSession
     
     internal init(url: String, useMobile: Bool = true) {
@@ -44,6 +44,8 @@ class HttpClient {
         var stopTrying = false
         var ready = false
         var content: String!
+        guard let url = self.url else { return nil }
+        
         let request = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 5.0)
         
         while !stopTrying && !ready {
@@ -345,7 +347,7 @@ class HttpClient {
             return contents
         }
         
-        let postString = "?source=0&criteria=title&sakai_action=doNavigate&collectionId=\(resource.collectionID)&navRoot=\(resource.navRoot)"
+        let postString = "?source=0&criteria=title&sakai_action=doNavigate&collectionId=\(resource.collectionID.preparedForURL())&navRoot=\(resource.navRoot.preparedForURL())"
         let url = "\(resource.link)\(postString)"
         
         guard let pageText = contentsOfPage(url) else {

@@ -99,7 +99,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
                     }
                     
                     if let syllabusLink = syllabusLink {
-                        controller.openLinkInSafari(syllabusLink, title: "Syllabus")
+                        controller.openLinkInWebView(syllabusLink, title: "Syllabus")
                         return
                     }
                     
@@ -120,7 +120,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             if iPad() {
                 link += "?force.classic=yes"
             }
-            controller.openLinkInSafari(link, title: displayClass.name)
+            controller.openLinkInWebView(link, title: displayClass.name)
             
         }),
         (identifier: "blank", onDisplay: hideSeparator, onTap: nil)

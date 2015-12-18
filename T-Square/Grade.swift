@@ -227,6 +227,8 @@ class GradeGroup : Scored, CustomStringConvertible {
         }
     }
     
+    var ignoreSubgroupScores = false
+    
     var scoreFraction: (totalPoints: Double, totalWeight: Double) {
         var totalPoints = 0.0
         var totalWeight = 0.0
@@ -237,6 +239,28 @@ class GradeGroup : Scored, CustomStringConvertible {
                 totalPoints += (points * weight)
                 totalWeight += weight
             }
+        }
+        
+        if totalPoints == 0.0 && totalWeight == 0.0 {
+            //no points/weight
+            //this might be an instance where the grade groups don't have weights
+            var groupCount = 0
+            for score in scores {
+                if score is GradeGroup { groupCount += 1 }
+            }
+            
+            if groupCount == scores.count {
+                ignoreSubgroupScores = true
+                //add up all of the points and weights from the sub-grades
+                for unwrappedGroup in scores where unwrappedGroup is GradeGroup {
+                    let group = unwrappedGroup as! GradeGroup
+                    let (points, weight) = group.scoreFraction
+                    totalPoints += points
+                    totalWeight += weight
+                }
+            }
+        } else {
+            ignoreSubgroupScores = false
         }
         
         return (totalPoints, totalWeight)
@@ -265,9 +289,22 @@ class GradeGroup : Scored, CustomStringConvertible {
     var fractionString: String? {
         //decide if the fractionString should ber used
         var subcountWithFraction = 0
+        
         for score in scores {
-            if score.scoreString.containsString("/") || score.score == nil {
-                subcountWithFraction += 1
+            
+            if let group = score as? GradeGroup {
+                
+                //there is a certain set of requirements that must be met for a Grade Group to be considered a fraction
+                // 1) all of it's subscores must be fractions, meaning group.fractionString is not nil
+                // 2) the group has no weight (a weight would change the reported fractions)
+                if group.fractionString != nil && (group.weight == nil || group.weight == 0.0) {
+                    subcountWithFraction += 1
+                }
+                
+            } else {
+                if score.scoreString.containsString("/") || score.score == nil {
+                    subcountWithFraction += 1
+                }
             }
         }
         
@@ -318,7 +355,7 @@ class GradeGroup : Scored, CustomStringConvertible {
     }
     
     func representAsString() -> String {
-        var string = "GROUP~\(name)~\(weight ?? 0.0)"
+        var string = "GROUP~\(name)~\(weight ?? 0)"
         if self.scores.count == 0 && self.score != nil { //has an intrinsic grade
             string += "~\(self.scoreString)"
         }

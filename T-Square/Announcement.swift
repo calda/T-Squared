@@ -59,6 +59,14 @@ class Announcement : CustomStringConvertible {
                         }
                     }
                     
+                    for imgTag in page.css("img") {
+                        if let src = imgTag["src"] where src.containsString("http") {
+                            let attachment = Attachment(link: src, fileName: "Attached image")
+                            if self.attachments == nil { self.attachments = [] }
+                            self.attachments!.append(attachment)
+                        }
+                    }
+                    
                     self.message = message.withNoTrailingWhitespace()
                     
                     //load attachments if present

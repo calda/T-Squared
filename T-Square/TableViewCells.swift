@@ -17,6 +17,7 @@ class ClassNameCell : UITableViewCell {
     func decorate(displayClass: Class) {
         nameLabel.text = displayClass.name
         subjectLabel.text = displayClass.subjectName ?? ""
+        displayClass.displayCell = self
     }
     
 }
@@ -216,7 +217,7 @@ class AttachmentCell : TitleCell {
     }
     
     static func presentAttachment(attachment: Attachment, inController controller: ClassesViewController) {
-        if let link = attachment.link, url = NSURL(string: link) {
+        if let link = attachment.link?.preparedForURL(isFullURL: true), let url = NSURL(string: link) {
             controller.presentDocumentFromURL(url)
         }
         
@@ -271,21 +272,45 @@ class GradeGroupCell : UITableViewCell {
     @IBOutlet weak var weightLabel: UILabel!
     @IBOutlet weak var editButton: UIImageView!
     
+    @IBOutlet weak var titleLabelPosition: NSLayoutConstraint!
+    @IBOutlet weak var editButtonHeight: NSLayoutConstraint!
+    
     func decorateForGradeGroup(group: GradeGroup, inClass displayClass: Class) {
         titleLabel.text = group.name
         scoreLabel.text = group.scoreString
+        weightLabel.text = nil
         
-        if let weight = group.weight {
+        if displayClass.grades?.ignoreSubgroupScores == true {
+            scoreLabel.text = ""
+        } else if group.weight == nil || group.weight == 0.0 {
+            scoreLabel.text = ""
+            weightLabel.text = "Excluded from average (not weighted, tap to edit)"
+        }
+        
+        if let weight = group.weight where weight != 0.0 {
             weightLabel.text = "Weight: \(Int(weight))%"
         }
+        
+        if weightLabel.text != nil {
+            weightLabel.alpha = 0.5
+            titleLabelPosition.constant = -10.0
+            titleLabel.baselineAdjustment = .AlignBaselines
+        }
         else {
-            weightLabel.text = "Unspecified Weight"
+            weightLabel.alpha = 0.0
+            titleLabelPosition.constant = 0
+            titleLabel.baselineAdjustment = .AlignCenters
         }
         
         editButton.hidden = !group.isArtificial
         if !editButton.hidden {
             editButton.alpha = displayClass.grades?.shouldAppearAsEdited == true ? 1.0 : 0.3
+            editButtonHeight.constant = 0
+        } else {
+            editButtonHeight.constant = -17.5 //make it basically disappear
         }
+        
+        self.layoutIfNeeded()
     }
     
 }

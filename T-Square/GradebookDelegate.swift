@@ -64,7 +64,12 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             let cell = tableView.dequeueReusableCellWithIdentifier("classTitle") as! ClassNameCell
             cell.nameLabel.text = displayClass.grades?.scoreString ?? "-"
             
+            let score = displayClass.grades?.score
+            
             cell.subjectLabel.text = "Grade in \(displayClass.name)"
+            if score > 0.9 {
+                cell.subjectLabel.text = "🎉 \(cell.subjectLabel.text!)"
+            }
             if let fractionScore = displayClass.grades?.fractionString {
                 cell.subjectLabel.text = "\(cell.subjectLabel.text!) (\(fractionScore))"
             }
@@ -160,6 +165,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     
     func loadData() {
         scores = flattenedGrades(TSAuthenticatedReader.getGradesForClass(displayClass))
+        displayClass.grades?.scoreString //calculate the score so any lingering configuration will be present
     }
     
     func flattenedGrades(grades: GradeGroup?) -> [Scored] {
@@ -494,6 +500,9 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         dict[classKey] = customScores
         data.setValue(dict, forKey: TSCustomGradesKey)
+        
+        //recalculate total score and all lingering configuration
+        displayClass.grades?.scoreString
         
         //update on screen
         scores = flattenedGrades(displayClass.grades)

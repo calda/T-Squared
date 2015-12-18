@@ -599,7 +599,7 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="dgZ-7R-tPG">
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="dgZ-7R-tPG">
                                                     <rect key="frame" x="16" y="40" width="263" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -652,7 +652,7 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="Reg-Id-ygD">
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="Reg-Id-ygD">
                                                     <rect key="frame" x="16" y="40" width="213" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -723,7 +723,7 @@
                                                         <constraint firstAttribute="height" constant="55" id="C92-M3-woc"/>
                                                     </constraints>
                                                 </view>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="84%" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="BAx-VR-EIu" userLabel="Grade Label">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="760" text="84%" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="BAx-VR-EIu" userLabel="Grade Label">
                                                     <rect key="frame" x="257" y="10" width="55" height="34"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="20" id="WbN-cW-blo"/>
@@ -743,7 +743,7 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="232" verticalHuggingPriority="267" text="Homework" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="GGY-ht-iBU" userLabel="Name Label">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="232" verticalHuggingPriority="267" horizontalCompressionResistancePriority="744" text="Homework" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.65000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="GGY-ht-iBU" userLabel="Name Label">
                                                     <rect key="frame" x="16" y="2" width="121" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="25" id="UkT-kU-cQF"/>
@@ -825,8 +825,10 @@
                                         <color key="backgroundColor" red="0.47395833333333337" green="0.74167596728863883" blue="1" alpha="0.14000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
                                         <connections>
                                             <outlet property="editButton" destination="fBJ-sB-QEY" id="K6b-Pk-EHv"/>
+                                            <outlet property="editButtonHeight" destination="48H-bO-y8W" id="ku3-PW-7jr"/>
                                             <outlet property="scoreLabel" destination="BAx-VR-EIu" id="peN-ea-ZoU"/>
                                             <outlet property="titleLabel" destination="GGY-ht-iBU" id="ndn-gi-P2n"/>
+                                            <outlet property="titleLabelPosition" destination="i4E-H2-ODI" id="xPx-F7-wvr"/>
                                             <outlet property="weightLabel" destination="2yU-Ny-c9M" id="iTV-hr-n4x"/>
                                         </connections>
                                     </tableViewCell>
@@ -929,7 +931,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="253" verticalHuggingPriority="253" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="yzv-64-BjU">
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="253" verticalHuggingPriority="253" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="yzv-64-BjU">
                                                     <rect key="frame" x="16" y="50" width="296" height="21"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="21" id="kji-ox-d4d"/>
@@ -969,7 +971,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="253" verticalHuggingPriority="253" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="qjT-uP-Gwk">
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="left" horizontalHuggingPriority="253" verticalHuggingPriority="253" text="Environmental and Atmospheric Science" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.80000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="qjT-uP-Gwk">
                                                     <rect key="frame" x="16" y="50" width="296" height="21"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="21" id="ZLZ-sN-okx"/>
@@ -1403,8 +1405,40 @@
                                             <outlet property="titleLabel" destination="9Tm-Nu-8eG" id="Lnb-bE-ubx"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="message-white-button" rowHeight="40" id="GVL-PA-IEf" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="1137" width="320" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="GVL-PA-IEf" id="Ge0-Qo-tOJ">
+                                            <rect key="frame" x="0.0" y="0.0" width="287" height="39"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.5" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="posted by Jonathan Victor Jemson" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eJu-m2-iaY">
+                                                    <rect key="frame" x="16" y="9" width="263" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="17"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="trailingMargin" secondItem="eJu-m2-iaY" secondAttribute="trailing" id="DY0-Wy-g2E"/>
+                                                <constraint firstItem="eJu-m2-iaY" firstAttribute="leading" secondItem="Ge0-Qo-tOJ" secondAttribute="leadingMargin" constant="8" id="MXp-Zl-Vxv"/>
+                                                <constraint firstItem="eJu-m2-iaY" firstAttribute="centerY" secondItem="Ge0-Qo-tOJ" secondAttribute="centerY" id="aOK-Sa-VLM"/>
+                                                <constraint firstItem="eJu-m2-iaY" firstAttribute="top" secondItem="Ge0-Qo-tOJ" secondAttribute="topMargin" id="if5-JD-PuZ"/>
+                                            </constraints>
+                                            <variation key="default">
+                                                <mask key="constraints">
+                                                    <exclude reference="if5-JD-PuZ"/>
+                                                </mask>
+                                            </variation>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.5" green="0.75" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <outlet property="titleLabel" destination="eJu-m2-iaY" id="IrC-Jd-NS6"/>
+                                        </connections>
+                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="announcementText" rowHeight="270" id="n6y-kU-iK3" userLabel="announcementText" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1137" width="320" height="270"/>
+                                        <rect key="frame" x="0.0" y="1177" width="320" height="270"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="n6y-kU-iK3" id="1Fg-WC-L0H">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="269"/>
@@ -1444,7 +1478,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="attachment" rowHeight="50" id="She-FH-acS" customClass="AttachmentCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1407" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="1447" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="She-FH-acS" id="wYr-cX-bbG">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
@@ -1492,7 +1526,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="folder" rowHeight="50" id="VnO-Ec-BBG" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1457" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="1497" width="320" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="VnO-Ec-BBG" id="yvr-2k-Wj6">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="49"/>
@@ -1535,7 +1569,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="assignment" rowHeight="70" id="E3V-j7-B51" customClass="AssignmentCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1507" width="320" height="70"/>
+                                        <rect key="frame" x="0.0" y="1547" width="320" height="70"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="E3V-j7-B51" id="kp2-vC-QBM">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="69"/>
@@ -1572,7 +1606,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="gradeComment" rowHeight="60" id="xBy-gH-Llg" userLabel="gradeComment" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1577" width="320" height="60"/>
+                                        <rect key="frame" x="0.0" y="1617" width="320" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="xBy-gH-Llg" id="mb1-em-79C">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="59"/>
@@ -1628,7 +1662,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="blank" rowHeight="30" id="DeP-Si-bjL" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="1637" width="320" height="30"/>
+                                        <rect key="frame" x="0.0" y="1677" width="320" height="30"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DeP-Si-bjL" id="sMY-ws-4yO">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="29"/>
@@ -1657,6 +1691,38 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                         <color key="backgroundColor" red="0.5" green="0.75" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                         <connections>
                                             <outlet property="titleLabel" destination="LrQ-Le-xPj" id="bfW-2L-YOM"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="blank2" rowHeight="30" id="ihp-Fs-OSl" userLabel="blank2" customClass="TitleCell" customModule="T_Squared" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="1707" width="320" height="30"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ihp-Fs-OSl" id="Yqs-ur-kc3">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="29"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OZV-C3-pNE">
+                                                    <rect key="frame" x="16" y="15" width="296" height="0.0"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="16"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" red="0.36620700360000003" green="0.3661960065" blue="0.36620220539999998" alpha="0.0" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstItem="OZV-C3-pNE" firstAttribute="centerY" secondItem="Yqs-ur-kc3" secondAttribute="centerY" id="6PT-J5-7kL"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="OZV-C3-pNE" secondAttribute="trailing" id="EQI-73-yKo"/>
+                                                <constraint firstItem="OZV-C3-pNE" firstAttribute="leading" secondItem="Yqs-ur-kc3" secondAttribute="leadingMargin" constant="8" id="UGB-bu-cix"/>
+                                                <constraint firstItem="OZV-C3-pNE" firstAttribute="top" secondItem="Yqs-ur-kc3" secondAttribute="topMargin" id="fgl-5S-VLQ"/>
+                                            </constraints>
+                                            <variation key="default">
+                                                <mask key="constraints">
+                                                    <exclude reference="fgl-5S-VLQ"/>
+                                                </mask>
+                                            </variation>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.5" green="0.75" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <outlet property="titleLabel" destination="OZV-C3-pNE" id="Zvz-YU-27b"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

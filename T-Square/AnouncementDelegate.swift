@@ -91,6 +91,14 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             cell.hideSeparator()
         }),
         
+        (identifier: "blank2", onDisplay: { cell, _ in cell.hideSeparator() }),
+        
+        (identifier: "message-white-button", onDisplay: { tableCell, announcement in
+            let cell = tableCell as! TitleCell
+            cell.decorate("View on T-Square")
+            cell.hideSeparator()
+        }),
+        
         (identifier: "blank", onDisplay: { cell, _ in cell.hideSeparator() }),
         
         (identifier: "announcementText", onDisplay: { tableCell, announcement in
@@ -139,8 +147,10 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
         if indexPath.section == 0 {
             let identifier = cells[indexPath.item].identifier
             if identifier == "blank" { return 15.0 }
+            if identifier == "blank2" { return 8.0 }
             if identifier == "back" { return 50.0 }
             if identifier == "attachment" { return 50.0 }
+            if identifier == "message-white-button" { return 30.0 }
             
             let fontSize: CGFloat
             let text: String
@@ -185,7 +195,16 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
     }
     
     func canHighlightCell(index: NSIndexPath) -> Bool {
-        return index.section == 1 && index.item != 0
+        if index.section == 1 && index.item != 0 { return true }
+        
+        if index.section == 0 {
+            let identifier = cells[index.item].identifier
+            if identifier == "attachment" || identifier == "message-white-button" {
+                return true
+            }
+        }
+        
+        return false
     }
     
     func processSelectedCell(index: NSIndexPath) {
@@ -207,6 +226,10 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
                     }
                 }
             }
+            if cells[index.item].identifier == "message-white-button" {
+                //Open on T-Square button
+                controller.openLinkInWebView(announcement.link, title: "Announcement")
+            }
         }
         else if index.section == 1 && index.item != 0 {
             let otherAnnouncement = otherAnnouncements[index.item - 1]
@@ -215,7 +238,21 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
     }
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
-        return
+        let normalColor: UIColor
+        let touchColor: UIColor
+        
+        if indexPath.section == 1 { //other announcements
+            normalColor = UIColor(red: 0.43, green: 0.69, blue: 1.0, alpha: indexPath.item == 0 ? 0.0 : 0.4)
+            touchColor = UIColor(hue: 0.5833333333, saturation: 1.0, brightness: 1.0, alpha: 0.1)
+        } else {
+            normalColor = UIColor.clearColor()
+            touchColor = UIColor(white: 1.0, alpha: 0.3)
+        }
+        
+        let newBackground = selected ? touchColor : normalColor
+        UIView.animateWithDuration(0.3, animations: {
+            cell.backgroundColor = newBackground
+        })
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {

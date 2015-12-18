@@ -241,7 +241,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         
         if index.section == 4 && index.item != 0 {
             let link = assignment.link
-            controller.openLinkInSafari(link, title: "Assignment")
+            controller.openLinkInWebView(link, title: "Assignment")
             delay(0.1) {
                 self.controller.loginController.browserViewController.scrollToBottomWhenDoneLoading = true
             }

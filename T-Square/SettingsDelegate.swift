@@ -45,7 +45,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
                 cell.decorate("Developed by Cal Stephens")
             }
         }, onTap: { controller in
-            controller.openLinkInSafari("http://calstephens.tech", title: "Developer Website")
+            controller.openLinkInWebView("http://calstephens.tech", title: "Developer Website")
         }),
         
         //disclaimer
@@ -97,7 +97,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
                 cell.decorate("http://calstephens.tech")
             }
         }, onTap: { controller in
-            controller.openLinkInSafari("http://calstephens.tech", title: "Developer Website")
+            controller.openLinkInWebView("http://calstephens.tech", title: "Developer Website")
         }),
         
         //blank
@@ -116,7 +116,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
                 cell.decorate("GitHub")
             }
         }, onTap: { controller in
-                controller.openLinkInSafari("https://github.com/calda/T-Square", title: "Source Code")
+                controller.openLinkInWebView("https://github.com/calda/T-Square", title: "Source Code")
         }),
         
         //blank
@@ -128,7 +128,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
                 cell.decorate("License")
             }
         }, onTap: { controller in
-                controller.openLinkInSafari("http://choosealicense.com/licenses/gpl-2.0/", title: "License")
+                controller.openLinkInWebView("http://choosealicense.com/licenses/gpl-2.0/", title: "License")
         }),
         
         //disclaimer
@@ -138,7 +138,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
                 cell.titleLabel.alpha = 0.45
             }
         }, onTap: { controller in
-                controller.openLinkInSafari("http://choosealicense.com/licenses/gpl-2.0/", title: "License")
+                controller.openLinkInWebView("http://choosealicense.com/licenses/gpl-2.0/", title: "License")
         })
         
     ]

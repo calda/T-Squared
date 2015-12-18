@@ -11,6 +11,7 @@ import UIKit
 import Kanna
 
 let TSClassOpenCountKey = "edu.gatech.cal.classOpenCount"
+let TSSpecificSubjectNamesKey = "edu.gatech.cal.specificSubjectNamesDict"
 
 func == (lhs: Class, rhs: Class) -> Bool {
     return lhs.permanentID == rhs.permanentID
@@ -21,13 +22,18 @@ class Class : CustomStringConvertible, Equatable {
     let permanentID: String
     let fullName: String
     let subjectID: String?
-    let subjectName: String?
+    var subjectName: String?
     let subjectIcon: String
     var name: String
     let link: String
     var isActive: Bool = false
     
-    var classPage: HTMLDocument?
+    var classPage: HTMLDocument? {
+        didSet {
+            pullSpecificSubjectNameIfNotCached()
+        }
+    }
+    
     var announcements: [Announcement] = []
     var rootResource: ResourceFolder?
     var assignments: [Assignment]?
@@ -36,6 +42,10 @@ class Class : CustomStringConvertible, Equatable {
     var description: String {
         return name
     }
+    
+    weak var displayCell: ClassNameCell?
+    
+    //MARK: - Set up the class and decide how it should be displayed
     
     convenience init(fromElement element: XMLElement) {
         let fullName = element.text!.cleansed()
@@ -58,9 +68,13 @@ class Class : CustomStringConvertible, Equatable {
                self.name = nameParts[0] + " " + nameParts[1]
             }
             
-            self.subjectID = nameParts[0]
+            if nameParts[0].containsString("/") || nameParts[0].containsString("\\") {
+                self.subjectID = nameParts[0].componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString: "/\\"))[0]
+            } else {
+                self.subjectID = nameParts[0]
+            }
             
-            let subjectInfo = GTSubjects[nameParts[0]]
+            let subjectInfo = GTSubjects[self.subjectID!]
             self.subjectName = subjectInfo?.description
             self.subjectIcon = subjectInfo != nil ? "class-" + subjectInfo!.image : "class-language"
         }
@@ -86,9 +100,13 @@ class Class : CustomStringConvertible, Equatable {
         
         verifySingleSubjectName()
         offsetOpenCount(0)
+        useSpecificSubjectNameIfCached()
     }
     
     func verifySingleSubjectName() {
+        //not really sure what this function is supposed to do, in retrospect
+        //something about classes where there are two names
+        
         if let subjectID = subjectID where (fullName as NSString).countOccurancesOfString(subjectID) > 1 {
             var subs: [String] = []
             
@@ -126,13 +144,61 @@ class Class : CustomStringConvertible, Equatable {
         return classPage
     }
     
+    func useSpecificSubjectNameIfCached() {
+        //check if it's cached
+        let data = NSUserDefaults.standardUserDefaults()
+        let dict = data.dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
+        if let specificSubjectName = dict[self.permanentID] where specificSubjectName != "TSSubjectNameUnavailable" {
+            self.subjectName = specificSubjectName
+            return
+        }
+    }
+    
+    static var cachedSpecificSubjectNames: [String : String]? = nil
+    
+    func pullSpecificSubjectNameIfNotCached() {
+        
+        //check if it's cached
+        let data = NSUserDefaults.standardUserDefaults()
+        Class.cachedSpecificSubjectNames = data.dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
+        if Class.cachedSpecificSubjectNames?[self.permanentID] != nil {
+            return
+        }
+        
+        //not cached
+        let specificSubjectName = TSAuthenticatedReader.getSpecificSubjectNameForClass(self) ?? "TSSubjectNameUnavailable"
+        
+        //reload the dictionary since things are happening asynchronously
+        
+        if Class.cachedSpecificSubjectNames == nil {
+            Class.cachedSpecificSubjectNames = data.dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
+        }
+        
+        Class.cachedSpecificSubjectNames?.updateValue(specificSubjectName, forKey: self.permanentID)
+        data.setValue(Class.cachedSpecificSubjectNames!, forKey: TSSpecificSubjectNamesKey)
+        
+        if specificSubjectName != "TSSubjectNameUnavailable" {
+            self.subjectName = specificSubjectName
+            
+            if let displayCell = displayCell {
+                if displayCell.nameLabel.text == self.name {
+                    sync { displayCell.subjectLabel.text = specificSubjectName }
+                }
+            }
+        }
+    }
+    
     //MARK: - Tracking for 3D Touch Shortcut items
     
     func markClassOpened() {
         offsetOpenCount(1)
     }
     
+    private static var ignoreOpenCountOffsets = false
+    
     private func offsetOpenCount(offset: Int) {
+        
+        if Class.ignoreOpenCountOffsets { return }
         
         //update open count on disk
         let data = NSUserDefaults.standardUserDefaults()
@@ -154,7 +220,11 @@ class Class : CustomStringConvertible, Equatable {
         dict.updateValue(previousCount + offset, forKey: key)
         data.setValue(dict, forKey: TSClassOpenCountKey)
         
+        //prevent this method from being called again while inside updateShortcutItems()
+        //because otherwise we get a recursive overflow
+        Class.ignoreOpenCountOffsets = true
         Class.updateShortcutItems()
+        Class.ignoreOpenCountOffsets = false
     }
     
     static func updateShotcutItemsForActiveClasses(classes: [Class]) {
@@ -189,14 +259,17 @@ class Class : CustomStringConvertible, Equatable {
                 let splits = key.componentsSeparatedByString("~~")
                 
                 if splits.count != 4 { continue }
-                let fullName = splits[0] //currently don't actually use the ID since it is also saved as part of the link itself
+                let fullName = splits[0]
                 let icon = splits[1]
                 let name = splits[2]
                 let link = splits[3]
                 
+                //grab the subject display name through the logic in the Class constructor
+                let subjectName = Class(withFullName: fullName, link: link).subjectName
+                
                 let shortcutIcon = UIApplicationShortcutIcon(templateImageName: icon)
                 let info = ["URL" : link, "FULL_NAME" : fullName, "DISPLAY_NAME" : name]
-                let shortcut = UIApplicationShortcutItem(type: "openClass", localizedTitle: name, localizedSubtitle: nil, icon: shortcutIcon, userInfo: info)
+                let shortcut = UIApplicationShortcutItem(type: "openClass", localizedTitle: name, localizedSubtitle: subjectName, icon: shortcutIcon, userInfo: info)
                 shortcuts.append(shortcut)
             }
             
@@ -232,7 +305,7 @@ let GTSubjects: [String : (description: String, image: String)] = [
     "CS" : ("Computer Science", "computer"),
     "COOP" : ("Cooperative Work Assignment", "world"),
     "UCGA" : ("Cross Enrollment", "world"),
-    "EAS" : ("Earth and Atmospheric Sciences", "science"),
+    "EAS" : ("Earth and Atmospheric Sciences", "world"),
     "ECON" : ("Economics", "econ"),
     "ECEP" : ("Electrical & Computer Engineering Professional", "engineering"),
     "ECE" : ("Electrical & Computer Engineering", "engineering"),
@@ -260,13 +333,13 @@ let GTSubjects: [String : (description: String, image: String)] = [
     "LS" : ("Learning Support", "humanities"),
     "LING" : ("Linguistics", "language"),
     "LMC" : ("Literature", "language"),
-    "MGT" : ("Management", "world"),
-    "MOT" : ("Management of Technology", "world"),
+    "MGT" : ("Management", "humanities"),
+    "MOT" : ("Management of Technology", "humanities"),
     "MSE" : ("Materials Science & Engineering", "engineering"),
     "MATH" : ("Mathematics", "math"),
     "ME" : ("Mechanical Engineering", "engineering"),
     "MP" : ("Medical Physics", "science"),
-    "MSL" : ("Military Science & Leadership", "humanities"),
+    "MSL" : ("Military Science & Leadership", "science"),
     "MUSI" : ("Music", "music"),
     "NS" : ("Naval Science", "science"),
     "NRE" : ("Nuclear & Radiological Engineering", "science"),
@@ -276,7 +349,7 @@ let GTSubjects: [String : (description: String, image: String)] = [
     "POL" : ("Political Science", "humanities"),
     "PTFE" : ("Polymer, Textile and Fiber Engineering", "engineering"),
     "DOPP" : ("Professional Practice", "world"),
-    "PSYC" : ("Psychology", "humanities"),
+    "PSYC" : ("Psychology", "science"),
     "PUBP" : ("Public Policy", "humanities"),
     "PUBJ" : ("Public Policy/Joint GSU PhD", "humanities"),
     "RUSS" : ("Russian", "language"),

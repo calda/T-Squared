@@ -14,15 +14,22 @@ import MessageUI
 //MARK: View Controller and initial Delegate
 
 let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled"
-let TSPerformingNetworkActivityNotification = "edu.gatech.cal.activityIndicatorVisible"
+let TSPerformingNetworkActivityNotification = "edu.gatech.cal.performingNetworkActivity"
 let TSBackPressedNotification = "edu.gatech.cal.backTriggered"
 let TSBackButtonPressCountKey = "edu.gatech.cal.backButtonCount"
 let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 let TSShowSettingsNotification = "edu.gatech.cal.showSettings"
 
+let TSHideClassCountPopupKey = "edu.gatech.cal.hideClassCountPopup"
+
 class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate, MFMailComposeViewControllerDelegate {
 
     var classes: [Class]?
+    var classOffsetCount: Int {
+        return 1 + (tooManyClassesIndex == nil ? 0 : 1)
+    }
+    var tooManyClassesIndex: NSIndexPath? = nil
+    
     var loadingAnnouncements: Bool = true
     var announcements: [Announcement] = []
     var recentAnnouncementsCell: TitleWithButtonCell?
@@ -51,7 +58,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         //it is not applicable to all Delegates instead of just this one
         //reloadClassesIfDroppedFromMemory()
         
-        if section == 0 { return (classes?.count ?? 0) + 2 }
+        if !NSUserDefaults.standardUserDefaults().boolForKey(TSHideClassCountPopupKey) {
+            tooManyClassesIndex = classes?.count > 8 ? NSIndexPath(forItem: 1, inSection: 0) : nil
+        }
+        
+        
+        if section == 0 { return (classes?.count ?? 0) + classOffsetCount + 1 }
         else { return announcements.count + (announcements.count == 0 ? 2 : 1) }
     }
     
@@ -64,7 +76,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         if indexPath.section == 0 {
             if indexPath.item == 0 { return 50.0 }
-            if indexPath.item == (classes?.count ?? 0) + 1 {
+            if indexPath == tooManyClassesIndex { return 100.0 }
+            if indexPath.item == (classes?.count ?? 0) + classOffsetCount { //all classes cell
                 return 50.0
             }
             return 70.0
@@ -87,14 +100,21 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 cell.hideSeparator()
                 return cell
             }
-            if index == (classes?.count ?? 0) + 1 {
+            
+            if indexPath == tooManyClassesIndex {
+                let cell = tableView.dequeueReusableCellWithIdentifier("tooManyClasses")!
+                cell.hideSeparator()
+                return cell
+            }
+            
+            if index == (classes?.count ?? 0) + classOffsetCount {
                 let cell = tableView.dequeueReusableCellWithIdentifier("subtitle") as! TitleCell
                 cell.decorate("View all classes")
                 cell.hideSeparator()
                 return cell
             }
             if let classes = classes {
-                let displayClass = classes[index - 1]
+                let displayClass = classes[index - classOffsetCount]
                 let cell = tableView.dequeueReusableCellWithIdentifier("classWithIcon") as! ClassNameCell
                 cell.decorate(displayClass)
                 //if index == classes.count {
@@ -172,7 +192,6 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         var doneLoadingCount = 0
         let necessaryCount = self.classes!.count
-        var previousTimeComplete = NSDate()
         
         for currentClass in self.classes ?? [] {
             if TSAuthenticatedReader == nil { break }
@@ -185,30 +204,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                     return doneLoadingCount == necessaryCount
                 }
                 
-                if announcements.count == 0 {
-                    if markLoadedAndCheckIfDone() {
-                        sync { self.doneLoadingAnnoucements() }
-                    }
-                    return
-                }
-                
-                //but only play animation once every 0.5 seconds at most
-                sync() {
-                    let timeComplete = NSDate()
-                    let timeDifference = timeComplete.timeIntervalSinceDate(previousTimeComplete)
-                    previousTimeComplete = timeComplete
-                    
-                    func performAdd() {
-                        self.addAnnouncements(announcements)
-                        self.doneLoadingAnnoucements()
-                    }
-                    
-                    let delayDuration = max(0.0, 0.5 - timeDifference)
-                    if delayDuration == 0.0 { performAdd() }
-                    else {
-                        previousTimeComplete = NSDate().dateByAddingTimeInterval(delayDuration)
-                        delay(delayDuration) { performAdd() }
-                    }
+                self.addAnnouncements(announcements)
+                if markLoadedAndCheckIfDone() {
+                    sync { self.doneLoadingAnnoucements() }
                 }
             }
         }
@@ -216,7 +214,6 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func addAnnouncements(newAnnouncements: [Announcement]) {
-        let previous = self.announcements
         
         for ann in newAnnouncements {
             announcements.append(ann)
@@ -238,18 +235,29 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             let last = announcements.indices.last!
             announcements.removeRange(first.advancedBy(recentCount)...last)
         }
+    }
+    
+    func doneLoadingAnnoucements() {
+        loadingAnnouncements = false
+        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
         
+        if announcements.count == 0 { self.reloadTable() }
+        
+        //animate the announcements
         //don't animate if this delegate isn't visible anymore
         if delegateStack.count != 0 { return }
-    
+        
         tableView.beginUpdates()
         
-        if previous.count == 0 && announcements.count != 0 {
+        if announcements.count != 0 {
             //remove "Loading Announcements..."
             tableView.deleteRowsAtIndexPaths([NSIndexPath(forItem: 1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Left)
         }
         
         //animate
+        let recentCount = iPad() ? 10 : 5
+        let previous: [Announcement] = []
+        
         for i in 0 ..< recentCount {
             if previous.count > i && !(announcements as NSArray).containsObject(previous[i]) {
                 tableView.deleteRowsAtIndexPaths([NSIndexPath(forItem: i + 1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Top)
@@ -261,7 +269,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
         
         tableView.endUpdates()
-        let countBefore = max(1, previous.count)
+        let countBefore = 1
         let countAfter = max(1, announcements.count)
         let cellHeight: CGFloat = 60.0
         
@@ -269,16 +277,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if offsetCount != 0 {
             updateBottomView(offset: CGFloat(offsetCount) * cellHeight)
         }
-    
+        
         //reload Recent Announcements cell
         //so that "mark all read" can appear if necessary
         tableView.reloadRowsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 1)], withRowAnimation: UITableViewRowAnimation.None)
-    }
-    
-    func doneLoadingAnnoucements() {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
-        loadingAnnouncements = false
-        if announcements.count == 0 { self.reloadTable() }
     }
     
     //MARK: - Customization of the view
@@ -516,22 +518,48 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Stackable Table Delegate methods
     
     func processSelectedCell(index: NSIndexPath) {
+        print("SHOULD NOT BE CALLED")
+        return //unused in favor of processSelectedCellWithTouch
+    }
+    
+    func processSelectedCellWithTouch(index: NSIndexPath, _ touchLocationInCell: CGPoint) {
         if index.section == 0 {
             if index.item == 0 { return }
-            if index.item == (classes?.count ?? 0) + 1 {
-                //load extra classes
-                if TSAuthenticatedReader.allClassesCached == nil {
-                    setActivityIndicatorVisible(true)
-                }
-                
+            if index.item == (classes?.count ?? 0) + classOffsetCount {
                 let delegate = AllClassesDelegate(controller: self)
                 delegate.loadDataAndPushInController(self)
                 return
             }
             
+            //"That's a lot of classes" popup
+            if index == tooManyClassesIndex {
+                if let cell = tableView.cellForRowAtIndexPath(index) as? BalloonPopupCell {
+                    let action = cell.actionForTouch(touchLocationInCell)
+                    
+                    if action == .Action {
+                        let delegate = AllClassesDelegate(controller: self)
+                        delegate.loadDataAndPushInController(self)
+                        return
+                    }
+                    else if action == .Cancel {
+                        //remove cell
+                        let indexToRemove = tooManyClassesIndex!
+                        tooManyClassesIndex = nil
+                        NSUserDefaults.standardUserDefaults().setBool(true, forKey: TSHideClassCountPopupKey)
+                        tableView.deleteRowsAtIndexPaths([indexToRemove], withRowAnimation: .Fade)
+                        delay(1.0) {
+                            NSUserDefaults.standardUserDefaults().setBool(false, forKey: TSHideClassCountPopupKey)
+                        }
+                        
+                    }
+                }
+                return
+            }
+            
             //show class
             guard let classes = classes else { return }
-            let displayClass = classes[index.item - 1]
+            
+            let displayClass = classes[index.item - classOffsetCount]
             let delegate = ClassDelegate(controller: self, displayClass: displayClass)
             delegate.loadDataAndPushInController(self)
         }

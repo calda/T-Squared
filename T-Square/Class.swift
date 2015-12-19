@@ -159,8 +159,7 @@ class Class : CustomStringConvertible, Equatable {
     func pullSpecificSubjectNameIfNotCached() {
         
         //check if it's cached
-        let data = NSUserDefaults.standardUserDefaults()
-        Class.cachedSpecificSubjectNames = data.dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
+        Class.cachedSpecificSubjectNames = NSUserDefaults.standardUserDefaults().dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
         if Class.cachedSpecificSubjectNames?[self.permanentID] != nil {
             return
         }
@@ -171,11 +170,11 @@ class Class : CustomStringConvertible, Equatable {
         //reload the dictionary since things are happening asynchronously
         
         if Class.cachedSpecificSubjectNames == nil {
-            Class.cachedSpecificSubjectNames = data.dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
+            Class.cachedSpecificSubjectNames = NSUserDefaults.standardUserDefaults().dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
         }
         
         Class.cachedSpecificSubjectNames?.updateValue(specificSubjectName, forKey: self.permanentID)
-        data.setValue(Class.cachedSpecificSubjectNames!, forKey: TSSpecificSubjectNamesKey)
+        NSUserDefaults.standardUserDefaults().setValue(Class.cachedSpecificSubjectNames!, forKey: TSSpecificSubjectNamesKey)
         
         if specificSubjectName != "TSSubjectNameUnavailable" {
             self.subjectName = specificSubjectName

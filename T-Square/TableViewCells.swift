@@ -199,6 +199,11 @@ class TitleWithButtonCell : BackCell {
     @IBOutlet weak var button: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setActivityIndicatorEnabled:", name: TSSetActivityIndicatorEnabledNotification, object: nil)
+    }
+    
     func decorate(text: String, buttonText: String) {
         titleLabel.text = text
         button.text = buttonText
@@ -428,6 +433,32 @@ class LogoutSettingsCell : TitleCell {
     
     @IBAction func settingsButtonPressed(sender: UIButton) {
         NSNotificationCenter.defaultCenter().postNotificationName(TSShowSettingsNotification, object: nil)
+    }
+    
+}
+
+class BalloonPopupCell : UITableViewCell {
+    
+    @IBOutlet weak var actionButton: UIButton!
+    @IBOutlet weak var cancelButton: UIImageView!
+    
+    enum PopupCellAction {
+        case Action, Cancel, None
+    }
+    
+    func actionForTouch(location: CGPoint) -> PopupCellAction {
+        
+        let actionFrame = actionButton.convertRect(actionButton.frame, toView: self)
+        let actionHitbot = CGRectMake(actionFrame.origin.x - 40.0, actionFrame.origin.y - 60.0, actionFrame.width + 80.0, actionFrame.height + 80.0)
+        if CGRectContainsPoint(actionHitbot, location) {
+            return .Action
+        }
+        
+        if location.x < 50.0 {
+            return .Cancel
+        }
+        
+        return .None
     }
     
 }

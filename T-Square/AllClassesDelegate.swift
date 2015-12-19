@@ -62,7 +62,14 @@ class AllClassesDelegate : NSObject, StackableTableDelegate {
     //MARK: - Stackable Table Delegate Methods
     
     func loadData() {
-        (self.allClasses, self.preferencesLink) = TSAuthenticatedReader.getAllClasses()
+        let (classes, preferencesLink) = TSAuthenticatedReader.getAllClasses()
+        self.preferencesLink = preferencesLink
+        
+        if classes.count == self.allClasses.count { //there was nothing new loaded, don't override
+            return
+        }
+        
+        self.allClasses = classes
     }
     
     func loadCachedData() {

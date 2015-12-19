@@ -421,7 +421,14 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
         tableView.delegate = delegate
         tableView.dataSource = delegate
         tableView.reloadData()
-        tableView.contentOffset = offset ?? CGPointZero
+        
+        //restore to the previous offset
+        //but only if the content size hasn't gotten smaller than the previous offset
+        let contentHeight = tableView.contentSize.height
+        if (offset?.y ?? 0) < contentHeight - tableView.frame.height {
+            tableView.contentOffset = offset ?? CGPointZero
+        }
+        
         unhighlightAllCells()
         
         let subtype = isBack ? kCATransitionFromLeft : kCATransitionFromRight
@@ -451,7 +458,13 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
                     if delegate?.shouldIgnoreTouch?(touch, inCell: cell) != true {
                     
                         if state == .Ended {
-                            delegate?.processSelectedCell(index)
+                            if let processSelectedCellWithTouch = delegate?.processSelectedCellWithTouch {
+                                let touchInView = cell.convertPoint(touch, fromView: tableView)
+                                processSelectedCellWithTouch(index, touchInView)
+                            } else {
+                                delegate?.processSelectedCell(index)
+                            }
+                            
                             delegate?.animateSelection(cell, indexPath: index, selected: false)
                             return
                         }
@@ -487,6 +500,7 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
 @objc protocol StackableTableDelegate : UITableViewDelegate, UITableViewDataSource {
     
     func processSelectedCell(index: NSIndexPath)
+    optional func processSelectedCellWithTouch(index: NSIndexPath, _ touchLocationInCell: CGPoint)
     func canHighlightCell(index: NSIndexPath) -> Bool
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool)
     func loadCachedData()

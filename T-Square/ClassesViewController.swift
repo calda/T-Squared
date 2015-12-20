@@ -26,9 +26,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
 
     var classes: [Class]?
     var classOffsetCount: Int {
-        return 1 + (tooManyClassesIndex == nil ? 0 : 1)
+        return 1 + (tooManyClassesIndex == nil ? 0 : 1) + (backToGTPortalIndex == nil ? 0 : 1)
     }
     var tooManyClassesIndex: NSIndexPath? = nil
+    var backToGTPortalIndex: NSIndexPath? = nil
     
     var loadingAnnouncements: Bool = true
     var announcements: [Announcement] = []
@@ -58,8 +59,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         //it is not applicable to all Delegates instead of just this one
         //reloadClassesIfDroppedFromMemory()
         
+        backToGTPortalIndex = TSWasLaunchedFromGTPortal ? NSIndexPath(forItem: 0, inSection: 0) : nil
+        
         if !NSUserDefaults.standardUserDefaults().boolForKey(TSHideClassCountPopupKey) {
-            tooManyClassesIndex = classes?.count > 8 ? NSIndexPath(forItem: 1, inSection: 0) : nil
+            let index = TSWasLaunchedFromGTPortal ? 2 : 1
+            tooManyClassesIndex = classes?.count > 8 ? NSIndexPath(forItem: index, inSection: 0) : nil
         }
         
         
@@ -75,8 +79,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if indexPath == nil { return 50.0 }
         
         if indexPath.section == 0 {
-            if indexPath.item == 0 { return 50.0 }
+            if indexPath.item == (backToGTPortalIndex == nil ? 0 : 1) { return 50.0 }
             if indexPath == tooManyClassesIndex { return 100.0 }
+            if indexPath == backToGTPortalIndex { return 30.0 }
             if indexPath.item == (classes?.count ?? 0) + classOffsetCount { //all classes cell
                 return 50.0
             }
@@ -94,7 +99,14 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         //classes
         if section == 0 {
-            if index == 0 {
+            
+            if indexPath == backToGTPortalIndex {
+                let cell = tableView.dequeueReusableCellWithIdentifier("title") as! TitleCell
+                cell.decorate("Back to GT Portal")
+                return cell
+            }
+            
+            if index == (backToGTPortalIndex == nil ? 0 : 1) {
                 let cell = tableView.dequeueReusableCellWithIdentifier("settings") as! LogoutSettingsCell
                 cell.decorate(TSAuthenticatedReader?.username ?? "username")
                 cell.hideSeparator()
@@ -128,7 +140,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if section == 1 {
             if index == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("titleWithButton") as! TitleWithButtonCell
-                cell.decorate("Recent Announcements", buttonText: "mark all read")
+                cell.decorate("Recent Announcements", buttonText: "mark all read", activityIndicatorHidden: !self.loadingAnnouncements)
                 recentAnnouncementsCell = cell
                 
                 //only show button if there is an unread announcement
@@ -156,6 +168,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func reloadTable(centerTable: Bool = false) {
+        if tableView == nil { return }
+        
         self.tableView.reloadData()
         updateBottomView()
         
@@ -179,8 +193,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true, userInfo: nil)
         if reloadClasses { self.classes = TSAuthenticatedReader.getActiveClasses() }
         
-        self.announcements = []
         self.loadingAnnouncements = true
+        
+        //reload the Recent Announcements Cell to get enable the activity indicator
+        tableView.reloadRowsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 1)], withRowAnimation: .None)
+        
+        self.announcements = []
         
         if self.classes == nil || self.classes?.count == 0 {
             //no classes to load from
@@ -249,6 +267,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         tableView.beginUpdates()
         
+        //reload the Recent Announcements Cell to get rid of the activity indicator
+        tableView.reloadRowsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 1)], withRowAnimation: .None)
+        
         if announcements.count != 0 {
             //remove "Loading Announcements..."
             tableView.deleteRowsAtIndexPaths([NSIndexPath(forItem: 1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Left)
@@ -277,10 +298,6 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if offsetCount != 0 {
             updateBottomView(offset: CGFloat(offsetCount) * cellHeight)
         }
-        
-        //reload Recent Announcements cell
-        //so that "mark all read" can appear if necessary
-        tableView.reloadRowsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 1)], withRowAnimation: UITableViewRowAnimation.None)
     }
     
     //MARK: - Customization of the view
@@ -434,9 +451,16 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
         let background: UIColor
+        
         if indexPath.section == 0 {
-            if indexPath.item == 0 { return }
-            background = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
+            if indexPath == backToGTPortalIndex {
+                //R:0.08 G:0.24 B:0.45 A:0.85
+                background = UIColor(red: 0.08, green: 0.24, blue: 0.45, alpha: selected ? 0.6 : 0.85)
+            }
+            else {
+                if indexPath.item == (backToGTPortalIndex == nil ? 0 : 1) { return }
+                background = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
+            }
         }
         else { //if section == 1
             if indexPath.item == 0 { return }
@@ -524,7 +548,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     func processSelectedCellWithTouch(index: NSIndexPath, _ touchLocationInCell: CGPoint) {
         if index.section == 0 {
-            if index.item == 0 { return }
+            if index == backToGTPortalIndex {
+                UIApplication.sharedApplication().openURL(NSURL(string: "gtportal://")!)
+                return
+            }
+            if index.item == (backToGTPortalIndex == nil ? 0 : 1) { return }
             if index.item == (classes?.count ?? 0) + classOffsetCount {
                 let delegate = AllClassesDelegate(controller: self)
                 delegate.loadDataAndPushInController(self)
@@ -547,10 +575,6 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                         tooManyClassesIndex = nil
                         NSUserDefaults.standardUserDefaults().setBool(true, forKey: TSHideClassCountPopupKey)
                         tableView.deleteRowsAtIndexPaths([indexToRemove], withRowAnimation: .Fade)
-                        delay(1.0) {
-                            NSUserDefaults.standardUserDefaults().setBool(false, forKey: TSHideClassCountPopupKey)
-                        }
-                        
                     }
                 }
                 return
@@ -673,8 +697,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         dispatch_async(TSNetworkQueue, {
             guard let data = NSData(contentsOfURL: webURL) else {
-                NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
-                self.setActivityIndicatorVisible(false)
+                sync {
+                    let alert = UIAlertController(title: "Cannot Display Attachment", message: "The attachment is no longer available.", preferredStyle: .Alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                    self.presentViewController(alert, animated: true, completion: nil)
+                    self.setActivityIndicatorVisible(false)
+                }
                 return
             }
             
@@ -758,7 +786,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         loginController.presentWebViewWithURL(URL, title: title)
     }
     
-    func openTextInSafari(text: String, title: String) {
+    func openTextInWebView(text: String, title: String) {
         loginController.presentWebViewWithText(text, title: title)
     }
     

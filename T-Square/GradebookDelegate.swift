@@ -13,6 +13,7 @@ let TSGradebookCalculationSettingKey = "edu.gatech.cal.gradebookCalculationSetti
 let TSCustomGradesKey = "edu.gatech.cal.customGrades"
 let TSCachedGradesKey = "edu.gatech.cal.cachedGrades"
 let TSDroppedGradesKey = "edu.gatech.cal.droppedGrades"
+let TSManualCategoryWeightsKey = "edu.gatech.cal.manualCategoryWeight"
 
 class GradebookDelegate : NSObject, StackableTableDelegate {
     
@@ -263,8 +264,6 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     //MARK: - User Interaction
     
     func gradeTogglePressed(newValue: Bool) {
-        self.displayClass.grades?.useAllSubscores = newValue
-        self.loadCachedData()
         
         let animateScrollUp = self.controller.tableView.contentOffset.y > 40.0
         let paths = [NSIndexPath(forItem: 1, inSection: 0)]
@@ -276,6 +275,9 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             }
             
             delay(0.6) {
+                self.displayClass.grades?.useAllSubscores = newValue
+                self.loadCachedData()
+                
                 self.controller.tableView.reloadRowsAtIndexPaths(paths, withRowAnimation: animation)
             }
         }
@@ -398,6 +400,25 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         let alert = UIAlertController(title: "Edit \(score is Grade ? "Grade" : "Category")", message: nil, preferredStyle: .Alert)
         
         if let group = score as? GradeGroup {
+            
+            if !group.isArtificial {
+                let title = (group.weight == nil || group.weight == 0.0) ? "Add Weight" : "Edit Weight"
+                alert.addAction(UIAlertAction(title: title, style: .Default, handler: editScoreHandler(score, completion: { newScore in
+                    if let newCategory = newScore as? GradeGroup {
+                        self.setManualWeightForGroup(newCategory, weight: newCategory.weight ?? 0.0)
+                    }
+                })))
+                
+                if title == "Edit Weight" {
+                    alert.addAction(UIAlertAction(title: "Remove Weight", style: .Default, handler: { _ in
+                        self.setManualWeightForGroup(group, weight: 0.0)
+                        let newGroup = GradeGroup(name: group.name, weight: nil, isArtificial: false)
+                        newGroup.owningGroup = group.owningGroup
+                        self.finalizeGradeChanges(add: [], remove: [], swap: [(newGroup, group)])
+                    }))
+                }
+            }
+            
             alert.addAction(UIAlertAction(title: "Add Grade\(group.isArtificial ? "" : " to Category")", style: .Default, handler: { _ in
                 self.showAddGradeDialog(inGroup: group)
             }))
@@ -431,21 +452,30 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
     }
     
-    func editScoreHandler(score: Scored) -> (UIAlertAction) -> () {
+    func editScoreHandler(score: Scored, completion: ((Scored) -> ())? = nil) -> (UIAlertAction) -> () {
         return { _ in
             
             func closure(var new: Scored) {
                 new.owningGroup = score.owningGroup
                 self.finalizeGradeChanges(add: [], remove: [], swap: [(new, score)])
+                completion?(new)
             }
             
             if score is Grade {
                 self.getValidGradeInput(score.name, completion: closure)
             } else {
-                self.getValidGroupInput(score.name, completion: closure)
+                self.getValidGroupInput(score.name, canEditName: score.isArtificial, completion: closure)
             }
             
         }
+    }
+    
+    func setManualWeightForGroup(group: GradeGroup, weight: Double) {
+        let data = NSUserDefaults.standardUserDefaults()
+        var dict = data.dictionaryForKey(TSManualCategoryWeightsKey) as? [String : Double] ?? [:]
+        let key = "\(TSAuthenticatedReader.username)~\(self.displayClass.permanentID)~\(group.name)"
+        dict.updateValue(weight, forKey: key)
+        data.setValue(dict, forKey: TSManualCategoryWeightsKey)
     }
     
     //MARK: - Validate and Finalize changes
@@ -460,22 +490,31 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         for (addScore, removeScore) in swap {
             
             if let removeGroup = removeScore as? GradeGroup, let addGroup = addScore as? GradeGroup {
+                
                 for var score in removeGroup.scores {
-                    remove.append(score)
-                    add.append(score)
+                    if addGroup.isArtificial {
+                        remove.append(score)
+                        add.append(score)
+                    } else {
+                        addGroup.scores.append(score)
+                    }
                     score.owningGroup = addGroup
                 }
             }
             
-            if let removeIndex = removeScore.owningGroup?.scores.indexOf(equalityFunctionForScore(removeScore)) {
-                removeScore.owningGroup?.scores[removeIndex] = addScore
+            let owner = removeScore.owningGroup?.name == "ROOT" ? displayClass.grades : removeScore.owningGroup
+            if let removeIndex = owner?.scores.indexOf(equalityFunctionForScore(removeScore)) {
+                owner?.scores[removeIndex] = addScore
             }
             
-            if let index = customScores.indexOf(removeScore.representAsString()) {
-                customScores[index] = addScore.representAsString()
-            } else {
-                customScores.append(addScore.representAsString())
+            if addScore.isArtificial {
+                if let index = customScores.indexOf(removeScore.representAsString()) {
+                    customScores[index] = addScore.representAsString()
+                } else {
+                    customScores.append(addScore.representAsString())
+                }
             }
+            
         }
         
         //remove grades
@@ -530,16 +569,16 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
     }
     
-    func getValidGroupInput(initialName: String? = nil, completion: (GradeGroup) -> ()) {
+    func getValidGroupInput(initialName: String? = nil, canEditName: Bool = true, completion: (GradeGroup) -> ()) {
         let title = "\(initialName != nil ? "Edit" : "Add") a Category"
-        self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: false, previousNameInput: initialName, performingEdit: initialName != nil, completion: { name, weightInput in
+        self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: false, previousNameInput: initialName, performingEdit: initialName != nil, canEditName: canEditName, completion: { name, weightInput in
             
             var weightString = weightInput
             if !weightString.hasSuffix("%") {
                 weightString.appendContentsOf("%")
             }
             
-            let group = GradeGroup(name: name, weight: weightString, isArtificial: true)
+            let group = GradeGroup(name: name, weight: weightString, isArtificial: canEditName, inClass: self.displayClass)
             if group.weight == nil {
                 //couldn't parse the weight
                 return false
@@ -550,7 +589,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         })
     }
     
-    func showDialogForMultipleInputWithTitle(title: String, shouldAllowFractions: Bool, previousNameInput: String? = nil, performingEdit: Bool = false, completion: (String, String) -> (Bool)) {
+    func showDialogForMultipleInputWithTitle(title: String, shouldAllowFractions: Bool, previousNameInput: String? = nil, performingEdit: Bool = false, canEditName: Bool = true, completion: (String, String) -> (Bool)) {
         
         let inputNumberName = shouldAllowFractions ? "Score" : "Weight"
         
@@ -575,6 +614,12 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             if let name = previousNameInput where name != "" {
                 nameField.text = name
             }
+            
+            if !canEditName {
+                nameField.enabled = false
+                nameField.textColor = UIColor.grayColor()
+            }
+            
         })
         alert.addTextFieldWithConfigurationHandler({ textField in
             scoreField = textField

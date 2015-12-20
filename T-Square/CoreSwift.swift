@@ -237,7 +237,7 @@ func linksInText(string: String) -> [(text: String, range: NSRange)] {
                 if wordEnd == text.length { return false }
                 
                 let currentEnd = text.stringAtIndex(wordEnd)
-                return currentEnd.isWhitespace()
+                return currentEnd.isWhitespace() || currentEnd == ")"
             }
             
             while !nextIsWhitespace() && (wordEnd != text.length) {
@@ -424,8 +424,8 @@ class TableViewStackController : UIViewController, UITableViewDelegate, UITableV
         
         //restore to the previous offset
         //but only if the content size hasn't gotten smaller than the previous offset
-        let contentHeight = tableView.contentSize.height
-        if (offset?.y ?? 0) < contentHeight - tableView.frame.height {
+        let contentHeight = tableView.contentSize.height + tableView.contentInset.top + tableView.contentInset.bottom
+        if (offset?.y ?? 0) <= contentHeight - tableView.frame.height {
             tableView.contentOffset = offset ?? CGPointZero
         }
         

@@ -105,7 +105,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
                     
                     //no return, meaning none of the expecting links worked
                     controller.setActivityIndicatorVisible(false)
-                    let alert = UIAlertController(title: "Syllabus not available", message: "The syllabus got away from us somehow. Has it been posted?", preferredStyle: .Alert)
+                    let alert = UIAlertController(title: "Syllabus not available", message: "The syllabus got away from us somehow. It looks like there isn't one posted.", preferredStyle: .Alert)
                     alert.addAction(UIAlertAction(title: "ok", style: UIAlertActionStyle.Default, handler: nil))
                     controller.presentViewController(alert, animated: true, completion: nil)
 

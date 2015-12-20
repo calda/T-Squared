@@ -454,7 +454,7 @@ class TSReader {
                     }
                     let name = (nameIndex != nil ? cols[nameIndex!].text?.cleansed() : nil) ?? "Unnamed Category"
                     let weight = (weightIndex != nil ? cols[weightIndex!].text?.cleansed() : nil)
-                    currentGroup = GradeGroup(name: name, weight: weight)
+                    currentGroup = GradeGroup(name: name, weight: weight, inClass: currentClass)
                     
                     //check if the group has an intrinsic grade
                     if let scoreIndex = scoreIndex where scoreIndex < cols.count {
@@ -553,7 +553,7 @@ class TSReader {
             var grades: [Grade] = []
             
             for string in customGrades {
-                if let score = scorefromString(string, isArtificial: key == TSCustomGradesKey) {
+                if let score = scorefromString(string, isArtificial: key == TSCustomGradesKey, inClass: currentClass) {
                     if let grade = score as? Grade { grades.append(grade) }
                     if let group = score as? GradeGroup { groups.append(group) }
                 }
@@ -596,7 +596,7 @@ class TSReader {
     
     //MARK: - Getting Resource for Syllabus
     
-    func getSyllabusURLForClass(currentClass: Class) -> (rawSyllabusLink: String?, document: String?) {
+    func getSyllabusURLForClass(currentClass: Class) -> (syllabusPage: String?, document: String?) {
         
         guard let classPage = currentClass.getClassPage() else { return (nil, nil) }
         //load page for class announcements

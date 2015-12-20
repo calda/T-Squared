@@ -23,7 +23,7 @@ protocol Scored {
     
 }
 
-func scorefromString(string: String, isArtificial: Bool) -> Scored? {
+func scorefromString(string: String, isArtificial: Bool, inClass owningClass: Class) -> Scored? {
     
     if string.hasPrefix("GRADE") {
         let splits = string.componentsSeparatedByString("~")
@@ -41,7 +41,7 @@ func scorefromString(string: String, isArtificial: Bool) -> Scored? {
         let splits = string.componentsSeparatedByString("~")
         if splits.count != 3 && splits.count != 4 { return nil }
         
-        let group = GradeGroup(name: splits[1], weight: "\(splits[2])%", isArtificial: isArtificial)
+        let group = GradeGroup(name: splits[1], weight: "\(splits[2])%", isArtificial: isArtificial, inClass: owningClass)
         
         //intrinsic grade (index 4) may or may not exist
         let intrinsicGradeString: String? = splits.count >= 4 ? splits[3] : nil
@@ -153,7 +153,7 @@ class Grade : Scored, CustomStringConvertible {
 class GradeGroup : Scored, CustomStringConvertible {
     
     let name: String
-    let weight: Double?
+    var weight: Double?
     var scores: [Scored] = []
     var intrinsicScore: Double?
     let isArtificial: Bool
@@ -192,15 +192,27 @@ class GradeGroup : Scored, CustomStringConvertible {
         return artificialCount > 0 && artificialCount != totalCount
     }
     
-    init(name: String, weight: String?, isArtificial: Bool = false) {
+    init(name: String, weight: String?, isArtificial: Bool = false, inClass owningClass: Class) {
         self.name = name
         self.isArtificial = isArtificial
+        
         if let weightString = weight?.cleansed() where weightString.hasSuffix("%") {
-            if let percent = weightString.percentStringAsDouble() {
+            if let percent = weightString.percentStringAsDouble() where percent != 0.0 {
                 self.weight = percent * 100.0
                 return
             }
         }
+        
+        //attempt to load weight from TSManualCategoryWeights if not already loaded
+        let data = NSUserDefaults.standardUserDefaults()
+        var dict = data.dictionaryForKey(TSManualCategoryWeightsKey) as? [String : Double] ?? [:]
+        let key = "\(TSAuthenticatedReader.username)~\(owningClass.permanentID)~\(self.name)"
+        
+        if let manualWeight = dict[key] where manualWeight != 0.0 {
+            self.weight = manualWeight
+            return
+        }
+        
         self.weight = nil
     }
     

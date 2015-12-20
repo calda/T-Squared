@@ -13,21 +13,40 @@ let TSStatusBarTappedNotification = "edu.gatech.cal.statusBarTapped"
 @available(iOS 9.0, *)
 var TSQueuedShortcutItem: UIApplicationShortcutItem?
 var TSLaunchedUsername: String?
+var TSWasLaunchedFromGTPortal = false
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
+    //MARK: - Launch from URL
+    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "networkActivityEvent:", name: TSPerformingNetworkActivityNotification, object: nil)
         
-        //check for launch from tsquared:// url
-        if let launchURL = launchOptions?[UIApplicationLaunchOptionsURLKey] as? NSURL {
-            TSLaunchedUsername = "\(launchURL)".stringByReplacingOccurrencesOfString("tsquared://", withString: "")
-            if TSLaunchedUsername == "" { TSLaunchedUsername = nil }
+        if let launchSource = launchOptions?[UIApplicationLaunchOptionsSourceApplicationKey] as? String,
+           let launchURL = launchOptions?[UIApplicationLaunchOptionsURLKey] as? NSURL {
+            self.application(UIApplication.sharedApplication(), openURL: launchURL, sourceApplication: launchSource, annotation: "")
         }
         
+        return true
+    }
+    
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
+        
+        if sourceApplication == "CBTech.GT" && NSProcessInfo().operatingSystemVersion.majorVersion < 9 {
+            TSWasLaunchedFromGTPortal = true
+            let controller = (window?.rootViewController as? LoginViewController)?.classesViewController
+            controller?.reloadTable()
+            if controller?.tableView?.delegate is ClassesViewController {
+                controller?.tableView.contentOffset = CGPoint(x: 0.0, y: 0.0)
+            }
+        }
+        
+        //check for launch from tsquared:// url
+        TSLaunchedUsername = "\(url)".stringByReplacingOccurrencesOfString("tsquared://", withString: "")
+        if TSLaunchedUsername == "" { TSLaunchedUsername = nil }
         return true
     }
     
@@ -70,6 +89,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }
+    }
+    
+    func applicationDidEnterBackground(application: UIApplication) {
+        TSWasLaunchedFromGTPortal = false
+        (window?.rootViewController as? LoginViewController)?.classesViewController?.reloadTable()
     }
     
     //MARK: Open from Springboard 3D Touch shortcut

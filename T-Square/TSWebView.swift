@@ -126,6 +126,18 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     }
     
     func webView(webView: UIWebView, shouldStartLoadWithRequest request: NSURLRequest, navigationType: UIWebViewNavigationType) -> Bool {
+        
+        //the UIWebView can't display PDFs, so we have to intercept them and open the request in a Document View Controller
+        if let url = request.URL {
+            let knownFileExtensions = ["pdf", "ppt", "pptx", "xls", "xlsx", "png", "jpg", "jpeg"]
+            for ext in knownFileExtensions {
+                if "\(url)".lowercaseString.hasSuffix(".\(ext)") {
+                    loginController.classesViewController.presentDocumentFromURL(url)
+                    return false
+                }
+            }
+        }
+        
         return true
     }
     

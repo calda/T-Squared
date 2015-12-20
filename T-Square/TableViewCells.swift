@@ -199,14 +199,10 @@ class TitleWithButtonCell : BackCell {
     @IBOutlet weak var button: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setActivityIndicatorEnabled:", name: TSSetActivityIndicatorEnabledNotification, object: nil)
-    }
-    
-    func decorate(text: String, buttonText: String) {
+    func decorate(text: String, buttonText: String, activityIndicatorHidden: Bool) {
         titleLabel.text = text
         button.text = buttonText
+        activityIndicator.hidden = activityIndicatorHidden
     }
     
 }
@@ -227,7 +223,7 @@ class AttachmentCell : TitleCell {
         }
         
         else if let rawText = attachment.rawText {
-            controller.openTextInSafari(rawText, title: attachment.fileName)
+            controller.openTextInWebView(rawText, title: attachment.fileName)
         }
     }
     

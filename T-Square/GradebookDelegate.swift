@@ -499,6 +499,26 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         let classKey = TSAuthenticatedReader.username + "~" + displayClass.permanentID
         var customScores = dict[classKey] ?? []
         
+        //make a list of all the scores being edited
+        var allScores: [Scored] = []
+        allScores.appendContentsOf(add)
+        allScores.appendContentsOf(remove)
+        for (add, remove) in swap {
+            allScores.append(add)
+            allScores.append(remove)
+        }
+        //make sure the owning group of any grade is that group from the current root
+        //(because we swap out the root after loading from the server)
+        for score in allScores {
+            if let grade = score as? Grade,
+               let currentOwner = grade.owningGroup {
+                if let indexInRoot = displayClass.grades?.scores.indexOf(equalityFunctionForScore(currentOwner)) {
+                    let groupInRoot = displayClass.grades!.scores[indexInRoot] as! GradeGroup
+                    grade.owningGroup = groupInRoot
+                }
+            }
+        }
+        
         //swap grades with new versions
         for (addScore, removeScore) in swap {
             
@@ -550,11 +570,15 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             customScores.append(string)
         }
         
-        dict[classKey] = customScores
-        data.setValue(dict, forKey: TSCustomGradesKey)
-        
         //recalculate total score and all lingering configuration
         displayClass.grades?.scoreString
+        
+        //save to disk
+        //(we specifically save *after* recalculating the score,
+        // because if the user does something that causes it to crash, like an integer overflow,
+        // that number would get saved to disk and cause it to crash every time in the future)
+        dict[classKey] = customScores
+        data.setValue(dict, forKey: TSCustomGradesKey)
         
         //update on screen
         scores = flattenedGrades(displayClass.grades)
@@ -573,6 +597,11 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             let grade = Grade(name: name, score: scoreString, weight: nil, comment: nil, isArtificial: true)
             if grade.score == nil {
                 //couldn't parse the score
+                return false
+            }
+            
+            //prevent an integer overflow
+            if grade.score > Double(Int.max) {
                 return false
             }
             

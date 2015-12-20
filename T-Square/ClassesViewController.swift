@@ -256,7 +256,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func doneLoadingAnnoucements() {
+        if !loadingAnnouncements {
+            return
+        }
         loadingAnnouncements = false
+        
         NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
         
         if announcements.count == 0 { self.reloadTable() }
@@ -280,12 +284,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let previous: [Announcement] = []
         
         for i in 0 ..< recentCount {
-            if previous.count > i && !(announcements as NSArray).containsObject(previous[i]) {
+            if previous.count > i && !(announcements as NSArray).containsObject(previous[i]) { //will never be called with the current setup
                 tableView.deleteRowsAtIndexPaths([NSIndexPath(forItem: i + 1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Top)
             }
             
             if announcements.count > i && !(previous as NSArray).containsObject(announcements[i]) {
-                tableView.insertRowsAtIndexPaths([NSIndexPath(forItem: i + 1, inSection: 1)], withRowAnimation:  UITableViewRowAnimation.Middle)
+                tableView.insertRowsAtIndexPaths([NSIndexPath(forItem: i + 1, inSection: 1)], withRowAnimation:  UITableViewRowAnimation.Fade)
             }
         }
         

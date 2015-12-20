@@ -111,7 +111,7 @@ class ClassNameCellWithSwitch : ClassNameCellWithIcon {
                 })
                 
                 //add or remove from arrays representing active classes
-                if newStatus {
+                if newStatus && controller.classes?.contains(displayClass) == false {
                     controller.classes?.append(displayClass)
                     TSAuthenticatedReader.classes?.append(displayClass)
                 } else {

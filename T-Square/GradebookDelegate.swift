@@ -87,8 +87,20 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
         
         if indexPath.item == 2 {
+            let whatIf: String? = (displayClass.grades?.scores.count > 0) == true ? " (what if)" : nil
             let cell = tableView.dequeueReusableCellWithIdentifier("button") as! ButtonCell
-            cell.decorateWithText("Add new grade", buttonImage: "button-add")
+            cell.decorateWithText("Add new grade" + (whatIf ?? ""), buttonImage: "button-add")
+            
+            if let whatIf = whatIf {
+                //make an attributed string
+                let base = NSMutableAttributedString(string: "Add new grade")
+                let whatIfAttr = NSMutableAttributedString(string: whatIf)
+                whatIfAttr.addAttribute(NSForegroundColorAttributeName, value: UIColor(white: 0.0, alpha: 0.25), range: NSMakeRange(0, whatIf.length))
+                
+                base.appendAttributedString(whatIfAttr)
+                cell.label?.attributedText = base
+            }
+            
             return cell
         }
         
@@ -401,6 +413,10 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         if let group = score as? GradeGroup {
             
+            alert.addAction(UIAlertAction(title: "Add Grade\(group.isArtificial ? "" : " to Category")", style: .Default, handler: { _ in
+                self.showAddGradeDialog(inGroup: group)
+            }))
+            
             if !group.isArtificial {
                 let title = (group.weight == nil || group.weight == 0.0) ? "Add Weight" : "Edit Weight"
                 alert.addAction(UIAlertAction(title: title, style: .Default, handler: editScoreHandler(score, completion: { newScore in
@@ -419,9 +435,6 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
                 }
             }
             
-            alert.addAction(UIAlertAction(title: "Add Grade\(group.isArtificial ? "" : " to Category")", style: .Default, handler: { _ in
-                self.showAddGradeDialog(inGroup: group)
-            }))
         }
         
         if score.isArtificial {

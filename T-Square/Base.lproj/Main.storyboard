@@ -702,8 +702,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Add grade" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="xAr-AW-XjB">
-                                                    <rect key="frame" x="16" y="16" width="255" height="17"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Add new grade" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="xAr-AW-XjB">
+                                                    <rect key="frame" x="16" y="16" width="260" height="17"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.49527254970000001" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -723,7 +723,7 @@
                                                 <constraint firstItem="xAr-AW-XjB" firstAttribute="top" secondItem="DLu-BG-Idt" secondAttribute="topMargin" id="gCb-LU-9sp"/>
                                                 <constraint firstItem="xAr-AW-XjB" firstAttribute="leading" secondItem="DLu-BG-Idt" secondAttribute="leadingMargin" constant="8" id="o4t-W3-O3f"/>
                                                 <constraint firstItem="xAr-AW-XjB" firstAttribute="centerY" secondItem="sVv-Om-2ti" secondAttribute="centerY" id="vND-Jv-XDk"/>
-                                                <constraint firstItem="sVv-Om-2ti" firstAttribute="leading" secondItem="xAr-AW-XjB" secondAttribute="trailing" constant="8" id="yrd-FB-jwn"/>
+                                                <constraint firstItem="sVv-Om-2ti" firstAttribute="leading" secondItem="xAr-AW-XjB" secondAttribute="trailing" constant="3" id="yrd-FB-jwn"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="sVv-Om-2ti" secondAttribute="bottom" id="yza-0y-4yD"/>
                                             </constraints>
                                             <variation key="default">

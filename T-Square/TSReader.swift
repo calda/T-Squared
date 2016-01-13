@@ -139,7 +139,7 @@ class TSReader {
             guard let workspace = HttpClient.contentsOfPage(workspaceURL) else { return (classes ?? [], nil) }
 
             for worksiteLink in workspace.css("a, link") {
-                if worksiteLink["title"] != "Worksite Setup" { continue }
+                if !"Worksite Setup Membership".containsString(worksiteLink["title"] ?? "x") { continue }
                 let worksiteURL = worksiteLink["href"]!.stringByReplacingOccurrencesOfString("tool-reset", withString: "tool")
                 
                 //find preferencesLink

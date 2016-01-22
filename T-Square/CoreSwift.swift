@@ -675,6 +675,11 @@ extension String {
             " " : "%20"
         ]
         
+        if isFullURL {
+            //replacing % on full URLs would change %20 to %2520, breaking the link
+            specialCharacters.removeValueForKey("%")
+        }
+        
         //if this isn't a full URL (ex: a post argument), then also strip out some special URL characters
         if !isFullURL {
             specialCharacters.updateValue("%2F", forKey: "/")

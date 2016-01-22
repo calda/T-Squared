@@ -50,6 +50,12 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             controller.reloadTable()
             announcement.markRead()
             controller.setActivityIndicatorVisible(false)
+            
+            //open the announcement in a web view if the text wasn't parsed properly
+            if announcement.message?.isEmpty == true || announcement.message?.isWhitespace() == true {
+                controller.openLinkInWebView(announcement.link, title: "Announcement")
+            }
+            
         })
     }
     
@@ -170,6 +176,9 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             let height = heightForText(text, width: tableView.frame.width - 30.0, font: font)
             
             if identifier == "announcementText" {
+                if text.isWhitespace() || text.isEmpty {
+                    return 0.0
+                }
                 return max(100.0, height + 30.0)
             }
             return height

@@ -134,13 +134,13 @@ class TSReader {
         
         for workspaceLink in doc.css("a, link") {
             if workspaceLink["title"] != "My Workspace" { continue }
-            let workspaceURL = workspaceLink["href"]!
+            guard let workspaceURL = workspaceLink["href"] else { return (classes ?? [], nil) }
             
             guard let workspace = HttpClient.contentsOfPage(workspaceURL) else { return (classes ?? [], nil) }
 
             for worksiteLink in workspace.css("a, link") {
                 if !"Worksite Setup Membership".containsString(worksiteLink["title"] ?? "x") { continue }
-                let worksiteURL = worksiteLink["href"]!.stringByReplacingOccurrencesOfString("tool-reset", withString: "tool")
+                guard let worksiteURL = worksiteLink["href"]?.stringByReplacingOccurrencesOfString("tool-reset", withString: "tool") else { continue }
                 
                 //find preferencesLink
                 var preferencesLink: String?
@@ -166,7 +166,7 @@ class TSReader {
                     if links.count == 0 { continue }
                     let classLink = links[links.count - 1]
                     
-                    let className = classLink.text!.cleansed()
+                    let className = classLink.text?.cleansed() ?? "Unnamed Class"
                     if className == "My Workspace" { continue }
                     
                     //show the short-form name unless there would be duplicates
@@ -207,7 +207,7 @@ class TSReader {
         for link in classPage.css("a, link") {
             if link.text != "Site Information Display" { continue }
             
-            let url = link["href"]!
+            guard let url = link["href"] else { continue }
             guard let page = HttpClient.contentsOfPage(url) else { return nil }
             
             for div in page.css("div") {
@@ -247,8 +247,8 @@ class TSReader {
         //load page for class announcements
         for link in classPage.css("a, link") {
             if link.text != "Announcements" { continue }
+            guard let announcementsURL = link["href"] else { continue }
             
-            let announcementsURL = link["href"]!
             var announcementsPageOpt: HTMLDocument?
             if !loadAll {
                 announcementsPageOpt = HttpClient.contentsOfPage(announcementsURL)
@@ -264,14 +264,14 @@ class TSReader {
                 let links = row.css("a")
                 if links.count == 1 {
                     
-                    let link = links[0]["href"]!
-                    let name = links[0].text!.cleansed()
+                    guard let link = links[0]["href"] else { continue }
+                    let name = links[0].text?.cleansed() ?? "Untitled Announcement"
                     var author: String = ""
                     var date: String = ""
                     
                     for col in row.css("td") {
                         if let header = col["headers"] {
-                            let text = col.text!.cleansed()
+                            let text = col.text?.cleansed() ?? "Could not load message."
                             switch(header) {
                                 case "author": author = text; break;
                                 case "date": date = text; break;
@@ -311,7 +311,8 @@ class TSReader {
         //load page for resources
         for link in classPage.css("a, link") {
             if link.text != "Resources" { continue }
-            let root = ResourceFolder(name: "Resources in \(currentClass.name)", link: link["href"]!, collectionID: "", navRoot: "")
+            guard let linkURL = link["href"] else { continue }
+            let root = ResourceFolder(name: "Resources in \(currentClass.name)", link: linkURL, collectionID: "", navRoot: "")
             currentClass.rootResource = root
             return root
         }
@@ -332,23 +333,26 @@ class TSReader {
             if let javascript = resourcesLink["onclick"] {
                 let collectionID = HttpClient.getInfoFromPage(javascript as NSString, infoSearch: "'collectionId').value='", terminator: "'")!
                 let navRoot = HttpClient.getInfoFromPage(javascript as NSString, infoSearch: "'navRoot').value='", terminator: "'")!
-                let name = resourcesLink.text!.cleansed()
+                let name = (resourcesLink.text ?? "Unnamed folder").cleansed()
                 let folder = ResourceFolder(name: name, link: folder.link, collectionID: collectionID, navRoot: navRoot)
                 resources.append(folder)
             }
             else {
                 //find a link with actual content
                 var linkOffset = 2
-                while resourcesLink["href"]! == "#" && linkOffset < (links.count + 1) {
+                while resourcesLink["href"] == "#" && linkOffset < (links.count + 1) {
                     resourcesLink = links[max(0, links.count - linkOffset)]
-                    linkOffset++
+                    linkOffset += 1
                 }
                 
                 //we didn't find anything useful. bail out.
-                if resourcesLink["href"]! == "#" { continue }
+                if resourcesLink["href"] == "#" { continue }
                 
-                let resource = Resource(name: resourcesLink.text!.cleansed(), link: resourcesLink["href"]!)
-                resources.append(resource)
+                if let resourcesLinkURL = resourcesLink["href"] {
+                    let name = resourcesLink.text ?? "Unnamed Resource"
+                    let resource = Resource(name: name.cleansed(), link: resourcesLinkURL)
+                    resources.append(resource)
+                }
             }
             
         }
@@ -367,21 +371,21 @@ class TSReader {
         //load page for class announcements
         for link in classPage.css("a, link") {
             if link.text != "Assignments" { continue }
-            guard let assignmentsPage = HttpClient.getPageWith100Count(link["href"]!) else { return [] }
+            guard let linkHref = link["href"] else { return [] }
+            guard let assignmentsPage = HttpClient.getPageWith100Count(linkHref) else { return [] }
             
             //load announcements
             for row in assignmentsPage.css("tr") {
                 let links = row.css("a")
                 if links.count == 1 {
                     
-                    let link = links[0]["href"]!
-                    let name = links[0].text!.cleansed()
+                    guard let link = links[0]["href"] else { continue }
+                    let name = (links[0].text ?? "Untitled Annoucement").cleansed()
                     var statusString: String = ""
                     var dueDateString: String = ""
                     
                     for col in row.css("td") {
-                        if let header = col["headers"] {
-                            let text = col.text!.cleansed()
+                        if let header = col["headers"], let text = col.text?.cleansed() {
                             switch(header) {
                                 case "dueDate": dueDateString = text; break;
                                 case "status": statusString = text; break;
@@ -417,7 +421,8 @@ class TSReader {
         //load page for class announcements
         for link in classPage.css("a, link") {
             if link.text != "Gradebook" && link.text != "Markbook" { continue }
-            guard let gradebookPage = HttpClient.contentsOfPage(link["href"]!) else { return rootGroup }
+            guard let gradebookLink = link["href"] else { return rootGroup }
+            guard let gradebookPage = HttpClient.contentsOfPage(gradebookLink) else { return rootGroup }
             
             
             //get indecies for name, score, weight, and comment
@@ -432,7 +437,7 @@ class TSReader {
             
             let thArray = thead.css("th")
             for i in 0 ..< thArray.count {
-                let text = thArray[i].text!.lowercaseString
+                guard let text = thArray[i].text?.lowercaseString else { continue }
                 if text.containsString("title") { nameIndex = i }
                 else if text.containsString("grade") { scoreIndex = i }
                 else if text.containsString("weight") { weightIndex = i }
@@ -452,6 +457,7 @@ class TSReader {
                     if currentGroup !== rootGroup {
                         rootGroup.scores.append(currentGroup)
                     }
+                    
                     let name = (nameIndex != nil ? cols[nameIndex!].text?.cleansed() : nil) ?? "Unnamed Category"
                     let weight = (weightIndex != nil ? cols[weightIndex!].text?.cleansed() : nil)
                     currentGroup = GradeGroup(name: name, weight: weight, inClass: currentClass)
@@ -602,7 +608,7 @@ class TSReader {
         //load page for class announcements
         for link in classPage.css("a, link") {
             if link.text != "Syllabus" { continue }
-            let syllabusLink = link["href"]!
+            guard let syllabusLink = link["href"] else { return (nil, nil) }
             guard let syllabusPage = HttpClient.contentsOfPage(syllabusLink) else { return (nil, nil) }
             
             //check if the syllabus is hiding in an iframe

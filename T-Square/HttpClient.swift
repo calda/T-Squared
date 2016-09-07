@@ -62,7 +62,7 @@ class HttpClient {
                     }
                 }
                 
-                attempts++
+                attempts += 1
                 failed = true
                 if attempts >= 3 {
                     stopTrying = true
@@ -122,7 +122,9 @@ class HttpClient {
     static var previous: String?
     static var isRunningInBackground = false
     
-    static func authenticateWithUsername(var user: String, var password: String, completion: (Bool, HTMLDocument?) -> ()) {
+    static func authenticateWithUsername(username: String, password userPassword: String, completion: (Bool, HTMLDocument?) -> ()) {
+        var user = username
+        var password = userPassword
         var didCompletion = false
         
         //call the completion before exiting scope
@@ -209,11 +211,12 @@ class HttpClient {
         password.prepareForURL()
         
         //send HTTP POST for login
-        let postString = "?warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)"
+        let postString = "?warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)&submit=LOGIN&_eventId=submit"
         let loginClient = HttpClient(url: "https://login.gatech.edu\(formPost)\(postString)")
         guard let response = loginClient.sendGet() else {
-            //(UIApplication.sharedApplication().windows[0].rootViewController as? LoginViewController)?.networkErrorRecieved()
-            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            //synchronous network error even though in background thread
+            //because the app locks up when calling sync{ } for some reason
+            (UIApplication.sharedApplication().windows[0].rootViewController as? LoginViewController)?.syncronizedNetworkErrorRecieved()
             return
         }
         

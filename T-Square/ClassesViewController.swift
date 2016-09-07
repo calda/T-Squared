@@ -308,7 +308,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     override func viewDidLoad() {
         refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: "tableRefreshed:", forControlEvents: .ValueChanged)
+        refreshControl.addTarget(self, action: #selector(ClassesViewController.tableRefreshed(_:)), forControlEvents: .ValueChanged)
         tableView.addSubview(refreshControl)
     }
     
@@ -319,10 +319,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     override func viewDidAppear(animated: Bool) {
         tableViewRestingPosition = tableView.frame.origin
         updateBottomView()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setTouchDelegateEnabled:", name: TSSetTouchDelegateEnabledNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "backTriggeredFromButtonPress", name: TSBackPressedNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "scrollToTop", name: TSStatusBarTappedNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "pushSettingsDelegate", name: TSShowSettingsNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClassesViewController.setTouchDelegateEnabled(_:)), name: TSSetTouchDelegateEnabledNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClassesViewController.backTriggeredFromButtonPress), name: TSBackPressedNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClassesViewController.scrollToTop), name: TSStatusBarTappedNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClassesViewController.pushSettingsDelegate), name: TSShowSettingsNotification, object: nil)
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -748,7 +748,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             for other in links {
                 let otherShort = websiteForLink(other)
                 if otherShort == shortWebsite {
-                    countMatching++
+                    countMatching += 1
                 }
                 if other == link {
                     thisCount = countMatching

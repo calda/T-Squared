@@ -103,11 +103,11 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
             self.view.layoutIfNeeded()
         }, completion: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showLogoutAlert", name: TSLogoutNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "dismissWebView", name: TSDismissWebViewNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardHeightChanged:", name: UIKeyboardWillChangeFrameNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "centerForm", name: UIKeyboardWillHideNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "networkErrorRecieved", name: TSNetworkErrorNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.showLogoutAlert), name: TSLogoutNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.dismissWebView as (LoginViewController) -> () -> ()), name: TSDismissWebViewNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.keyboardHeightChanged(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.centerForm), name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.networkErrorRecieved), name: TSNetworkErrorNotification, object: nil)
         
         activityCircle.hidden = false
         activityCircle.layer.cornerRadius = 25.0
@@ -316,20 +316,20 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         tapRecognizer.enabled = false
         var classes: [Class] = []
         var loadAttempt = 0
-        while classes.count == 0 && loadAttempt < 15 && !reader.actuallyHasNoClasses {
-            loadAttempt++
+        while classes.count == 0 && loadAttempt < 4 && !reader.actuallyHasNoClasses {
+            loadAttempt += 1
             classes = reader.getActiveClasses()
             
             if classes.count == 0 {
                 reader.checkIfHasNoClasses()
             }
             
-            if loadAttempt > 4 {
+            if loadAttempt > 2 {
                 HttpClient.clearCookies()
             }
         }
         
-        if loadAttempt >= 15 {
+        if loadAttempt >= 4 {
             //present an alert and then exit the app if the classes aren't loading
             //this means a failed authentication looked like it passed
             //AKA I have no idea what happened

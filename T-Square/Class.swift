@@ -174,7 +174,10 @@ class Class : CustomStringConvertible, Equatable {
         }
         
         Class.cachedSpecificSubjectNames?.updateValue(specificSubjectName, forKey: self.permanentID)
-        NSUserDefaults.standardUserDefaults().setValue(Class.cachedSpecificSubjectNames!, forKey: TSSpecificSubjectNamesKey)
+        
+        if let cachedSpecificSubjectNames = Class.cachedSpecificSubjectNames {
+            NSUserDefaults.standardUserDefaults().setValue(cachedSpecificSubjectNames, forKey: TSSpecificSubjectNamesKey)
+        }
         
         if specificSubjectName != "TSSubjectNameUnavailable" {
             self.subjectName = specificSubjectName

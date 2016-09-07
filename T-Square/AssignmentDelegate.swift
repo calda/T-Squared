@@ -250,11 +250,11 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         
         var attachment: Attachment?
         
-        if index.section == 1 {
-            attachment = assignment.attachments![index.item]
+        if index.section == 1, let attachments = assignment.attachments {
+            attachment = attachments[index.item]
         }
-        if index.section == 2 && index.item > 0 {
-            attachment = assignment.submissions![index.item - 1]
+        if index.section == 2 && index.item > 0, let submissions = assignment.submissions {
+            attachment = submissions[index.item - 1]
         }
         
         if let attachment = attachment {

@@ -192,10 +192,10 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         for score in flattened {
             if score.scoreString.hasPrefix("(") {
-                gradesWithParenthesis++
+                gradesWithParenthesis += 1
             }
             else if score.scoreString == "" || score.scoreString == "COMMENT_PLACEHOLDER" {
-                totalGrades--
+                totalGrades -= 1
             }
         }
         
@@ -313,7 +313,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         for grade in displayClass.grades?.scores ?? [] {
             if let group = grade as? GradeGroup {
                 totalGroupWeight += group.weight ?? 0.0
-                groupCount++
+                groupCount += 1
             }
         }
         
@@ -468,7 +468,8 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     func editScoreHandler(score: Scored, completion: ((Scored) -> ())? = nil) -> (UIAlertAction) -> () {
         return { _ in
             
-            func closure(var new: Scored) {
+            func closure(newScore: Scored) {
+                var new = newScore
                 new.owningGroup = score.owningGroup
                 self.finalizeGradeChanges(add: [], remove: [], swap: [(new, score)])
                 completion?(new)
@@ -493,7 +494,10 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Validate and Finalize changes
     
-    func finalizeGradeChanges(var add add: [Scored], var remove: [Scored], swap: [(add: Scored, remove: Scored)]) {
+    func finalizeGradeChanges(add addScores: [Scored], remove removeScores: [Scored], swap: [(add: Scored, remove: Scored)]) {
+        var add = addScores
+        var remove = removeScores
+        
         let data = NSUserDefaults.standardUserDefaults()
         var dict = data.dictionaryForKey(TSCustomGradesKey) as? [String : [String]] ?? [:]
         let classKey = TSAuthenticatedReader.username + "~" + displayClass.permanentID

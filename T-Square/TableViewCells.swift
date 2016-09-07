@@ -360,7 +360,7 @@ class BackCell : UITableViewCell {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setActivityIndicatorEnabled:", name: TSSetActivityIndicatorEnabledNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BackCell.setActivityIndicatorEnabled(_:)), name: TSSetActivityIndicatorEnabledNotification, object: nil)
     }
     
     override func prepareForReuse() {

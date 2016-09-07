@@ -241,7 +241,7 @@ func linksInText(string: String) -> [(text: String, range: NSRange)] {
             }
             
             while !nextIsWhitespace() && (wordEnd != text.length) {
-                wordEnd++;
+                wordEnd += 1;
             }
             
             let linkRange = NSMakeRange(wordStart, wordEnd - wordStart)
@@ -667,31 +667,7 @@ extension String {
     }
     
     func preparedForURL(isFullURL isFullURL: Bool = false) -> String {
-        var specialCharacters = [
-            "?" : "%3F",
-            "&" : "%26",
-            "%" : "%25",
-            "=" : "%3D",
-            " " : "%20"
-        ]
-        
-        if isFullURL {
-            //replacing % on full URLs would change %20 to %2520, breaking the link
-            specialCharacters.removeValueForKey("%")
-        }
-        
-        //if this isn't a full URL (ex: a post argument), then also strip out some special URL characters
-        if !isFullURL {
-            specialCharacters.updateValue("%2F", forKey: "/")
-            specialCharacters.updateValue("%2E", forKey: ".")
-            specialCharacters.updateValue("%3A", forKey: ":")
-        }
-        
-        var currentString = self
-        for (special, replace) in specialCharacters {
-            currentString = currentString.stringByReplacingOccurrencesOfString(special, withString: replace)
-        }
-        return currentString
+        return self.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLPathAllowedCharacterSet()) ?? self
     }
     
 }
@@ -704,6 +680,8 @@ extension NSString {
     }
     
     func countOccurancesOfString(string: String) -> Int {
+        if string.length == 0 { return 0 }
+        
         let strCount = self.length - self.stringByReplacingOccurrencesOfString(string, withString: "").length
         return strCount / string.length
     }

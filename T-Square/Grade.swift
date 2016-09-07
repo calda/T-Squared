@@ -177,13 +177,13 @@ class GradeGroup : Scored, CustomStringConvertible {
                 return isEdit
             }
             
-            if countsAsEdit(score) { artificialCount++ }
-            totalCount++
+            if countsAsEdit(score) { artificialCount += 1 }
+            totalCount += 1
             
             if let group = score as? GradeGroup {
                 for score in group.scores {
-                    if countsAsEdit(score) { artificialCount++ }
-                    totalCount++
+                    if countsAsEdit(score) { artificialCount += 1 }
+                    totalCount += 1
                 }
             }
             

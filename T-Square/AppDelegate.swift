@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //MARK: - Launch from URL
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "networkActivityEvent:", name: TSPerformingNetworkActivityNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AppDelegate.networkActivityEvent(_:)), name: TSPerformingNetworkActivityNotification, object: nil)
         
         if let launchSource = launchOptions?[UIApplicationLaunchOptionsSourceApplicationKey] as? String,
            let launchURL = launchOptions?[UIApplicationLaunchOptionsURLKey] as? NSURL {

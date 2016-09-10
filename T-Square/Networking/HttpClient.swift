@@ -88,6 +88,7 @@ class HttpClient {
         self.url = NSURL(string: url)
     }
     
+    
     //MARK: - Handling Login
     static var sessionID: String?
     static var authFormPost: String?
@@ -184,22 +185,22 @@ class HttpClient {
         var LT: String
         
         //get page form
+        let pageFormInfo = HttpClient.getInfoFromPage(loginScreen, infoSearch: "<form id=\"fm1\" class=\"fm-v clearfix\" action=\"")
+        let LT_info = HttpClient.getInfoFromPage(loginScreen, infoSearch: "value=\"LT")
+        
         if let previousFormPost = HttpClient.authFormPost {
             formPost = previousFormPost
-        }
-        else if let pageFormAddress = HttpClient.getInfoFromPage(loginScreen, infoSearch: "<form id=\"fm1\" class=\"fm-v clearfix\" action=\"") {
+        } else if let pageFormAddress = pageFormInfo {
             formPost = pageFormAddress
             HttpClient.authFormPost = formPost
-        }
-        else {
+        } else {
             return
         }
         
         //get LT
         if let previousLT = HttpClient.authLTPost {
             LT = previousLT
-        }
-        else if let LT_part = HttpClient.getInfoFromPage(loginScreen, infoSearch: "value=\"LT") {
+        } else if let LT_part = LT_info {
             LT = "LT" + LT_part
             HttpClient.authLTPost = LT
         }
@@ -213,6 +214,7 @@ class HttpClient {
         //send HTTP POST for login
         let postString = "?warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)&submit=LOGIN&_eventId=submit"
         let loginClient = HttpClient(url: "https://login.gatech.edu\(formPost)\(postString)")
+        
         guard let response = loginClient.sendGet() else {
             //synchronous network error even though in background thread
             //because the app locks up when calling sync{ } for some reason
@@ -220,14 +222,48 @@ class HttpClient {
             return
         }
         
+        //incorrect password
         if response.containsString("Incorrect login or disabled account.") || response.containsString("Login requested by:") {
             didCompletion = true
             HttpClient.sessionID = HttpClient.getInfoFromPage(formPost, infoSearch: "jsessionid=", terminator: "?")
             sync() { completion(false, nil) }
         }
+            
+        //two factor required
+        else if response.containsString("duo_iframe") {
+            sync {
+                
+                //spin up a UIWebView
+                //the response container an iframe, but that iframe's src is loaded via javascript
+                
+                let webView = UIWebView()
+                webView.frame = CGRect(x: 100, y: 100, width: 800, height: 800)
+                webView.loadHTMLString(response, baseURL: NSURL(string: "https://login.gatech.edu/cas/login"))
+                
+                if let controller = UIApplication.sharedApplication().keyWindow?.rootViewController as? LoginViewController {
+                    controller.view.addSubview(webView)
+                }
+                
+                //wait for the javascript to finish evaluating
+                func iframeSrc() -> String? {
+                    let content = webView.stringByEvaluatingJavaScriptFromString("document.documentElement.outerHTML")
+                    let iframe = HttpClient.getInfoFromPage(content ?? "", infoSearch: "<iframe", terminator: ">")
+                    return HttpClient.getInfoFromPage(iframe ?? "", infoSearch: "src=\"", terminator: "\"")
+                }
+                
+                //how do i know when it's done??
+
+            }
+        }
+            
+        //successful login
         else {
             callCompletionForSuccessWithPageContents(response)
         }
+    }
+    
+    func setUpTwoFactor() {
+        
     }
     
     static func requestPageWithLoginVerification(url: String) -> HTMLDocument? {

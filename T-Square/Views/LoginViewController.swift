@@ -166,6 +166,10 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func doLogin(newLogin newLogin: Bool) {
+        
+        usernameField.text = "jstephens60"
+        passwordField.text = "#Periapsis123"
+        
         if usernameField.text! == "" || passwordField.text! == "" {
             shakeView(formView)
             self.animateFormSubviewsWithDuration(0.5, hidden: false)

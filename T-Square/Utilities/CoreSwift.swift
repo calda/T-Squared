@@ -705,3 +705,15 @@ extension NSBundle {
     }
     
 }
+
+extension NSTimer {
+    
+    class func scheduleAfter(delay: NSTimeInterval, handler: () -> ()) -> NSTimer {
+        let fireDate = delay + CFAbsoluteTimeGetCurrent()
+        let timer = CFRunLoopTimerCreateWithHandler(kCFAllocatorDefault, fireDate, 0, 0, 0, { _ in handler() })
+        CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopCommonModes)
+        
+        return timer
+    }
+    
+}

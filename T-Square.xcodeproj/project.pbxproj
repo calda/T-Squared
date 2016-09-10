@@ -7,35 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2E1288861BB8E10D00B8032E /* GradebookDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E1288851BB8E10D00B8032E /* GradebookDelegate.swift */; };
-		2E1A63441B9696A7002D7632 /* TableViewCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E1A63431B9696A7002D7632 /* TableViewCells.swift */; };
-		2E3C4E3C1B99447C00DD0B6B /* ClassDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3C4E3B1B99447C00DD0B6B /* ClassDelegate.swift */; };
+		2E18CFE51D8494130048F730 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E18CFE21D8494130048F730 /* AppDelegate.swift */; };
+		2E18CFE61D8494130048F730 /* CoreSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E18CFE31D8494130048F730 /* CoreSwift.swift */; };
+		2E18CFE71D8494130048F730 /* ZLKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E18CFE41D8494130048F730 /* ZLKeychainService.swift */; };
+		2E36536C1D84884300B2403E /* AllClassesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653651D84884300B2403E /* AllClassesDelegate.swift */; };
+		2E36536D1D84884300B2403E /* AnouncementDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653661D84884300B2403E /* AnouncementDelegate.swift */; };
+		2E36536E1D84884300B2403E /* AssignmentDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653671D84884300B2403E /* AssignmentDelegate.swift */; };
+		2E36536F1D84884300B2403E /* AssignmentsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653681D84884300B2403E /* AssignmentsDelegate.swift */; };
+		2E3653701D84884300B2403E /* ClassDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653691D84884300B2403E /* ClassDelegate.swift */; };
+		2E3653711D84884300B2403E /* GradebookDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E36536A1D84884300B2403E /* GradebookDelegate.swift */; };
+		2E3653721D84884300B2403E /* ResourcesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E36536B1D84884300B2403E /* ResourcesDelegate.swift */; };
+		2E36537A1D84884B00B2403E /* Announcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653741D84884B00B2403E /* Announcement.swift */; };
+		2E36537B1D84884B00B2403E /* Assignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653751D84884B00B2403E /* Assignment.swift */; };
+		2E36537C1D84884B00B2403E /* Class.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653761D84884B00B2403E /* Class.swift */; };
+		2E36537D1D84884B00B2403E /* Grade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653771D84884B00B2403E /* Grade.swift */; };
+		2E36537E1D84884B00B2403E /* Resource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653781D84884B00B2403E /* Resource.swift */; };
+		2E36537F1D84884B00B2403E /* SettingsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653791D84884B00B2403E /* SettingsDelegate.swift */; };
+		2E3653831D84885700B2403E /* HttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653811D84885700B2403E /* HttpClient.swift */; };
+		2E3653841D84885700B2403E /* TSReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653821D84885700B2403E /* TSReader.swift */; };
+		2E36538A1D84885D00B2403E /* ClassesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653861D84885D00B2403E /* ClassesViewController.swift */; };
+		2E36538B1D84885D00B2403E /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653871D84885D00B2403E /* LoginViewController.swift */; };
+		2E36538C1D84885D00B2403E /* TableViewCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653881D84885D00B2403E /* TableViewCells.swift */; };
+		2E36538D1D84885D00B2403E /* TSWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653891D84885D00B2403E /* TSWebView.swift */; };
 		2E4207A71B8FB828002B79E6 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4207A61B8FB828002B79E6 /* libxml2.2.dylib */; };
-		2E4207BD1B8FBA27002B79E6 /* TSReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4207BC1B8FBA27002B79E6 /* TSReader.swift */; };
-		2E4207BF1B9004F7002B79E6 /* Class.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4207BE1B9004F7002B79E6 /* Class.swift */; };
-		2E4207D61B9009F8002B79E6 /* ClassesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */; };
 		2E4B30991BCF5B6700C13222 /* Kanna.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4B30921BCF5B5F00C13222 /* Kanna.framework */; };
 		2E4B309B1BCF5B7700C13222 /* Kanna.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4B30921BCF5B5F00C13222 /* Kanna.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		2E78739D1B90D49900C1F4BE /* Announcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E78739C1B90D49900C1F4BE /* Announcement.swift */; };
-		2E7C6F601B8E6DDE00E95183 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F5F1B8E6DDE00E95183 /* AppDelegate.swift */; };
-		2E7C6F621B8E6DDE00E95183 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */; };
 		2E7C6F651B8E6DDE00E95183 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F631B8E6DDE00E95183 /* Main.storyboard */; };
 		2E7C6F671B8E6DDE00E95183 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */; };
 		2E7C6F6A1B8E6DDE00E95183 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F681B8E6DDE00E95183 /* LaunchScreen.storyboard */; };
-		2E7C6F801B8E6E5100E95183 /* HttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */; };
-		2E7C6F8E1B8E94BA00E95183 /* CoreSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */; };
-		2E7F58181BE5913C000590EB /* ZLKeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7F58171BE5913C000590EB /* ZLKeychainService.swift */; };
 		2E7F581A1BE59566000590EB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E7F58191BE59566000590EB /* Security.framework */; };
-		2E809C151BA51AD0008849FB /* Assignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E809C141BA51AD0008849FB /* Assignment.swift */; };
-		2E809C171BA528FC008849FB /* AssignmentsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E809C161BA528FC008849FB /* AssignmentsDelegate.swift */; };
-		2E8244821B9A517500236B60 /* Resource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8244811B9A517500236B60 /* Resource.swift */; };
-		2E8AFE071B92DF5700DE7E28 /* AnouncementDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8AFE061B92DF5700DE7E28 /* AnouncementDelegate.swift */; };
-		2E8E4CCF1B9A6BD800D62A2E /* ResourcesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8E4CCE1B9A6BD800D62A2E /* ResourcesDelegate.swift */; };
-		2E9A2D8A1BA6592200E93BA0 /* AssignmentDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9A2D891BA6592200E93BA0 /* AssignmentDelegate.swift */; };
-		2E9AF9721BC0E85A0066F91B /* SettingsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9AF9711BC0E85A0066F91B /* SettingsDelegate.swift */; };
-		2ED1E8C41BA90EC2007F1A90 /* AllClassesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */; };
-		2EE303201BB239DF00FFEA5A /* Grade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE3031F1BB239DF00FFEA5A /* Grade.swift */; };
-		2EFA126A1BAE6F48007510A0 /* TSWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFA12691BAE6F48007510A0 /* TSWebView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,37 +98,37 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2E1288851BB8E10D00B8032E /* GradebookDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradebookDelegate.swift; sourceTree = "<group>"; };
-		2E1A63431B9696A7002D7632 /* TableViewCells.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewCells.swift; sourceTree = "<group>"; };
-		2E3C4E3B1B99447C00DD0B6B /* ClassDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassDelegate.swift; sourceTree = "<group>"; };
+		2E18CFE21D8494130048F730 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		2E18CFE31D8494130048F730 /* CoreSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreSwift.swift; sourceTree = "<group>"; };
+		2E18CFE41D8494130048F730 /* ZLKeychainService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLKeychainService.swift; sourceTree = "<group>"; };
+		2E3653651D84884300B2403E /* AllClassesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllClassesDelegate.swift; sourceTree = "<group>"; };
+		2E3653661D84884300B2403E /* AnouncementDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnouncementDelegate.swift; sourceTree = "<group>"; };
+		2E3653671D84884300B2403E /* AssignmentDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssignmentDelegate.swift; sourceTree = "<group>"; };
+		2E3653681D84884300B2403E /* AssignmentsDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssignmentsDelegate.swift; sourceTree = "<group>"; };
+		2E3653691D84884300B2403E /* ClassDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassDelegate.swift; sourceTree = "<group>"; };
+		2E36536A1D84884300B2403E /* GradebookDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradebookDelegate.swift; sourceTree = "<group>"; };
+		2E36536B1D84884300B2403E /* ResourcesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourcesDelegate.swift; sourceTree = "<group>"; };
+		2E3653741D84884B00B2403E /* Announcement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Announcement.swift; sourceTree = "<group>"; };
+		2E3653751D84884B00B2403E /* Assignment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Assignment.swift; sourceTree = "<group>"; };
+		2E3653761D84884B00B2403E /* Class.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Class.swift; sourceTree = "<group>"; };
+		2E3653771D84884B00B2403E /* Grade.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Grade.swift; sourceTree = "<group>"; };
+		2E3653781D84884B00B2403E /* Resource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Resource.swift; sourceTree = "<group>"; };
+		2E3653791D84884B00B2403E /* SettingsDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsDelegate.swift; sourceTree = "<group>"; };
+		2E3653811D84885700B2403E /* HttpClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpClient.swift; sourceTree = "<group>"; };
+		2E3653821D84885700B2403E /* TSReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSReader.swift; sourceTree = "<group>"; };
+		2E3653861D84885D00B2403E /* ClassesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassesViewController.swift; sourceTree = "<group>"; };
+		2E3653871D84885D00B2403E /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		2E3653881D84885D00B2403E /* TableViewCells.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewCells.swift; sourceTree = "<group>"; };
+		2E3653891D84885D00B2403E /* TSWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSWebView.swift; sourceTree = "<group>"; };
 		2E4207A61B8FB828002B79E6 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = ../../../../../usr/lib/libxml2.2.dylib; sourceTree = "<group>"; };
-		2E4207BC1B8FBA27002B79E6 /* TSReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSReader.swift; sourceTree = "<group>"; };
-		2E4207BE1B9004F7002B79E6 /* Class.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Class.swift; sourceTree = "<group>"; };
-		2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassesViewController.swift; sourceTree = "<group>"; };
 		2E4B308A1BCF5B5F00C13222 /* Kanna.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Kanna.xcodeproj; path = Kanna/Kanna.xcodeproj; sourceTree = "<group>"; };
-		2E78739C1B90D49900C1F4BE /* Announcement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Announcement.swift; sourceTree = "<group>"; };
 		2E7C6F5C1B8E6DDE00E95183 /* T-Squared.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "T-Squared.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2E7C6F5F1B8E6DDE00E95183 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		2E7C6F641B8E6DDE00E95183 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2E7C6F691B8E6DDE00E95183 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2E7C6F6B1B8E6DDE00E95183 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E7C6F701B8E6DDE00E95183 /* T-SquareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "T-SquareTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpClient.swift; sourceTree = "<group>"; };
-		2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreSwift.swift; sourceTree = "<group>"; };
-		2E7F58171BE5913C000590EB /* ZLKeychainService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLKeychainService.swift; sourceTree = "<group>"; };
 		2E7F58191BE59566000590EB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		2E809C141BA51AD0008849FB /* Assignment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Assignment.swift; sourceTree = "<group>"; };
-		2E809C161BA528FC008849FB /* AssignmentsDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssignmentsDelegate.swift; sourceTree = "<group>"; };
-		2E8244811B9A517500236B60 /* Resource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Resource.swift; sourceTree = "<group>"; };
-		2E8AFE061B92DF5700DE7E28 /* AnouncementDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnouncementDelegate.swift; sourceTree = "<group>"; };
-		2E8E4CCE1B9A6BD800D62A2E /* ResourcesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourcesDelegate.swift; sourceTree = "<group>"; };
-		2E9A2D891BA6592200E93BA0 /* AssignmentDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssignmentDelegate.swift; sourceTree = "<group>"; };
-		2E9AF9711BC0E85A0066F91B /* SettingsDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsDelegate.swift; sourceTree = "<group>"; };
-		2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllClassesDelegate.swift; sourceTree = "<group>"; };
-		2EE3031F1BB239DF00FFEA5A /* Grade.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Grade.swift; sourceTree = "<group>"; };
-		2EFA12691BAE6F48007510A0 /* TSWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +152,63 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2E18CFE11D8494130048F730 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				2E18CFE21D8494130048F730 /* AppDelegate.swift */,
+				2E18CFE31D8494130048F730 /* CoreSwift.swift */,
+				2E18CFE41D8494130048F730 /* ZLKeychainService.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		2E3653641D84884300B2403E /* Delegates */ = {
+			isa = PBXGroup;
+			children = (
+				2E3653651D84884300B2403E /* AllClassesDelegate.swift */,
+				2E3653661D84884300B2403E /* AnouncementDelegate.swift */,
+				2E3653671D84884300B2403E /* AssignmentDelegate.swift */,
+				2E3653681D84884300B2403E /* AssignmentsDelegate.swift */,
+				2E3653691D84884300B2403E /* ClassDelegate.swift */,
+				2E36536A1D84884300B2403E /* GradebookDelegate.swift */,
+				2E36536B1D84884300B2403E /* ResourcesDelegate.swift */,
+			);
+			path = Delegates;
+			sourceTree = "<group>";
+		};
+		2E3653731D84884B00B2403E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2E3653741D84884B00B2403E /* Announcement.swift */,
+				2E3653751D84884B00B2403E /* Assignment.swift */,
+				2E3653761D84884B00B2403E /* Class.swift */,
+				2E3653771D84884B00B2403E /* Grade.swift */,
+				2E3653781D84884B00B2403E /* Resource.swift */,
+				2E3653791D84884B00B2403E /* SettingsDelegate.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		2E3653801D84885700B2403E /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				2E3653811D84885700B2403E /* HttpClient.swift */,
+				2E3653821D84885700B2403E /* TSReader.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		2E3653851D84885D00B2403E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2E3653861D84885D00B2403E /* ClassesViewController.swift */,
+				2E3653871D84885D00B2403E /* LoginViewController.swift */,
+				2E3653881D84885D00B2403E /* TableViewCells.swift */,
+				2E3653891D84885D00B2403E /* TSWebView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		2E4B308B1BCF5B5F00C13222 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -186,32 +243,15 @@
 		2E7C6F5E1B8E6DDE00E95183 /* T-Square */ = {
 			isa = PBXGroup;
 			children = (
-				2E7C6F8D1B8E94BA00E95183 /* CoreSwift.swift */,
-				2E7C6F5F1B8E6DDE00E95183 /* AppDelegate.swift */,
 				2E7C6F631B8E6DDE00E95183 /* Main.storyboard */,
 				2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */,
 				2E7C6F681B8E6DDE00E95183 /* LaunchScreen.storyboard */,
 				2E7C6F6B1B8E6DDE00E95183 /* Info.plist */,
-				2E7C6F611B8E6DDE00E95183 /* LoginViewController.swift */,
-				2E4207D51B9009F8002B79E6 /* ClassesViewController.swift */,
-				2E1A63431B9696A7002D7632 /* TableViewCells.swift */,
-				2E3C4E3B1B99447C00DD0B6B /* ClassDelegate.swift */,
-				2ED1E8C31BA90EC2007F1A90 /* AllClassesDelegate.swift */,
-				2E809C161BA528FC008849FB /* AssignmentsDelegate.swift */,
-				2E9A2D891BA6592200E93BA0 /* AssignmentDelegate.swift */,
-				2E8E4CCE1B9A6BD800D62A2E /* ResourcesDelegate.swift */,
-				2E8AFE061B92DF5700DE7E28 /* AnouncementDelegate.swift */,
-				2E1288851BB8E10D00B8032E /* GradebookDelegate.swift */,
-				2E9AF9711BC0E85A0066F91B /* SettingsDelegate.swift */,
-				2E7C6F7F1B8E6E5100E95183 /* HttpClient.swift */,
-				2E4207BC1B8FBA27002B79E6 /* TSReader.swift */,
-				2E4207BE1B9004F7002B79E6 /* Class.swift */,
-				2E78739C1B90D49900C1F4BE /* Announcement.swift */,
-				2E8244811B9A517500236B60 /* Resource.swift */,
-				2E809C141BA51AD0008849FB /* Assignment.swift */,
-				2EE3031F1BB239DF00FFEA5A /* Grade.swift */,
-				2E7F58171BE5913C000590EB /* ZLKeychainService.swift */,
-				2EFA12691BAE6F48007510A0 /* TSWebView.swift */,
+				2E3653731D84884B00B2403E /* Model */,
+				2E3653801D84885700B2403E /* Networking */,
+				2E3653641D84884300B2403E /* Delegates */,
+				2E3653851D84885D00B2403E /* Views */,
+				2E18CFE11D8494130048F730 /* Utilities */,
 			);
 			path = "T-Square";
 			sourceTree = "<group>";
@@ -361,28 +401,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2ED1E8C41BA90EC2007F1A90 /* AllClassesDelegate.swift in Sources */,
-				2E78739D1B90D49900C1F4BE /* Announcement.swift in Sources */,
-				2E4207BF1B9004F7002B79E6 /* Class.swift in Sources */,
-				2E809C171BA528FC008849FB /* AssignmentsDelegate.swift in Sources */,
-				2E7C6F8E1B8E94BA00E95183 /* CoreSwift.swift in Sources */,
-				2E1288861BB8E10D00B8032E /* GradebookDelegate.swift in Sources */,
-				2E1A63441B9696A7002D7632 /* TableViewCells.swift in Sources */,
-				2E8E4CCF1B9A6BD800D62A2E /* ResourcesDelegate.swift in Sources */,
-				2E7C6F621B8E6DDE00E95183 /* LoginViewController.swift in Sources */,
-				2E9A2D8A1BA6592200E93BA0 /* AssignmentDelegate.swift in Sources */,
-				2E7C6F801B8E6E5100E95183 /* HttpClient.swift in Sources */,
-				2E7C6F601B8E6DDE00E95183 /* AppDelegate.swift in Sources */,
-				2E809C151BA51AD0008849FB /* Assignment.swift in Sources */,
-				2E7F58181BE5913C000590EB /* ZLKeychainService.swift in Sources */,
-				2E3C4E3C1B99447C00DD0B6B /* ClassDelegate.swift in Sources */,
-				2E4207BD1B8FBA27002B79E6 /* TSReader.swift in Sources */,
-				2E8244821B9A517500236B60 /* Resource.swift in Sources */,
-				2EFA126A1BAE6F48007510A0 /* TSWebView.swift in Sources */,
-				2E4207D61B9009F8002B79E6 /* ClassesViewController.swift in Sources */,
-				2EE303201BB239DF00FFEA5A /* Grade.swift in Sources */,
-				2E8AFE071B92DF5700DE7E28 /* AnouncementDelegate.swift in Sources */,
-				2E9AF9721BC0E85A0066F91B /* SettingsDelegate.swift in Sources */,
+				2E36538D1D84885D00B2403E /* TSWebView.swift in Sources */,
+				2E36537B1D84884B00B2403E /* Assignment.swift in Sources */,
+				2E36537A1D84884B00B2403E /* Announcement.swift in Sources */,
+				2E36536E1D84884300B2403E /* AssignmentDelegate.swift in Sources */,
+				2E36538A1D84885D00B2403E /* ClassesViewController.swift in Sources */,
+				2E36537F1D84884B00B2403E /* SettingsDelegate.swift in Sources */,
+				2E3653841D84885700B2403E /* TSReader.swift in Sources */,
+				2E3653831D84885700B2403E /* HttpClient.swift in Sources */,
+				2E18CFE51D8494130048F730 /* AppDelegate.swift in Sources */,
+				2E36538C1D84885D00B2403E /* TableViewCells.swift in Sources */,
+				2E3653711D84884300B2403E /* GradebookDelegate.swift in Sources */,
+				2E18CFE61D8494130048F730 /* CoreSwift.swift in Sources */,
+				2E3653721D84884300B2403E /* ResourcesDelegate.swift in Sources */,
+				2E18CFE71D8494130048F730 /* ZLKeychainService.swift in Sources */,
+				2E36536D1D84884300B2403E /* AnouncementDelegate.swift in Sources */,
+				2E36536C1D84884300B2403E /* AllClassesDelegate.swift in Sources */,
+				2E36536F1D84884300B2403E /* AssignmentsDelegate.swift in Sources */,
+				2E36537D1D84884B00B2403E /* Grade.swift in Sources */,
+				2E36538B1D84885D00B2403E /* LoginViewController.swift in Sources */,
+				2E36537E1D84884B00B2403E /* Resource.swift in Sources */,
+				2E36537C1D84884B00B2403E /* Class.swift in Sources */,
+				2E3653701D84884300B2403E /* ClassDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

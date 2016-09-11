@@ -169,14 +169,14 @@ class Authenticator {
     }
 
     static func continueWithTwoFactor() {
-        print(Authenticator.twoFactorURL)
+        print("continue with two factor")
         
         guard let twoFactorURL = Authenticator.twoFactorURL else { return }
         
         let request = NSURLRequest(URL: NSURL(string: twoFactorURL)!)
         loginController?.twoFactorWebView.loadRequest(request)
         loginController?.twoFactorWebView.superview?.alpha = 1.0
-        loginController?.twoFactorWebView.scrollView.scrollEnabled = false
+        //loginController?.twoFactorWebView.scrollView.scrollEnabled = false
         Authenticator.webViewDelegate = TwoFactorWebViewDelegate()
         loginController?.twoFactorWebView.delegate = Authenticator.webViewDelegate!
     }
@@ -191,6 +191,7 @@ class Authenticator {
     
 }
 
+
 class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
     
     func iframeSrc(webView: UIWebView) -> String? {
@@ -199,13 +200,28 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
         return HttpClient.getInfoFromPage(iframe ?? "", infoSearch: "src=\"", terminator: "\"")
     }
     
+    func webView(webView: UIWebView, shouldStartLoadWithRequest request: NSURLRequest, navigationType: UIWebViewNavigationType) -> Bool {
+        guard let url = request.URL?.absoluteString else { return true }
+
+        if url.containsString("http://output.com/?auth=") {
+            let encodedResponse = url.stringByReplacingOccurrencesOfString("http://output.com/?auth=", withString: "")
+            guard let unencodedResponse = encodedResponse.stringByRemovingPercentEncoding else { return false }
+            guard let partialDuoResponse = HttpClient.getInfoFromPage(unencodedResponse, infoSearch: "AUTH|", terminator: "\\") else { return false }
+            let signedDuoResponse = "AUTH|\(partialDuoResponse)"
+            print(signedDuoResponse)
+            return false
+        }
+        
+        return true
+    }
+    
     func webViewDidFinishLoad(webView: UIWebView) {
         
         let content = webView.stringByEvaluatingJavaScriptFromString("document.documentElement.outerHTML")
         if (content?.containsString("Send Me a Push") == true) {
             
             //hide content on the page
-            let javascript = "$(document).ready(function() { $('.base-navigation').hide(); $('.base-main').css('top', '0'); $('.base-main').css('width', '75%'); $('.base-main').css('margin', '0 auto'); $('.stay-logged-in').parent().hide(); $('.base-wrapper').css('border', '0') })"
+            let javascript = "$('.base-navigation').hide(); $('.base-main').css('top', '0'); $('.base-main').css('width', '75%'); $('.base-main').css('margin', '0 auto'); $('.stay-logged-in').parent().hide(); $('.base-wrapper').css('border', '0')"
             webView.stringByEvaluatingJavaScriptFromString(javascript)
             
             Authenticator.presentTwoFactorView()
@@ -222,6 +238,40 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
         }
         
     }
-    
+
 }
 
+
+//MARK: - Custom NSURLCache that swizzles a jquery method
+
+class OverrideNSURLCache : NSURLCache {
+    
+    override func cachedResponseForRequest(request: NSURLRequest) -> NSCachedURLResponse? {
+        
+        //catch the file that processes Two-Factor auth
+        if let url = request.URL where url.absoluteString.containsString("jquery-legacy") && url.absoluteString.containsString("duosecurity") {
+            guard let javascript = HttpClient(url: url.absoluteString).sendGet() else { return nil }
+            
+            //replace a specific method call with a line that will create a new network request
+            //this is very fragile.
+            
+            let originalLine = "responses.text=xhr.responseText"
+            let replacementLine = "if(JSON.stringify(xhr.responseText).includes('AUTH|')) {"
+                                + "    window.location = 'http://output.com/?auth=' + encodeURIComponent(JSON.stringify(xhr.responseText))"
+                                + "} "
+                                + originalLine
+            
+            let swizzled = javascript.stringByReplacingOccurrencesOfString(originalLine, withString: replacementLine)
+            
+            let response = NSURLResponse(URL: url, MIMEType: "application/javascript", expectedContentLength: -1, textEncodingName: nil)
+            guard let data = NSString(string: swizzled).dataUsingEncoding(NSUTF8StringEncoding) else { return nil }
+            let cachedResponse = NSCachedURLResponse(response: response, data: data)
+            
+            return cachedResponse
+        }
+        
+        else {
+           return super.cachedResponseForRequest(request)
+        }
+    }
+}

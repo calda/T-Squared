@@ -178,23 +178,35 @@
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BPH-GC-LvU">
                                                 <rect key="frame" x="0.0" y="0.0" width="320" height="41"/>
                                                 <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Two-factor login is needed" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WAw-Xc-Bvq">
-                                                        <rect key="frame" x="58" y="10" width="204" height="21"/>
-                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hdk-vm-iPE">
+                                                        <rect key="frame" x="0.0" y="0.0" width="320" height="41"/>
+                                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="c3V-zt-k9I">
+                                                            <rect key="frame" x="0.0" y="0.0" width="320" height="41"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        </view>
+                                                        <blurEffect style="light"/>
+                                                    </visualEffectView>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Login with Duo Two-Factor" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WAw-Xc-Bvq">
+                                                        <rect key="frame" x="55" y="10" width="211" height="21"/>
+                                                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                 </subviews>
-                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
+                                                    <constraint firstAttribute="trailing" secondItem="hdk-vm-iPE" secondAttribute="trailing" id="CTM-6S-Miw"/>
                                                     <constraint firstItem="WAw-Xc-Bvq" firstAttribute="centerY" secondItem="BPH-GC-LvU" secondAttribute="centerY" id="DS0-k4-8ON"/>
                                                     <constraint firstItem="WAw-Xc-Bvq" firstAttribute="centerX" secondItem="BPH-GC-LvU" secondAttribute="centerX" id="S9E-l1-s4j"/>
                                                     <constraint firstItem="WAw-Xc-Bvq" firstAttribute="top" secondItem="BPH-GC-LvU" secondAttribute="top" constant="10" id="VEn-0O-Jbh"/>
+                                                    <constraint firstAttribute="bottom" secondItem="hdk-vm-iPE" secondAttribute="bottom" id="abv-tc-jCt"/>
+                                                    <constraint firstItem="hdk-vm-iPE" firstAttribute="top" secondItem="BPH-GC-LvU" secondAttribute="top" id="hJJ-tZ-6AX"/>
+                                                    <constraint firstItem="hdk-vm-iPE" firstAttribute="leading" secondItem="BPH-GC-LvU" secondAttribute="leading" id="hMV-Ln-5Un"/>
                                                     <constraint firstAttribute="bottom" secondItem="WAw-Xc-Bvq" secondAttribute="bottom" constant="10" id="lx5-z3-F3v"/>
                                                 </constraints>
                                             </view>
                                         </subviews>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstItem="BPH-GC-LvU" firstAttribute="top" secondItem="aab-Nj-SFm" secondAttribute="top" id="4Bg-8Z-PQP"/>
                                             <constraint firstAttribute="trailing" secondItem="BIN-Ze-XW9" secondAttribute="trailing" id="8ST-0i-69m"/>

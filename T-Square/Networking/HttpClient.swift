@@ -28,7 +28,7 @@ class HttpClient {
             config.HTTPAdditionalHeaders = ["User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4"]
         }
         self.session = NSURLSession(configuration: config)
-        NSURLCache.setSharedURLCache(OverrideNSURLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil))
+        NSURLCache.setSharedURLCache(SwizzlingNSURLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil))
         
         session.configuration.HTTPShouldSetCookies = true
         session.configuration.HTTPCookieAcceptPolicy = NSHTTPCookieAcceptPolicy.Always

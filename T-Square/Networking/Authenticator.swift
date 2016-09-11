@@ -20,8 +20,8 @@ class Authenticator {
     static var isRunningInBackground = false
     
     static var webViewDelegate: UIWebViewDelegate?
-    static var twoFactorURL: String?
-    static var signedTwoFactorResponse: String?
+    static var loadedDuoTwoFactor: Bool = false
+    static var twoFactorCompletion: ((success: Bool, document: HTMLDocument?) -> ())?
     
     static var loginController: LoginViewController? {
         return UIApplication.sharedApplication().keyWindow?.rootViewController as? LoginViewController
@@ -135,82 +135,35 @@ class Authenticator {
             
             //two factor required
         else if response.containsString("duo_iframe") {
-            Authenticator.twoFactorURL = nil
-            
             sync {
                 //spin up a UIWebView
                 //the response container an iframe, but that iframe's src is loaded via javascript
                 
-                let webView = UIWebView()
-                webView.frame = CGRect.zero
-                webView.loadHTMLString(response, baseURL: NSURL(string: "https://login.gatech.edu/cas/login"))
+                loginController?.twoFactorWebView.loadHTMLString(response, baseURL: NSURL(string: "https://login.gatech.edu/cas/login"))
                 
                 Authenticator.webViewDelegate = TwoFactorWebViewDelegate()
-                webView.delegate = Authenticator.webViewDelegate!
-                Authenticator.twoFactorURL = nil
+                loginController?.twoFactorWebView.delegate = Authenticator.webViewDelegate!
+                loginController?.twoFactorWebView.superview?.alpha = 1.0
                 waitingForTwoFactor = true
-                
-                loginController?.view.addSubview(webView)
-                
-                delay(5.0) {
-                    if Authenticator.twoFactorURL == nil {
-                        completion(true, nil)
-                    }
-                }
-                
+                loadedDuoTwoFactor = false
+                twoFactorCompletion = completion
             }
         }
-            //successful login
+        
+        //successful login
         else {
             callCompletionForSuccessWithPageContents(response)
         }
     }
-
-    static func continueWithTwoFactor() {
-        print("continue with two factor")
-        
-        guard let twoFactorURL = Authenticator.twoFactorURL else { return }
-        
-        let request = NSURLRequest(URL: NSURL(string: twoFactorURL)!)
-        loginController?.twoFactorWebView.loadRequest(request)
-        loginController?.twoFactorWebView.superview?.alpha = 1.0
-        //loginController?.twoFactorWebView.scrollView.scrollEnabled = false
-        Authenticator.webViewDelegate = TwoFactorWebViewDelegate()
-        loginController?.twoFactorWebView.delegate = Authenticator.webViewDelegate!
-    }
     
     static func presentTwoFactorView() {
-        UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+        if loginController?.twoFactorWebViewCenterConstraint.constant == 0 { return }
+        
+        UIView.animateWithDuration(0.45, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             loginController?.twoFactorWebViewCenterConstraint.constant = 0
             loginController?.view.layoutIfNeeded()
             loginController?.animateActivityIndicator(on: false)
         }, completion: nil)
-    }
-    
-    static func finalizeTwoFactorLogin(withSignedResponse duoResponse: String) {
-        guard let authFormPost = Authenticator.authFormPost else { return }
-        guard let authLTPost = Authenticator.authLTPost else { return }
-        
-        let postString = "&warn=true&lt=\(authLTPost)&execution=e1s2&_eventId=submit&signedDuoResponse=\(duoResponse.preparedForURL())"
-        let loginClient = HttpClient(url: "https://login.gatech.edu\(authFormPost)\(postString)")
-        
-        guard let response = loginClient.sendGet() else {
-            //error alert
-            return
-        }
-        
-        //spin up another web view
-        let webView = UIWebView()
-        webView.frame = CGRect.zero
-        webView.loadHTMLString(response, baseURL: NSURL(string: "https://login.gatech.edu/cas/login"))
-        
-        Authenticator.webViewDelegate = TwoFactorWebViewDelegate()
-        webView.delegate = Authenticator.webViewDelegate!
-        Authenticator.twoFactorURL = nil
-        
-        loginController?.view.addSubview(webView)
-        print(response)
-        print(response)
     }
     
 }
@@ -224,85 +177,63 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
         return HttpClient.getInfoFromPage(iframe ?? "", infoSearch: "src=\"", terminator: "\"")
     }
     
-    func webView(webView: UIWebView, shouldStartLoadWithRequest request: NSURLRequest, navigationType: UIWebViewNavigationType) -> Bool {
-        guard let url = request.URL?.absoluteString else { return true }
-
-        if url.containsString("http://output.com/?auth=") {
-            let encodedResponse = url.stringByReplacingOccurrencesOfString("http://output.com/?auth=", withString: "")
-            guard let unencodedResponse = encodedResponse.stringByRemovingPercentEncoding else { return false }
-            guard let partialDuoResponse = HttpClient.getInfoFromPage(unencodedResponse, infoSearch: "AUTH|", terminator: "\\") else { return false }
-            let signedDuoResponse = "AUTH|\(partialDuoResponse)"
-            print(signedDuoResponse)
-            
-            Authenticator.finalizeTwoFactorLogin(withSignedResponse: signedDuoResponse)
-            return false
-        }
-        
-        return true
-    }
-    
     func webViewDidFinishLoad(webView: UIWebView) {
         
         let content = webView.stringByEvaluatingJavaScriptFromString("document.documentElement.outerHTML")
-        if (content?.containsString("Send Me a Push") == true) {
-            
-            //hide content on the page
-            let javascript = "$('.base-navigation').hide();" +
-                             "$('.base-main').css('top', '0');" +
-                             "$('.base-main').css('width', '75%');" +
-                             "$('.base-main').css('margin', '0 auto');" +
-                             "$('.stay-logged-in').parent().hide();" +
-                             "$('.base-wrapper').css('border', '0')"
-            webView.stringByEvaluatingJavaScriptFromString(javascript)
-            
-            Authenticator.presentTwoFactorView()
+        
+        if let content = content where content.containsString("My Workspace") == true {
+            let document = Kanna.HTML(html: content, encoding: NSUTF8StringEncoding)
+            Authenticator.twoFactorCompletion?(success: true, document: document)
         }
         
-        else {
-            if iframeSrc(webView) != nil {
-                webView.stopLoading()
-                Authenticator.twoFactorURL = iframeSrc(webView)!
-                webView.delegate = nil
-                Authenticator.webViewDelegate = nil
-                Authenticator.continueWithTwoFactor()
+        if !Authenticator.loadedDuoTwoFactor {
+            let isCorrectPage = content?.containsString("Two-factor login is needed") == true
+            let hasFinishedProcessing = iframeSrc(webView) != nil
+            
+            if isCorrectPage && hasFinishedProcessing {
+                Authenticator.loadedDuoTwoFactor = true
+                
+                //move the iframe & then hide everything else
+                let javascript = "$($('body').append($('#duo_iframe')));" +
+                                 "$('body > *:not(#duo_iframe)').hide()"
+                webView.stringByEvaluatingJavaScriptFromString(javascript)
+                
+                Authenticator.presentTwoFactorView()
             }
         }
-        
     }
-
 }
 
 
-//MARK: - Custom NSURLCache that swizzles a jquery method
+//MARK: - Custom NSURLCache that swizzles the CSS of the Duo iframe
 
-class OverrideNSURLCache : NSURLCache {
+class SwizzlingNSURLCache : NSURLCache {
     
     override func cachedResponseForRequest(request: NSURLRequest) -> NSCachedURLResponse? {
         
-        //catch the file that processes Two-Factor auth
-        if let url = request.URL where url.absoluteString.containsString("jquery-legacy") && url.absoluteString.containsString("duosecurity") {
-            guard let javascript = HttpClient(url: url.absoluteString).sendGet() else { return nil }
+        //intercept and swizzle CSS for Duo Two-Factor
+        if let url = request.URL where url.absoluteString.containsString("base-v3.css") {
+            guard let pageContents = HttpClient(url: url.absoluteString).sendGet() else { return nil }
             
-            //replace a specific method call with a line that will create a new network request
-            //this is very fragile.
+            let newCss = ".base-navigation { display: none !important; }" +
+                         ".base-main { top: 0px !important; }" +
+                         ".base-wrapper { border: 0 !important; }"
             
-            let originalLine = "responses.text=xhr.responseText"
-            let replacementLine = "if(JSON.stringify(xhr.responseText).includes('AUTH|')) {"
-                                + "    window.location = 'http://output.com/?auth=' + encodeURIComponent(JSON.stringify(xhr.responseText))"
-                                + "} "
-                                + originalLine
+            var swizzled = pageContents + newCss
             
-            let swizzled = javascript.stringByReplacingOccurrencesOfString(originalLine, withString: replacementLine)
+            //replace a bit because it doesn't want to be overriden by re-declaration
+            swizzled = swizzled.stringByReplacingOccurrencesOfString(".stay-logged-in {\n  margin-top: -6px; }", withString: ".stay-logged-in {\n  margin-top: 30x; }")
             
-            let response = NSURLResponse(URL: url, MIMEType: "application/javascript", expectedContentLength: -1, textEncodingName: nil)
+            //pass the modified file up the chain as if it was authentic
+            let response = NSURLResponse(URL: url, MIMEType: "text/css", expectedContentLength: -1, textEncodingName: nil)
             guard let data = NSString(string: swizzled).dataUsingEncoding(NSUTF8StringEncoding) else { return nil }
             let cachedResponse = NSCachedURLResponse(response: response, data: data)
             
             return cachedResponse
         }
-        
+            
         else {
-           return super.cachedResponseForRequest(request)
+            return super.cachedResponseForRequest(request)
         }
     }
 }

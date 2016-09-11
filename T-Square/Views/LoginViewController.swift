@@ -405,7 +405,9 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         TSAuthenticatedReader = nil
         
         self.usernameField.text = ""
-        self.passwordField.text = ""    
+        self.passwordField.text = ""
+        self.twoFactorWebViewCenterConstraint.constant = 220.0
+        self.view.layoutIfNeeded()
         self.setSavedCredentials(correct: false)
         NSUserDefaults.standardUserDefaults().setValue(nil, forKey: TSClassOpenCountKey)
         Class.updateShortcutItems()

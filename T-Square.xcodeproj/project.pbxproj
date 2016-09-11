@@ -204,8 +204,8 @@
 		2E3653851D84885D00B2403E /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				2E3653861D84885D00B2403E /* ClassesViewController.swift */,
 				2E3653871D84885D00B2403E /* LoginViewController.swift */,
+				2E3653861D84885D00B2403E /* ClassesViewController.swift */,
 				2E3653881D84885D00B2403E /* TableViewCells.swift */,
 				2E3653891D84885D00B2403E /* TSWebView.swift */,
 			);

@@ -22,7 +22,6 @@
 		2E36537C1D84884B00B2403E /* Class.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653761D84884B00B2403E /* Class.swift */; };
 		2E36537D1D84884B00B2403E /* Grade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653771D84884B00B2403E /* Grade.swift */; };
 		2E36537E1D84884B00B2403E /* Resource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653781D84884B00B2403E /* Resource.swift */; };
-		2E36537F1D84884B00B2403E /* SettingsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653791D84884B00B2403E /* SettingsDelegate.swift */; };
 		2E3653831D84885700B2403E /* HttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653811D84885700B2403E /* HttpClient.swift */; };
 		2E3653841D84885700B2403E /* TSReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653821D84885700B2403E /* TSReader.swift */; };
 		2E36538A1D84885D00B2403E /* ClassesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653861D84885D00B2403E /* ClassesViewController.swift */; };
@@ -36,6 +35,8 @@
 		2E7C6F671B8E6DDE00E95183 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */; };
 		2E7C6F6A1B8E6DDE00E95183 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F681B8E6DDE00E95183 /* LaunchScreen.storyboard */; };
 		2E7F581A1BE59566000590EB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E7F58191BE59566000590EB /* Security.framework */; };
+		2EB173341D84995A00A10CEC /* Authenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB173331D84995A00A10CEC /* Authenticator.swift */; };
+		2EB173361D849B0300A10CEC /* SettingsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB173351D849B0300A10CEC /* SettingsDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,7 +114,6 @@
 		2E3653761D84884B00B2403E /* Class.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Class.swift; sourceTree = "<group>"; };
 		2E3653771D84884B00B2403E /* Grade.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Grade.swift; sourceTree = "<group>"; };
 		2E3653781D84884B00B2403E /* Resource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Resource.swift; sourceTree = "<group>"; };
-		2E3653791D84884B00B2403E /* SettingsDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsDelegate.swift; sourceTree = "<group>"; };
 		2E3653811D84885700B2403E /* HttpClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpClient.swift; sourceTree = "<group>"; };
 		2E3653821D84885700B2403E /* TSReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSReader.swift; sourceTree = "<group>"; };
 		2E3653861D84885D00B2403E /* ClassesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassesViewController.swift; sourceTree = "<group>"; };
@@ -129,6 +129,8 @@
 		2E7C6F6B1B8E6DDE00E95183 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E7C6F701B8E6DDE00E95183 /* T-SquareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "T-SquareTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7F58191BE59566000590EB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		2EB173331D84995A00A10CEC /* Authenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
+		2EB173351D849B0300A10CEC /* SettingsDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +174,7 @@
 				2E3653691D84884300B2403E /* ClassDelegate.swift */,
 				2E36536A1D84884300B2403E /* GradebookDelegate.swift */,
 				2E36536B1D84884300B2403E /* ResourcesDelegate.swift */,
+				2EB173351D849B0300A10CEC /* SettingsDelegate.swift */,
 			);
 			path = Delegates;
 			sourceTree = "<group>";
@@ -184,7 +187,6 @@
 				2E3653761D84884B00B2403E /* Class.swift */,
 				2E3653771D84884B00B2403E /* Grade.swift */,
 				2E3653781D84884B00B2403E /* Resource.swift */,
-				2E3653791D84884B00B2403E /* SettingsDelegate.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -194,6 +196,7 @@
 			children = (
 				2E3653811D84885700B2403E /* HttpClient.swift */,
 				2E3653821D84885700B2403E /* TSReader.swift */,
+				2EB173331D84995A00A10CEC /* Authenticator.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -247,8 +250,8 @@
 				2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */,
 				2E7C6F681B8E6DDE00E95183 /* LaunchScreen.storyboard */,
 				2E7C6F6B1B8E6DDE00E95183 /* Info.plist */,
-				2E3653731D84884B00B2403E /* Model */,
 				2E3653801D84885700B2403E /* Networking */,
+				2E3653731D84884B00B2403E /* Model */,
 				2E3653641D84884300B2403E /* Delegates */,
 				2E3653851D84885D00B2403E /* Views */,
 				2E18CFE11D8494130048F730 /* Utilities */,
@@ -406,8 +409,8 @@
 				2E36537A1D84884B00B2403E /* Announcement.swift in Sources */,
 				2E36536E1D84884300B2403E /* AssignmentDelegate.swift in Sources */,
 				2E36538A1D84885D00B2403E /* ClassesViewController.swift in Sources */,
-				2E36537F1D84884B00B2403E /* SettingsDelegate.swift in Sources */,
 				2E3653841D84885700B2403E /* TSReader.swift in Sources */,
+				2EB173341D84995A00A10CEC /* Authenticator.swift in Sources */,
 				2E3653831D84885700B2403E /* HttpClient.swift in Sources */,
 				2E18CFE51D8494130048F730 /* AppDelegate.swift in Sources */,
 				2E36538C1D84885D00B2403E /* TableViewCells.swift in Sources */,
@@ -418,6 +421,7 @@
 				2E36536D1D84884300B2403E /* AnouncementDelegate.swift in Sources */,
 				2E36536C1D84884300B2403E /* AllClassesDelegate.swift in Sources */,
 				2E36536F1D84884300B2403E /* AssignmentsDelegate.swift in Sources */,
+				2EB173361D849B0300A10CEC /* SettingsDelegate.swift in Sources */,
 				2E36537D1D84884B00B2403E /* Grade.swift in Sources */,
 				2E36538B1D84885D00B2403E /* LoginViewController.swift in Sources */,
 				2E36537E1D84884B00B2403E /* Resource.swift in Sources */,

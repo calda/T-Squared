@@ -32,6 +32,9 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     var classesViewController: ClassesViewController!
     var browserViewController: TSWebView!
     @IBOutlet var activityCircle: UIView!
+    @IBOutlet weak var twoFactorWebView: UIWebView!
+    @IBOutlet weak var twoFactorWebViewCenterConstraint: NSLayoutConstraint!
+    
     
     //MARK: - Preparing the View Controller
     
@@ -397,9 +400,9 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         NSURLCache.sharedURLCache().removeAllCachedResponses()
         HttpClient.clearCookies()
         
-        HttpClient.sessionID = nil
-        HttpClient.authFormPost = nil
-        HttpClient.authLTPost = nil
+        Authenticator.sessionID = nil
+        Authenticator.authFormPost = nil
+        Authenticator.authLTPost = nil
         TSAuthenticatedReader = nil
         
         self.usernameField.text = ""

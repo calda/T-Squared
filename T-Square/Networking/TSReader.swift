@@ -14,6 +14,7 @@ let TSLastLoadDate = "edu.gatech.cal.lastLoadDate"
 
 class TSReader {
     
+    
     //MARK: - Creating the TSAuthenticatedReader
     
     let username: String
@@ -29,7 +30,7 @@ class TSReader {
     }
     
     static func authenticatedReader(user user: String, password: String, isNewLogin: Bool, completion: (TSReader?) -> ()) {
-        HttpClient.authenticateWithUsername(user, password: password, completion: { success, response in
+        Authenticator.authenticateWithUsername(user, password: password, completion: { success, response in
             completion(success ? TSReader(username: user, password: password, initialPage: response) : nil)
         })
         
@@ -39,6 +40,7 @@ class TSReader {
             data.setValue(NSDate(), forKey: TSInstallDateKey)
         }
     }
+    
     
     //MARK: - Loading Classes
     
@@ -237,6 +239,7 @@ class TSReader {
         return nil
     }
     
+    
     //MARK: - Loading Announcements
     
     func getAnnouncementsForClass(currentClass: Class, loadAll: Bool = false) -> [Announcement] {
@@ -291,6 +294,7 @@ class TSReader {
         
         return announcements
     }
+    
     
     //MARK: - Loading Resources
     
@@ -361,6 +365,7 @@ class TSReader {
         return resources
     }
     
+    
     //MARK: - Loading Assignments
     
     func getAssignmentsForClass(currentClass: Class) -> [Assignment] {
@@ -405,6 +410,7 @@ class TSReader {
         
         return assignments
     }
+    
     
     //MARK: - Loading Grades
     
@@ -599,6 +605,7 @@ class TSReader {
         }
         
     }
+    
     
     //MARK: - Getting Resource for Syllabus
     

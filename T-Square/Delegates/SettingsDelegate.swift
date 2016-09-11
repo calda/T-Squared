@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-let TSDisclaimerText = "Cal is a freshman at Georgia Tech. He is in no way affiliated with campus officials. This app is an unofficial service provided at user discretion. Saved account information is encrypted, and only leaves the device to authenticate with Georgia Tech's official login service."
+let TSDisclaimerText = "Cal is a student at Georgia Tech. He is in no way affiliated with campus officials. This app is an unofficial service provided at user discretion. Saved account information is encrypted, and only leaves the device to authenticate with Georgia Tech's official login service."
 let TSLicenseText = "T-Squared is licensed under the GNU General Public License v2.0. Source Code is provided for those interested in validating the security of their credentials. "
 let TSEmailText = "Please feel free to send an email with any feedback, issues, or requests. T-Squared can only get better with the help of people like you!"
 let TSAvailableWidth = UIScreen.mainScreen().bounds.width - 24.0

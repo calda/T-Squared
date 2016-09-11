@@ -88,12 +88,6 @@ class HttpClient {
         self.url = NSURL(string: url)
     }
     
-    
-    //MARK: - Handling Login
-    static var sessionID: String?
-    static var authFormPost: String?
-    static var authLTPost: String?
-    
     static func getInfoFromPage(page: NSString, infoSearch: String, terminator: String = "\"") -> String? {
         let position = page.rangeOfString(infoSearch)
         let location = position.location
@@ -120,151 +114,8 @@ class HttpClient {
         }
     }
     
-    static var previous: String?
-    static var isRunningInBackground = false
     
-    static func authenticateWithUsername(username: String, password userPassword: String, completion: (Bool, HTMLDocument?) -> ()) {
-        var user = username
-        var password = userPassword
-        var didCompletion = false
-        
-        //call the completion before exiting scope
-        defer {
-            if !didCompletion {
-                if isRunningInBackground {
-                    completion(false, nil)
-                } else {
-                    sync() { completion(false, nil) }
-                }
-            }
-        }
-        
-        //request the login page
-        let client = HttpClient(url: "https://login.gatech.edu/cas/login?service=https%3A%2F%2Ft-square.gatech.edu%2Fsakai-login-tool%2Fcontainer")
-        guard let loginScreenText = client.sendGet() else {
-            if self.isRunningInBackground { return }
-            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
-            return
-        }
-        
-        func callCompletionForSuccessWithPageContents(successContents: String) {
-            didCompletion = true
-            
-            sessionID = nil
-            authFormPost = nil
-            authLTPost = nil
-            
-            if isRunningInBackground {
-                //Calling completion on current thread to resolve background activity
-                completion(true, HTML(html: successContents, encoding: NSUTF8StringEncoding))
-            }
-            else {
-                sync {
-                    //Calling completion synchronously
-                    completion(true, HTML(html: successContents, encoding: NSUTF8StringEncoding))
-                }
-            }
-        }
-        
-        //there are some cases where the user is logged in to GT CAS
-        ///but *not* logged in to T-Square
-        //so when we login to T-Square, CAS completes the login automatically
-        
-        //if the login page has the word "Log Out", then our work is already done
-        if loginScreenText.containsString("Log Out") {
-            callCompletionForSuccessWithPageContents(loginScreenText)
-            return
-        }
-        
-        //back to the standard login flow
-        //find the LT value and page for form post
-        
-        let loginScreen = loginScreenText as NSString
-        
-        var formPost: String
-        var LT: String
-        
-        //get page form
-        let pageFormInfo = HttpClient.getInfoFromPage(loginScreen, infoSearch: "<form id=\"fm1\" class=\"fm-v clearfix\" action=\"")
-        let LT_info = HttpClient.getInfoFromPage(loginScreen, infoSearch: "value=\"LT")
-        
-        if let previousFormPost = HttpClient.authFormPost {
-            formPost = previousFormPost
-        } else if let pageFormAddress = pageFormInfo {
-            formPost = pageFormAddress
-            HttpClient.authFormPost = formPost
-        } else {
-            return
-        }
-        
-        //get LT
-        if let previousLT = HttpClient.authLTPost {
-            LT = previousLT
-        } else if let LT_part = LT_info {
-            LT = "LT" + LT_part
-            HttpClient.authLTPost = LT
-        }
-        else {
-            return
-        }
-        
-        user.prepareForURL()
-        password.prepareForURL()
-        
-        //send HTTP POST for login
-        let postString = "?warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)&submit=LOGIN&_eventId=submit"
-        let loginClient = HttpClient(url: "https://login.gatech.edu\(formPost)\(postString)")
-        
-        guard let response = loginClient.sendGet() else {
-            //synchronous network error even though in background thread
-            //because the app locks up when calling sync{ } for some reason
-            (UIApplication.sharedApplication().windows[0].rootViewController as? LoginViewController)?.syncronizedNetworkErrorRecieved()
-            return
-        }
-        
-        //incorrect password
-        if response.containsString("Incorrect login or disabled account.") || response.containsString("Login requested by:") {
-            didCompletion = true
-            HttpClient.sessionID = HttpClient.getInfoFromPage(formPost, infoSearch: "jsessionid=", terminator: "?")
-            sync() { completion(false, nil) }
-        }
-            
-        //two factor required
-        else if response.containsString("duo_iframe") {
-            sync {
-                
-                //spin up a UIWebView
-                //the response container an iframe, but that iframe's src is loaded via javascript
-                
-                let webView = UIWebView()
-                webView.frame = CGRect(x: 100, y: 100, width: 800, height: 800)
-                webView.loadHTMLString(response, baseURL: NSURL(string: "https://login.gatech.edu/cas/login"))
-                
-                if let controller = UIApplication.sharedApplication().keyWindow?.rootViewController as? LoginViewController {
-                    controller.view.addSubview(webView)
-                }
-                
-                //wait for the javascript to finish evaluating
-                func iframeSrc() -> String? {
-                    let content = webView.stringByEvaluatingJavaScriptFromString("document.documentElement.outerHTML")
-                    let iframe = HttpClient.getInfoFromPage(content ?? "", infoSearch: "<iframe", terminator: ">")
-                    return HttpClient.getInfoFromPage(iframe ?? "", infoSearch: "src=\"", terminator: "\"")
-                }
-                
-                //how do i know when it's done??
-
-            }
-        }
-            
-        //successful login
-        else {
-            callCompletionForSuccessWithPageContents(response)
-        }
-    }
-    
-    func setUpTwoFactor() {
-        
-    }
+    //MARK: - HTTP Requests
     
     static func requestPageWithLoginVerification(url: String) -> HTMLDocument? {
         
@@ -334,9 +185,9 @@ class HttpClient {
                 password = TSAuthenticatedReader.password
             }
             
-            HttpClient.isRunningInBackground = true
+            Authenticator.isRunningInBackground = true
             TSReader.authenticatedReader(user: username, password: password, isNewLogin: false, completion: { reader in
-                HttpClient.isRunningInBackground = false
+                Authenticator.isRunningInBackground = false
                 
                 if let reader = reader {
                     TSAuthenticatedReader = reader
@@ -360,8 +211,6 @@ class HttpClient {
             return requestedPage
         }
     }
-    
-    //MARK: - Fetching data and performing requests
     
     static func contentsOfPage(url: String, postNotificationOnError: Bool = true) -> HTMLDocument? {
         
@@ -439,6 +288,9 @@ class HttpClient {
     }
     
 }
+
+
+//MARK: - Relevant Extensions
 
 extension String {
     

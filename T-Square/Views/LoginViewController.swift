@@ -400,7 +400,6 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         NSURLCache.sharedURLCache().removeAllCachedResponses()
         HttpClient.clearCookies()
         
-        Authenticator.sessionID = nil
         Authenticator.authFormPost = nil
         Authenticator.authLTPost = nil
         TSAuthenticatedReader = nil

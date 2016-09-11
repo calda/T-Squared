@@ -13,7 +13,6 @@ import UIKit
 class Authenticator {
     
     //MARK: - Handling Login
-    static var sessionID: String?
     static var authFormPost: String?
     static var authLTPost: String?
     
@@ -22,6 +21,7 @@ class Authenticator {
     
     static var webViewDelegate: UIWebViewDelegate?
     static var twoFactorURL: String?
+    static var signedTwoFactorResponse: String?
     
     static var loginController: LoginViewController? {
         return UIApplication.sharedApplication().keyWindow?.rootViewController as? LoginViewController
@@ -56,7 +56,6 @@ class Authenticator {
         func callCompletionForSuccessWithPageContents(successContents: String) {
             didCompletion = true
             
-            sessionID = nil
             authFormPost = nil
             authLTPost = nil
             
@@ -118,7 +117,7 @@ class Authenticator {
         password.prepareForURL()
         
         //send HTTP POST for login
-        let postString = "?warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)&submit=LOGIN&_eventId=submit"
+        let postString = "&warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)&submit=LOGIN&_eventId=submit"
         let loginClient = HttpClient(url: "https://login.gatech.edu\(formPost)\(postString)")
         
         guard let response = loginClient.sendGet() else {
@@ -131,7 +130,6 @@ class Authenticator {
         //incorrect password
         if response.containsString("Incorrect login or disabled account.") || response.containsString("Login requested by:") {
             didCompletion = true
-            Authenticator.sessionID = HttpClient.getInfoFromPage(formPost, infoSearch: "jsessionid=", terminator: "?")
             sync() { completion(false, nil) }
         }
             
@@ -189,6 +187,32 @@ class Authenticator {
         }, completion: nil)
     }
     
+    static func finalizeTwoFactorLogin(withSignedResponse duoResponse: String) {
+        guard let authFormPost = Authenticator.authFormPost else { return }
+        guard let authLTPost = Authenticator.authLTPost else { return }
+        
+        let postString = "&warn=true&lt=\(authLTPost)&execution=e1s2&_eventId=submit&signedDuoResponse=\(duoResponse.preparedForURL())"
+        let loginClient = HttpClient(url: "https://login.gatech.edu\(authFormPost)\(postString)")
+        
+        guard let response = loginClient.sendGet() else {
+            //error alert
+            return
+        }
+        
+        //spin up another web view
+        let webView = UIWebView()
+        webView.frame = CGRect.zero
+        webView.loadHTMLString(response, baseURL: NSURL(string: "https://login.gatech.edu/cas/login"))
+        
+        Authenticator.webViewDelegate = TwoFactorWebViewDelegate()
+        webView.delegate = Authenticator.webViewDelegate!
+        Authenticator.twoFactorURL = nil
+        
+        loginController?.view.addSubview(webView)
+        print(response)
+        print(response)
+    }
+    
 }
 
 
@@ -209,6 +233,8 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
             guard let partialDuoResponse = HttpClient.getInfoFromPage(unencodedResponse, infoSearch: "AUTH|", terminator: "\\") else { return false }
             let signedDuoResponse = "AUTH|\(partialDuoResponse)"
             print(signedDuoResponse)
+            
+            Authenticator.finalizeTwoFactorLogin(withSignedResponse: signedDuoResponse)
             return false
         }
         
@@ -221,7 +247,12 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
         if (content?.containsString("Send Me a Push") == true) {
             
             //hide content on the page
-            let javascript = "$('.base-navigation').hide(); $('.base-main').css('top', '0'); $('.base-main').css('width', '75%'); $('.base-main').css('margin', '0 auto'); $('.stay-logged-in').parent().hide(); $('.base-wrapper').css('border', '0')"
+            let javascript = "$('.base-navigation').hide();" +
+                             "$('.base-main').css('top', '0');" +
+                             "$('.base-main').css('width', '75%');" +
+                             "$('.base-main').css('margin', '0 auto');" +
+                             "$('.stay-logged-in').parent().hide();" +
+                             "$('.base-wrapper').css('border', '0')"
             webView.stringByEvaluatingJavaScriptFromString(javascript)
             
             Authenticator.presentTwoFactorView()

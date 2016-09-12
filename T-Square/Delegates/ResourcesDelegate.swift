@@ -81,6 +81,7 @@ class ResourcesDelegate : NSObject, StackableTableDelegate {
         else { return 50.0 }
     }
     
+    
     //MARK: - Stackable Table Delegate Methods
     
     func loadData() {

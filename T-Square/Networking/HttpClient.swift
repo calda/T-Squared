@@ -195,7 +195,7 @@ class HttpClient {
                 else {
                     loginController.unpresentClassesView()
                     
-                    let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Either the network connection is unavailable, or your login credentials have changed since the last time you logged in.", preferredStyle: .Alert)
+                    let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "You were automatically logged out by the server. Please log in again.", preferredStyle: .Alert)
                     
                     alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
                     alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
@@ -257,21 +257,6 @@ class HttpClient {
         return pageText
     }
     
-    /*
-    POST///make active
-    prefs_form=numtabs:20
-    prefs_form=_id43:gtc-3248-ad8f-5f07-8d4d-aa83ebdedd48 (permanent id)
-    prefs_form=prefs_form
-    prefs_form:_idcl=prefs_form:remove
-    prefs_form:submit=Update Preferences
-
-    POST///make inactve
-    prefs_form=numtabs:20
-    prefs_form=_id35:gtc-0eff-f218-57ec-88bc-566361a0fe33 (permanent id)
-    prefs_form=prefs_form
-    prefs_form=_idcl:prefs_form:add
-    prefs_form=submit:Update Preferences
-    */
     static func markClassActive(currentClass: Class, active: Bool, atPreferencesLink link: String) {
         
         var postString = "?prefs_form:numtabs=20"

@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
+    
     //MARK: - Launch from URL
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
@@ -50,6 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    
     //MARK: Tracking Network Activity
     var networkActivityCount = 0
     
@@ -70,6 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
     }
+    
     
     //MARK: Disable selection for cells when the app resigns active
     //like when a notification is tapped on
@@ -95,6 +98,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         TSWasLaunchedFromGTPortal = false
         (window?.rootViewController as? LoginViewController)?.classesViewController?.reloadTable()
     }
+    
     
     //MARK: Open from Springboard 3D Touch shortcut
     
@@ -159,6 +163,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
+    
     
     //MARK: Check if a touch happens in the status bar
     

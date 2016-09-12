@@ -52,6 +52,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     var loginController: LoginViewController!
     var documentController: UIDocumentInteractionController?
     
+    
     //MARK: - Table View cell arrangement
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -187,6 +188,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
     }
     
+    
     //MARK: - Handle announcements as they're loaded
     
     func loadAnnouncements(reloadClasses reloadClasses: Bool = true) {
@@ -304,6 +306,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
     }
     
+    
     //MARK: - Customization of the view
     
     override func viewDidLoad() {
@@ -314,6 +317,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     override func viewWillAppear(animated: Bool) {
         tableView.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 30.0, right: 0.0)
+        tableView.tableFooterView = UIView()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -533,10 +537,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
         
         delegate.loadData()
-        tableView.reloadData()
-        delay(0.3) {
+        self.tableView.reloadData()
+        //delay(0.3) {
             refresh.endRefreshing()
-        }
+        //}
     }
     
     func scrollToTop() {
@@ -680,6 +684,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     func isFirstLoad() -> Bool {
         return TSAuthenticatedReader.classes == nil || (TSAuthenticatedReader.classes?.count == 0 && !TSAuthenticatedReader.actuallyHasNoClasses)
     }
+    
     
     //MARK: - Auxillary Functions
     

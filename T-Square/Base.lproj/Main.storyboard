@@ -1823,7 +1823,7 @@ The schedule (which is now available) can be found in the TA/Help Info tab on th
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" alpha="0.65000000000000002" contentMode="left" horizontalHuggingPriority="275" verticalHuggingPriority="249" horizontalCompressionResistancePriority="749" text="-1 removeAtIndex() throws a null pointer exception at large index" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="1" translatesAutoresizingMaskIntoConstraints="NO" id="SdW-aN-70D" userLabel="Name Label">
-                                                    <rect key="frame" x="16" y="0.0" width="225" height="36"/>
+                                                    <rect key="frame" x="16" y="0.0" width="224.5" height="36"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="25" id="g5l-x2-R7e"/>
                                                     </constraints>

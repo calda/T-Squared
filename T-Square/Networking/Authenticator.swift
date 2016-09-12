@@ -81,6 +81,7 @@ class Authenticator {
             return
         }
         
+        
         //back to the standard login flow
         //find the LT value and page for form post
         
@@ -108,8 +109,7 @@ class Authenticator {
         } else if let LT_part = LT_info {
             LT = "LT" + LT_part
             Authenticator.authLTPost = LT
-        }
-        else {
+        } else {
             return
         }
         
@@ -117,7 +117,7 @@ class Authenticator {
         password.prepareForURL()
         
         //send HTTP POST for login
-        let postString = "&warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)&submit=LOGIN&_eventId=submit"
+        let postString = "&warn=true&lt=\(LT)&execution=e1s1&_eventId=submit&submit=LOGIN&username=\(user)&password=\(password)&submit=LOGIN"
         let loginClient = HttpClient(url: "https://login.gatech.edu\(formPost)\(postString)")
         
         guard let response = loginClient.sendGet() else {
@@ -133,17 +133,23 @@ class Authenticator {
             sync() { completion(false, nil) }
         }
             
-            //two factor required
+        //two factor required
         else if response.containsString("duo_iframe") {
             sync {
-                //spin up a UIWebView
-                //the response container an iframe, but that iframe's src is loaded via javascript
                 
+                //can't complete two-factor login in the background
+                if Authenticator.isRunningInBackground {
+                    sync() { completion(false, nil) }
+                    return
+                }
+                
+                //load the Duo Two-Factor page in a Web View
                 loginController?.twoFactorWebView.loadHTMLString(response, baseURL: NSURL(string: "https://login.gatech.edu/cas/login"))
+                loginController?.twoFactorWebView.superview?.alpha = 1.0
                 
                 Authenticator.webViewDelegate = TwoFactorWebViewDelegate()
                 loginController?.twoFactorWebView.delegate = Authenticator.webViewDelegate!
-                loginController?.twoFactorWebView.superview?.alpha = 1.0
+                
                 waitingForTwoFactor = true
                 loadedDuoTwoFactor = false
                 twoFactorCompletion = completion
@@ -171,6 +177,8 @@ class Authenticator {
 
 class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
     
+    //URL pointed to by the Duo iframe
+    //is loaded by the page at runtime
     func iframeSrc(webView: UIWebView) -> String? {
         let content = webView.stringByEvaluatingJavaScriptFromString("document.documentElement.outerHTML")
         let iframe = HttpClient.getInfoFromPage(content ?? "", infoSearch: "<iframe", terminator: ">")
@@ -178,14 +186,9 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
     }
     
     func webViewDidFinishLoad(webView: UIWebView) {
-        
         let content = webView.stringByEvaluatingJavaScriptFromString("document.documentElement.outerHTML")
         
-        if let content = content where content.containsString("My Workspace") == true {
-            let document = Kanna.HTML(html: content, encoding: NSUTF8StringEncoding)
-            Authenticator.twoFactorCompletion?(success: true, document: document)
-        }
-        
+        //if still waiting on two-factor to complete
         if !Authenticator.loadedDuoTwoFactor {
             let isCorrectPage = content?.containsString("Two-factor login is needed") == true
             let hasFinishedProcessing = iframeSrc(webView) != nil
@@ -193,13 +196,19 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
             if isCorrectPage && hasFinishedProcessing {
                 Authenticator.loadedDuoTwoFactor = true
                 
-                //move the iframe & then hide everything else
+                //hide everything but the Duo iframe
                 let javascript = "$($('body').append($('#duo_iframe')));" +
                                  "$('body > *:not(#duo_iframe)').hide()"
                 webView.stringByEvaluatingJavaScriptFromString(javascript)
                 
                 Authenticator.presentTwoFactorView()
             }
+        }
+        
+        //successful login
+        if let content = content where content.containsString("My Workspace") == true || content.containsString("Log Out") == true {
+            let document = Kanna.HTML(html: content, encoding: NSUTF8StringEncoding)
+            Authenticator.twoFactorCompletion?(success: true, document: document)
         }
     }
 }
@@ -216,13 +225,14 @@ class SwizzlingNSURLCache : NSURLCache {
             guard let pageContents = HttpClient(url: url.absoluteString).sendGet() else { return nil }
             
             let newCss = ".base-navigation { display: none !important; }" +
-                         ".base-main { top: 0px !important; }" +
-                         ".base-wrapper { border: 0 !important; }"
+                         ".base-main { top: 10px !important; width: 80% !important; margin: 0 auto !important; }" +
+                         ".base-wrapper { border: 0 !important; }" +
+                         ".phone-label { display: none !important; }"
             
             var swizzled = pageContents + newCss
             
             //replace a bit because it doesn't want to be overriden by re-declaration
-            swizzled = swizzled.stringByReplacingOccurrencesOfString(".stay-logged-in {\n  margin-top: -6px; }", withString: ".stay-logged-in {\n  margin-top: 30x; }")
+            swizzled = swizzled.stringByReplacingOccurrencesOfString(".stay-logged-in {\n  margin-top: -6px; }", withString: ".stay-logged-in {\n  margin-top: 35x; }")
             
             //pass the modified file up the chain as if it was authentic
             let response = NSURLResponse(URL: url, MIMEType: "text/css", expectedContentLength: -1, textEncodingName: nil)

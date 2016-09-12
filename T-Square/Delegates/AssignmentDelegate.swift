@@ -70,6 +70,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
             onDisplay(cell, assignment)
             return cell
         }
+        
         if indexPath.section == 1 {
             if indexPath.item == assignment.attachments!.count {
                 let cell = tableView.dequeueReusableCellWithIdentifier("blank")!
@@ -82,6 +83,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
             cell.hideSeparator()
             return cell
         }
+            
         else if indexPath.section == 2 {
             if indexPath.item == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle")! as! TitleCell
@@ -99,6 +101,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
                 return cell
             }
         }
+            
         else if indexPath.section == 3 {
             if indexPath.item == 0 {
                 let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle")! as! TitleCell

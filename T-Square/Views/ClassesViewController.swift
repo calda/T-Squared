@@ -16,7 +16,6 @@ import MessageUI
 let TSSetTouchDelegateEnabledNotification = "edu.gatech.cal.touchDelegateEnabled"
 let TSPerformingNetworkActivityNotification = "edu.gatech.cal.performingNetworkActivity"
 let TSBackPressedNotification = "edu.gatech.cal.backTriggered"
-let TSBackButtonPressCountKey = "edu.gatech.cal.backButtonCount"
 let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 let TSShowSettingsNotification = "edu.gatech.cal.showSettings"
 
@@ -168,37 +167,26 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         return tableView.dequeueReusableCellWithIdentifier("classWithIcon")!
     }
     
-    func reloadTable(centerTable: Bool = false) {
+    func reloadTable() {
         if tableView == nil { return }
         
         self.tableView.reloadData()
         updateBottomView()
-        
-        if centerTable {
-            let contentHeight = tableView.contentSize.height
-            let availableHeight = self.view.frame.height
-            if contentHeight < availableHeight {
-                let difference = contentHeight - availableHeight
-                collectionViewHeight.constant = difference * 0.9
-            }
-            else {
-                collectionViewHeight.constant = 0.0
-            }
-            self.view.layoutIfNeeded()
-        }
     }
     
     
     //MARK: - Handle announcements as they're loaded
     
-    func loadAnnouncements(reloadClasses reloadClasses: Bool = true) {
+    func loadAnnouncements(reloadClasses reloadClasses: Bool = true, withInlineActivityIndicator: Bool = false) {
         NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true, userInfo: nil)
         if reloadClasses { self.classes = TSAuthenticatedReader.getActiveClasses() }
         
         self.loadingAnnouncements = true
         
         //reload the Recent Announcements Cell to get enable the activity indicator
-        tableView.reloadRowsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 1)], withRowAnimation: .None)
+        if withInlineActivityIndicator {
+            tableView.reloadRowsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 1)], withRowAnimation: .None)
+        }
         
         self.announcements = []
         
@@ -226,7 +214,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 
                 self.addAnnouncements(announcements)
                 if markLoadedAndCheckIfDone() {
-                    sync { self.doneLoadingAnnoucements() }
+                    dispatch_sync(dispatch_get_main_queue()) { self.doneLoadingAnnoucements() }
                 }
             }
         }
@@ -429,11 +417,6 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             
             if endPosition > tableViewRestingPosition.x + 10.0 {
                 self.popDelegate()
-                
-                //stop the "you can swipe" popup from ever showing up
-                //because the user clearly knows it's possible
-                let data = NSUserDefaults.standardUserDefaults()
-                data.setInteger(11, forKey: TSBackButtonPressCountKey)
             }
             else {
                 self.unhighlightAllCells()
@@ -507,20 +490,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func backTriggeredFromButtonPress() {
-     
-        let data = NSUserDefaults.standardUserDefaults()
-        let pressCount = min(data.integerForKey(TSBackButtonPressCountKey) + 1, 11)
-        data.setInteger(pressCount, forKey: TSBackButtonPressCountKey)
-        
-        if pressCount == 10 {
-            let alert = UIAlertController(title: "", message: "Did you know you can swipe right at any time to go back?", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "Awesome!", style: .Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
-        }
-        
-        else {
-            backTriggered()
-        }
+        backTriggered()
     }
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
@@ -536,11 +506,15 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             return
         }
         
-        delegate.loadData()
-        self.tableView.reloadData()
-        //delay(0.3) {
-            refresh.endRefreshing()
-        //}
+        dispatch_async(TSNetworkQueue) {
+            delegate.loadData()
+            sync {
+                self.reloadTable()
+                refresh.endRefreshing()
+
+            }
+        }
+        
     }
     
     func scrollToTop() {
@@ -704,6 +678,13 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     func presentDocumentFromURL(webURL: NSURL, name: String = "Attachment") {
         self.setActivityIndicatorVisible(true)
         
+        //open a .url or .webloc file in a browser instead of trying to download it
+        let url = webURL.absoluteString?.lowercaseString
+        if url?.hasSuffix(".url") == true || url?.hasSuffix(".webloc") == true {
+            self.openLinkInWebView(webURL.absoluteString!, title: name)
+            return
+        }
+        
         dispatch_async(TSNetworkQueue, {
             guard let data = NSData(contentsOfURL: webURL) else {
                 sync {
@@ -730,12 +711,19 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 let controller = UIDocumentInteractionController(URL: fileURL)
                 self.documentController = controller
                 controller.delegate = self
-                controller.presentPreviewAnimated(true)
-                delay(0.5) {
-                    self.setActivityIndicatorVisible(false)
+                
+                let success = controller.presentPreviewAnimated(true)
+                
+                if (success) {
+                    delay(0.5) {
+                        self.setActivityIndicatorVisible(false)
+                    }
+                } else {
+                    self.openLinkInWebView(webURL.absoluteString!, title: name)
                 }
+                
             }
-            
+                
         })
     }
     

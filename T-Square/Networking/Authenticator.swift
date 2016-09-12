@@ -221,8 +221,8 @@ class SwizzlingNSURLCache : NSURLCache {
     override func cachedResponseForRequest(request: NSURLRequest) -> NSCachedURLResponse? {
         
         //intercept and swizzle CSS for Duo Two-Factor
-        if let url = request.URL where url.absoluteString.containsString("base-v3.css") {
-            guard let pageContents = HttpClient(url: url.absoluteString).sendGet() else { return nil }
+        if let url = request.URL where url.absoluteString?.containsString("base-v3.css") == true {
+            guard let pageContents = HttpClient(url: url.absoluteString!).sendGet() else { return nil }
             
             let newCss = ".base-navigation { display: none !important; }" +
                          ".base-main { top: 10px !important; width: 80% !important; margin: 0 auto !important; }" +

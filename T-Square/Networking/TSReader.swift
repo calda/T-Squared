@@ -373,19 +373,19 @@ class TSReader {
         
         var assignments: [Assignment] = []
         
-        //load page for class announcements
+        //load page for class assignments
         for link in classPage.css("a, link") {
             if link.text != "Assignments" { continue }
             guard let linkHref = link["href"] else { return [] }
             guard let assignmentsPage = HttpClient.getPageWith100Count(linkHref) else { return [] }
             
-            //load announcements
+            //load assignments
             for row in assignmentsPage.css("tr") {
                 let links = row.css("a")
                 if links.count == 1 {
                     
                     guard let link = links[0]["href"] else { continue }
-                    let name = (links[0].text ?? "Untitled Annoucement").cleansed()
+                    let name = (links[0].text ?? "Untitled Assignment").cleansed()
                     var statusString: String = ""
                     var dueDateString: String = ""
                     

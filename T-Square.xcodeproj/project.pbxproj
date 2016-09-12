@@ -75,13 +75,6 @@
 			remoteGlobalIDString = 1EAFA0D71B6039D5001F3D84;
 			remoteInfo = Kanna_iOS;
 		};
-		2E7C6F711B8E6DDE00E95183 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2E7C6F541B8E6DDE00E95183 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2E7C6F5B1B8E6DDE00E95183;
-			remoteInfo = "T-Square";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -127,7 +120,6 @@
 		2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2E7C6F691B8E6DDE00E95183 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2E7C6F6B1B8E6DDE00E95183 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2E7C6F701B8E6DDE00E95183 /* T-SquareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "T-SquareTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7F58191BE59566000590EB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		2EB173331D84995A00A10CEC /* Authenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
 		2EB173351D849B0300A10CEC /* SettingsDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsDelegate.swift; sourceTree = "<group>"; };
@@ -141,13 +133,6 @@
 				2E7F581A1BE59566000590EB /* Security.framework in Frameworks */,
 				2E4B30991BCF5B6700C13222 /* Kanna.framework in Frameworks */,
 				2E4207A71B8FB828002B79E6 /* libxml2.2.dylib in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2E7C6F6D1B8E6DDE00E95183 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,8 +180,8 @@
 			isa = PBXGroup;
 			children = (
 				2E3653811D84885700B2403E /* HttpClient.swift */,
-				2E3653821D84885700B2403E /* TSReader.swift */,
 				2EB173331D84995A00A10CEC /* Authenticator.swift */,
+				2E3653821D84885700B2403E /* TSReader.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -238,7 +223,6 @@
 			isa = PBXGroup;
 			children = (
 				2E7C6F5C1B8E6DDE00E95183 /* T-Squared.app */,
-				2E7C6F701B8E6DDE00E95183 /* T-SquareTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -281,24 +265,6 @@
 			productReference = 2E7C6F5C1B8E6DDE00E95183 /* T-Squared.app */;
 			productType = "com.apple.product-type.application";
 		};
-		2E7C6F6F1B8E6DDE00E95183 /* T-SquareTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2E7C6F7C1B8E6DDE00E95183 /* Build configuration list for PBXNativeTarget "T-SquareTests" */;
-			buildPhases = (
-				2E7C6F6C1B8E6DDE00E95183 /* Sources */,
-				2E7C6F6D1B8E6DDE00E95183 /* Frameworks */,
-				2E7C6F6E1B8E6DDE00E95183 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				2E7C6F721B8E6DDE00E95183 /* PBXTargetDependency */,
-			);
-			name = "T-SquareTests";
-			productName = "T-SquareTests";
-			productReference = 2E7C6F701B8E6DDE00E95183 /* T-SquareTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -311,15 +277,12 @@
 					2E7C6F5B1B8E6DDE00E95183 = {
 						CreatedOnToolsVersion = 7.0;
 						DevelopmentTeam = FZ89A5SZ7C;
+						LastSwiftMigration = 0800;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 0;
 							};
 						};
-					};
-					2E7C6F6F1B8E6DDE00E95183 = {
-						CreatedOnToolsVersion = 7.0;
-						TestTargetID = 2E7C6F5B1B8E6DDE00E95183;
 					};
 				};
 			};
@@ -343,7 +306,6 @@
 			projectRoot = "";
 			targets = (
 				2E7C6F5B1B8E6DDE00E95183 /* T-Squared */,
-				2E7C6F6F1B8E6DDE00E95183 /* T-SquareTests */,
 			);
 		};
 /* End PBXProject section */
@@ -390,13 +352,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2E7C6F6E1B8E6DDE00E95183 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -430,13 +385,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2E7C6F6C1B8E6DDE00E95183 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -444,11 +392,6 @@
 			isa = PBXTargetDependency;
 			name = Kanna_iOS;
 			targetProxy = 2E4B309C1BCF5B7700C13222 /* PBXContainerItemProxy */;
-		};
-		2E7C6F721B8E6DDE00E95183 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2E7C6F5B1B8E6DDE00E95183 /* T-Squared */;
-			targetProxy = 2E7C6F711B8E6DDE00E95183 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -569,6 +512,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "edu.gatech.cal.T-Squared";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -584,30 +528,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "edu.gatech.cal.T-Squared";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		2E7C6F7D1B8E6DDE00E95183 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				INFOPLIST_FILE = "T-SquareTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "edu.gatech.cal.T-SquareTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/T-Square.app/T-Square";
-			};
-			name = Debug;
-		};
-		2E7C6F7E1B8E6DDE00E95183 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				INFOPLIST_FILE = "T-SquareTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "edu.gatech.cal.T-SquareTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/T-Square.app/T-Square";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
@@ -628,15 +549,6 @@
 			buildConfigurations = (
 				2E7C6F7A1B8E6DDE00E95183 /* Debug */,
 				2E7C6F7B1B8E6DDE00E95183 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2E7C6F7C1B8E6DDE00E95183 /* Build configuration list for PBXNativeTarget "T-SquareTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2E7C6F7D1B8E6DDE00E95183 /* Debug */,
-				2E7C6F7E1B8E6DDE00E95183 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

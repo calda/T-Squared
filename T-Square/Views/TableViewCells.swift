@@ -218,7 +218,7 @@ class AttachmentCell : TitleCell {
     }
     
     static func presentAttachment(attachment: Attachment, inController controller: ClassesViewController) {
-        if let link = attachment.link?.preparedForURL(isFullURL: true), let url = NSURL(string: link) {
+        if let link = attachment.link, let url = NSURL(string: link) {
             controller.presentDocumentFromURL(url)
         }
         

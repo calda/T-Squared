@@ -160,7 +160,7 @@ func downsampleImageInView(imageView: UIImageView) {
             UIGraphicsBeginImageContext(scaleSize)
             let context = UIGraphicsGetCurrentContext()
             //CGContextSetInterpolationQuality(context, kCGInterpolationHigh)
-            CGContextSetShouldAntialias(context, true)
+            CGContextSetShouldAntialias(context!, true)
             original.drawInRect(CGRect(origin: CGPointZero, size: scaleSize))
             let newImage = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
@@ -185,17 +185,17 @@ func cropImageToCircle(image: UIImage) -> UIImage {
     
     let radius = image.size.width / 2
     let imageCenter = CGPointMake(image.size.width / 2, image.size.height / 2)
-    CGContextBeginPath(context)
-    CGContextAddArc(context, imageCenter.x, imageCenter.y, radius, 0, CGFloat(2*M_PI), 0)
-    CGContextClosePath(context)
-    CGContextClip(context)
+    CGContextBeginPath(context!)
+    CGContextAddArc(context!, imageCenter.x, imageCenter.y, radius, 0, CGFloat(2*M_PI), 0)
+    CGContextClosePath(context!)
+    CGContextClip(context!)
     
-    CGContextScaleCTM(context, image.scale, image.scale)
+    CGContextScaleCTM(context!, image.scale, image.scale)
     image.drawInRect(CGRect(origin: CGPointZero, size: image.size))
     
     let cropped = UIGraphicsGetImageFromCurrentImageContext()
     UIGraphicsEndImageContext()
-    return cropped
+    return cropped!
 }
 
 ///Determines the height required to display the text in the given label

@@ -361,7 +361,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         
         animatePresentClassesView()
-        classesViewController.loadAnnouncements(reloadClasses: false)
+        classesViewController.loadAnnouncements(reloadClasses: false, withInlineActivityIndicator: true)
     }
     
     func animatePresentClassesView() {

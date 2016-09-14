@@ -442,6 +442,19 @@ class BalloonPopupCell : UITableViewCell {
         case Action, Cancel, None
     }
     
+    func decorateView() {
+        if self.layer.shadowPath != nil { return }
+        
+        let shadowRect = CGRect(x: 0, y: 10, width: self.bounds.width, height: self.bounds.height - 15)
+        let shadowPath = UIBezierPath(rect: shadowRect)
+        self.layer.masksToBounds = false
+        self.clipsToBounds = false
+        self.layer.shadowColor = UIColor.blackColor().CGColor
+        self.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
+        self.layer.shadowOpacity = 0.1
+        self.layer.shadowPath = shadowPath.CGPath
+    }
+    
     func actionForTouch(location: CGPoint) -> PopupCellAction {
         
         let actionFrame = actionButton.convertRect(actionButton.frame, toView: self)

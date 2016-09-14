@@ -20,24 +20,27 @@ let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 let TSShowSettingsNotification = "edu.gatech.cal.showSettings"
 
 let TSHideClassCountPopupKey = "edu.gatech.cal.hideClassCountPopup"
+let TSNeverShowRateAlertKey = "edu.gatech.cal.neverShowRateAlert"
+let TSLoginCountKey = "edu.gatech.cal.loginCount"
 
 class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate, MFMailComposeViewControllerDelegate {
 
     var classes: [Class]?
     var classOffsetCount: Int {
-        return 1 + (tooManyClassesIndex == nil ? 0 : 1) + (backToGTPortalIndex == nil ? 0 : 1)
+        return 1 + [tooManyClassesIndex, rateIndex, backToGTPortalIndex].filter{ $0 != nil }.count
     }
+    
     var tooManyClassesIndex: NSIndexPath? = nil
+    var rateIndex: NSIndexPath? = nil
     var backToGTPortalIndex: NSIndexPath? = nil
     
     var loadingAnnouncements: Bool = true
     var announcements: [Announcement] = []
     var recentAnnouncementsCell: TitleWithButtonCell?
     var announcementIndexOffset: Int {
-        get {
-            return (announcements.count == 0 ? 2 : 1)
-        }
+        return (announcements.count == 0 ? 2 : 1)
     }
+    
     var tableViewRestingPosition: CGPoint!
     @IBOutlet weak var bottomView: UIView!
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
@@ -55,15 +58,23 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Table View cell arrangement
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        //this feature has been transitioned in to a the reloadDataIfNecessary method on StackableTableDelegate
-        //it is not applicable to all Delegates instead of just this one
-        //reloadClassesIfDroppedFromMemory()
-        
+        //decide what alert to show
         backToGTPortalIndex = TSWasLaunchedFromGTPortal ? NSIndexPath(forItem: 0, inSection: 0) : nil
         
         if !NSUserDefaults.standardUserDefaults().boolForKey(TSHideClassCountPopupKey) {
             let index = TSWasLaunchedFromGTPortal ? 2 : 1
-            tooManyClassesIndex = classes?.count > 8 ? NSIndexPath(forItem: index, inSection: 0) : nil
+            if classes?.count > 8 {
+                tooManyClassesIndex = NSIndexPath(forItem: index, inSection: 0)
+            }
+        }
+        
+        if tooManyClassesIndex == nil && !NSUserDefaults.standardUserDefaults().boolForKey(TSNeverShowRateAlertKey) {
+            let index = TSWasLaunchedFromGTPortal ? 2 : 1
+            let loginCount = NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey)
+            
+            //if loginCount % 15 == 0 && loginCount > 0 {
+                rateIndex = NSIndexPath(forItem: index, inSection: 0)
+            //}
         }
         
         
@@ -80,7 +91,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         if indexPath.section == 0 {
             if indexPath.item == (backToGTPortalIndex == nil ? 0 : 1) { return 50.0 }
-            if indexPath == tooManyClassesIndex { return 100.0 }
+            if indexPath == tooManyClassesIndex || indexPath == rateIndex { return 100.0 }
             if indexPath == backToGTPortalIndex { return 30.0 }
             if indexPath.item == (classes?.count ?? 0) + classOffsetCount { //all classes cell
                 return 50.0
@@ -114,7 +125,15 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
             
             if indexPath == tooManyClassesIndex {
-                let cell = tableView.dequeueReusableCellWithIdentifier("tooManyClasses")!
+                let cell = tableView.dequeueReusableCellWithIdentifier("tooManyClasses")! as! BalloonPopupCell
+                cell.decorateView()
+                cell.hideSeparator()
+                return cell
+            }
+            
+            if indexPath == rateIndex {
+                let cell = tableView.dequeueReusableCellWithIdentifier("tooManyClasses")! as! BalloonPopupCell
+                cell.decorateView()
                 cell.hideSeparator()
                 return cell
             }
@@ -125,6 +144,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 cell.hideSeparator()
                 return cell
             }
+            
             if let classes = classes {
                 let displayClass = classes[index - classOffsetCount]
                 let cell = tableView.dequeueReusableCellWithIdentifier("classWithIcon") as! ClassNameCell
@@ -558,6 +578,13 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                         NSUserDefaults.standardUserDefaults().setBool(true, forKey: TSHideClassCountPopupKey)
                         tableView.deleteRowsAtIndexPaths([indexToRemove], withRowAnimation: .Fade)
                     }
+                }
+                return
+            }
+            
+            if index == rateIndex {
+                if let cell = tableView.cellForRowAtIndexPath(index) {
+                    print(cell)
                 }
                 return
             }

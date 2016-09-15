@@ -451,7 +451,7 @@ class BalloonPopupCell : UITableViewCell {
         self.clipsToBounds = false
         self.layer.shadowColor = UIColor.blackColor().CGColor
         self.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
-        self.layer.shadowOpacity = 0.1
+        self.layer.shadowOpacity = 0.08
         self.layer.shadowPath = shadowPath.CGPath
     }
     

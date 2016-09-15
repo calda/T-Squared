@@ -132,7 +132,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
             
             if indexPath == rateIndex {
-                let cell = tableView.dequeueReusableCellWithIdentifier("tooManyClasses")! as! BalloonPopupCell
+                let cell = tableView.dequeueReusableCellWithIdentifier("rate")! as! BalloonPopupCell
                 cell.decorateView()
                 cell.hideSeparator()
                 return cell
@@ -571,6 +571,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                         delegate.loadDataAndPushInController(self)
                         return
                     }
+                        
                     else if action == .Cancel {
                         //remove cell
                         let indexToRemove = tooManyClassesIndex!
@@ -580,6 +581,21 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                     }
                 }
                 return
+            }
+            
+            //rate popup
+            if index == rateIndex {
+                if let cell = tableView.cellForRowAtIndexPath(index) as? BalloonPopupCell {
+                    let action = cell.actionForTouch(touchLocationInCell)
+                    
+                    if action == .Action {
+                        
+                    }
+                    
+                    else if action == .Cancel {
+                        
+                    }
+                }
             }
             
             if index == rateIndex {

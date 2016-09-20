@@ -198,14 +198,12 @@ class ClassDelegate : NSObject, StackableTableDelegate {
     
     func loadData() {
         controller.loadingAnnouncements = true
-        dispatch_async(TSNetworkQueue) {
-            self.displayClass.announcements = TSAuthenticatedReader.getAnnouncementsForClass(self.displayClass)
-            sync {
-                self.controller.loadingAnnouncements = false
-                self.controller.reloadTable()
-            }
-        }
         
+        self.displayClass.announcements = TSAuthenticatedReader.getAnnouncementsForClass(self.displayClass)
+        sync {
+            self.controller.loadingAnnouncements = false
+            self.controller.reloadTable()
+        }
     }
     
     func loadCachedData() {

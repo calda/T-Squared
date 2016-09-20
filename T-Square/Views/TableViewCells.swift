@@ -375,11 +375,20 @@ class BackCell : UITableViewCell {
     func setActivityIndicatorEnabled(notification: NSNotification) {
         self.activityIndicator.startAnimating()
         
-        if let visible = notification.object as? Bool {
-            UIView.animateWithDuration(0.3, animations: {
-                self.activityIndicator.alpha = visible ? 1.0 : 0.0
-            })
+        //notification supports Bool or Int
+        let indicatorVisible: Bool
+        
+        if let notificationBool = notification.object as? Bool {
+            indicatorVisible = notificationBool
+        } else if let notificationInt = notification.object as? Int {
+            indicatorVisible = (notificationInt == 1 ? true : false)
+        } else {
+            return
         }
+        
+        UIView.animateWithDuration(0.3, animations: {
+            self.activityIndicator.alpha = indicatorVisible ? 1.0 : 0.0
+        })
     }
     
     @IBAction func backButtonPressed(sender: UIButton) {

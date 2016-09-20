@@ -169,10 +169,6 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func doLogin(newLogin newLogin: Bool) {
-        
-        usernameField.text = "jstephens60"
-        passwordField.text = "#Periapsis123"
-        
         if usernameField.text! == "" || passwordField.text! == "" {
             shakeView(formView)
             self.animateFormSubviewsWithDuration(0.5, hidden: false)
@@ -203,7 +199,11 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         dispatch_async(TSNetworkQueue, {
             TSReader.authenticatedReader(user: self.usernameField.text!, password: self.passwordField.text!, isNewLogin: newLogin, completion: { reader in
                 
+                //successful login
                 if let reader = reader {
+                    let loginCount = 29//NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey)
+                    NSUserDefaults.standardUserDefaults().setInteger(loginCount + 1, forKey: TSLoginCountKey)
+                    
                     TSAuthenticatedReader = reader
                     self.animateFormSubviewsWithDuration(0.5, hidden: false)
                     self.animateActivityIndicator(on: false)

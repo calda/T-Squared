@@ -21,6 +21,7 @@ class Authenticator {
     
     static var webViewDelegate: UIWebViewDelegate?
     static var loadedDuoTwoFactor: Bool = false
+    static var iframeContentLoaded: Bool = false
     static var twoFactorCompletion: ((success: Bool, document: HTMLDocument?) -> ())?
     
     static var loginController: LoginViewController? {
@@ -134,7 +135,7 @@ class Authenticator {
         }
             
         //two factor required
-        else if response.containsString("duo_iframe") {
+        else if response.containsString("iframe") {
             sync {
                 
                 //can't complete two-factor login in the background
@@ -152,7 +153,14 @@ class Authenticator {
                 
                 waitingForTwoFactor = true
                 loadedDuoTwoFactor = false
+                iframeContentLoaded = false
                 twoFactorCompletion = completion
+                
+                delay(2.0) {
+                    if !iframeContentLoaded {
+                        print("iframe content never loaded")
+                    }
+                }
             }
         }
         
@@ -198,7 +206,7 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
                 
                 //hide everything but the Duo iframe
                 let javascript = "$($('body').append($('#duo_iframe')));" +
-                                 "$('body > *:not(#duo_iframe)').hide()"
+                                 "$('body > *:not(iframe)').remove()"
                 webView.stringByEvaluatingJavaScriptFromString(javascript)
                 
                 Authenticator.presentTwoFactorView()
@@ -239,6 +247,7 @@ class SwizzlingNSURLCache : NSURLCache {
             guard let data = NSString(string: swizzled).dataUsingEncoding(NSUTF8StringEncoding) else { return nil }
             let cachedResponse = NSCachedURLResponse(response: response, data: data)
             
+            Authenticator.iframeContentLoaded = true
             return cachedResponse
         }
             

@@ -19,8 +19,8 @@ let TSBackPressedNotification = "edu.gatech.cal.backTriggered"
 let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 let TSShowSettingsNotification = "edu.gatech.cal.showSettings"
 
-let TSHideClassCountPopupKey = "edu.gatech.cal.hideClassCountPopup"
-let TSNeverShowRateAlertKey = "edu.gatech.cal.neverShowRateAlert"
+let TSHideClassCountPopupKey = "edu.gatech.cal.hideClassCountAlert"
+let TSNeverShowRateAlertKey = "edu.gatech.cal.hideRateAlert"
 let TSLoginCountKey = "edu.gatech.cal.loginCount"
 
 class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate, MFMailComposeViewControllerDelegate {
@@ -30,9 +30,10 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         return 1 + [tooManyClassesIndex, rateIndex, backToGTPortalIndex].filter{ $0 != nil }.count
     }
     
+    var backToGTPortalIndex: NSIndexPath? = nil
     var tooManyClassesIndex: NSIndexPath? = nil
     var rateIndex: NSIndexPath? = nil
-    var backToGTPortalIndex: NSIndexPath? = nil
+    var alertHidden = false
     
     var loadingAnnouncements: Bool = true
     var announcements: [Announcement] = []
@@ -58,28 +59,36 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     //MARK: - Table View cell arrangement
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
         //decide what alert to show
         backToGTPortalIndex = TSWasLaunchedFromGTPortal ? NSIndexPath(forItem: 0, inSection: 0) : nil
         
-        if !NSUserDefaults.standardUserDefaults().boolForKey(TSHideClassCountPopupKey) {
-            let index = TSWasLaunchedFromGTPortal ? 2 : 1
-            if classes?.count > 8 {
-                tooManyClassesIndex = NSIndexPath(forItem: index, inSection: 0)
+        if !alertHidden {
+            if !NSUserDefaults.standardUserDefaults().boolForKey(TSHideClassCountPopupKey) {
+                let index = TSWasLaunchedFromGTPortal ? 2 : 1
+                if classes?.count > 8 {
+                    tooManyClassesIndex = NSIndexPath(forItem: index, inSection: 0)
+                    rateIndex = nil //only one can be active. this takes precendnce.
+                    //take about some crazy spaghetti code with mutable state. this should really be done better.
+                }
+            }
+            
+            if tooManyClassesIndex == nil && !NSUserDefaults.standardUserDefaults().boolForKey(TSNeverShowRateAlertKey) {
+                let index = TSWasLaunchedFromGTPortal ? 2 : 1
+                let loginCount = NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey)
+                
+                if loginCount % 15 == 0 && loginCount > 0 {
+                    rateIndex = NSIndexPath(forItem: index, inSection: 0)
+                }
             }
         }
         
-        if tooManyClassesIndex == nil && !NSUserDefaults.standardUserDefaults().boolForKey(TSNeverShowRateAlertKey) {
-            let index = TSWasLaunchedFromGTPortal ? 2 : 1
-            let loginCount = NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey)
-            
-            //if loginCount % 15 == 0 && loginCount > 0 {
-                rateIndex = NSIndexPath(forItem: index, inSection: 0)
-            //}
+        if section == 0 {
+            return (classes?.count ?? 0) + classOffsetCount + 1
+        } else {
+            let showingAnnouncements = !(announcements.count == 0) && !self.loadingAnnouncements
+            return (!showingAnnouncements ? 2 : announcements.count + 1)
         }
-        
-        
-        if section == 0 { return (classes?.count ?? 0) + classOffsetCount + 1 }
-        else { return announcements.count + (announcements.count == 0 ? 2 : 1) }
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -261,7 +270,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if announcements.count > recentCount {
             let first = announcements.indices.first!
             let last = announcements.indices.last!
-            announcements.removeRange(first.advancedBy(recentCount)...last)
+            
+            announcements.removeRange(first.advancedBy(recentCount, limit: announcements.count - 1)...last)
         }
     }
     
@@ -531,7 +541,6 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             sync {
                 self.reloadTable()
                 refresh.endRefreshing()
-
             }
         }
         
@@ -574,10 +583,15 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                         
                     else if action == .Cancel {
                         //remove cell
-                        let indexToRemove = tooManyClassesIndex!
+                        self.tableView.beginUpdates()
+                        
+                        let oldIndex = tooManyClassesIndex!
                         tooManyClassesIndex = nil
+                        self.alertHidden = true
                         NSUserDefaults.standardUserDefaults().setBool(true, forKey: TSHideClassCountPopupKey)
-                        tableView.deleteRowsAtIndexPaths([indexToRemove], withRowAnimation: .Fade)
+                        
+                        tableView.deleteRowsAtIndexPaths([oldIndex], withRowAnimation: .Fade)
+                        self.tableView.endUpdates()
                     }
                 }
                 return
@@ -589,21 +603,41 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                     let action = cell.actionForTouch(touchLocationInCell)
                     
                     if action == .Action {
+                        let link = "itms-apps://itunes.apple.com/us/app/t-squared-for-georgia-tech/id1046350734"
+                        UIApplication.sharedApplication().openURL(NSURL(string: link)!)
                         
+                        NSUserDefaults.standardUserDefaults().setBool(true, forKey: TSNeverShowRateAlertKey)
+                        
+                        delay(0.5) {
+                            self.rateIndex = nil
+                            self.reloadTable()
+                        }
                     }
                     
                     else if action == .Cancel {
+                        let oldIndex = self.rateIndex!
                         
+                        //remove cell
+                        self.tableView.beginUpdates()
+                        self.alertHidden = true
+                        self.rateIndex = nil
+                        
+                        //if this isn't the first time seeing this alert, never show it again
+                        if NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey) > 20 {
+                            NSUserDefaults.standardUserDefaults().setBool(true, forKey: TSNeverShowRateAlertKey)
+                        }
+                        
+                        self.tableView.deleteRowsAtIndexPaths([oldIndex], withRowAnimation: .Left)
+                        self.tableView.endUpdates()
+                        
+                        //offset bottom view by height of alert
+                        updateBottomView(offset: CGFloat(100.0))
                     }
                 }
-            }
-            
-            if index == rateIndex {
-                if let cell = tableView.cellForRowAtIndexPath(index) {
-                    print(cell)
-                }
+                
                 return
             }
+            
             
             //show class
             guard let classes = classes else { return }
@@ -892,6 +926,7 @@ extension StackableTableDelegate {
                 if controller.activityIndicator.alpha == 1.0 && !(self is AnnouncementDelegate) {
                     controller.setActivityIndicatorVisible(false)
                 }
+                
                 NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
                 
                 if firstLoad {

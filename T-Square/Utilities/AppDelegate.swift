@@ -56,7 +56,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var networkActivityCount = 0
     
     func networkActivityEvent(notification: NSNotification) {
-        guard let activityToggle = notification.object as? Bool else { return }
+        
+        let activityToggle: Bool
+        
+        if let notificationBool = notification.object as? Bool {
+            activityToggle = notificationBool
+        } else if let notificationInt = notification.object as? Int {
+            activityToggle = (notificationInt == 1 ? true : false)
+        } else {
+            return
+        }
         
         //update count
         networkActivityCount += activityToggle ? 1 : -1
@@ -133,6 +142,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             classesController.delegateStack = Stack()
             let stackItem: (delegate: StackableTableDelegate, contentOffset: CGPoint) = (classesController, CGPointMake(0.0, 0.0))
             classesController.delegateStack.push(stackItem)
+            
+            networkActivityCount = 0 //reset counter
             
             loginController.animatePresentClassesView()
         }

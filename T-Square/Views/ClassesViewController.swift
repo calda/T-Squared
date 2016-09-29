@@ -20,7 +20,7 @@ let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 let TSShowSettingsNotification = "edu.gatech.cal.showSettings"
 
 let TSHideClassCountPopupKey = "edu.gatech.cal.hideClassCountAlert"
-let TSNeverShowRateAlertKey = "edu.gatech.cal.hideRateAlert"
+let TSNeverShowRateAlertKey = "edu.gatech.cal.hideRateAlert_1"
 let TSLoginCountKey = "edu.gatech.cal.loginCount"
 
 class ClassesViewController : TableViewStackController, StackableTableDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate, MFMailComposeViewControllerDelegate {

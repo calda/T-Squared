@@ -124,7 +124,7 @@ class Authenticator {
         guard let response = loginClient.sendGet() else {
             //synchronous network error even though in background thread
             //because the app locks up when calling sync{ } for some reason
-            (UIApplication.sharedApplication().windows[0].rootViewController as? LoginViewController)?.syncronizedNetworkErrorRecieved()
+            loginController?.syncronizedNetworkErrorRecieved()
             return
         }
         
@@ -156,9 +156,12 @@ class Authenticator {
                 iframeContentLoaded = false
                 twoFactorCompletion = completion
                 
-                delay(2.0) {
+                delay(10.0) {
                     if !iframeContentLoaded {
                         print("iframe content never loaded")
+                        loginController?.syncronizedNetworkErrorRecieved()
+                        loginController?.twoFactorWebViewCenterConstraint.constant = 220
+                        loginController?.view.layoutIfNeeded()
                     }
                 }
             }
@@ -206,7 +209,8 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
                 
                 //hide everything but the Duo iframe
                 let javascript = "$($('body').append($('#duo_iframe')));" +
-                                 "$('body > *:not(iframe)').remove()"
+                                 "$('body > *:not(iframe)').hide();" +
+                                 "$('#duo_iframe').height(100);"
                 webView.stringByEvaluatingJavaScriptFromString(javascript)
                 
                 Authenticator.presentTwoFactorView()
@@ -235,8 +239,9 @@ class SwizzlingNSURLCache : NSURLCache {
             let newCss = ".base-navigation { display: none !important; }" +
                          ".base-main { top: 10px !important; width: 80% !important; margin: 0 auto !important; }" +
                          ".base-wrapper { border: 0 !important; }" +
-                         ".phone-label { display: none !important; }"
-            
+                         ".phone-label { display: none !important; }" +
+                         "body { height: 183px !important; max-height: 183px !important; }"
+        
             var swizzled = pageContents + newCss
             
             //replace a bit because it doesn't want to be overriden by re-declaration

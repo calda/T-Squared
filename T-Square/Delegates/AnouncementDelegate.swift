@@ -247,6 +247,12 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
     }
     
     func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
+        
+        //don't highlight "Other Announcements in..." cell
+        if let cell = self.controller.tableView.cellForRowAtIndexPath(indexPath) as? TitleCell where cell.titleLabel.text?.hasPrefix("Other Announcements") == true {
+            return //this is a gnarly fix that doesn't want to resolve itself any other way
+        }
+        
         let normalColor: UIColor
         let touchColor: UIColor
         

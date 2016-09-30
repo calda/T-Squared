@@ -232,6 +232,10 @@ class SwizzlingNSURLCache : NSURLCache {
     
     override func cachedResponseForRequest(request: NSURLRequest) -> NSCachedURLResponse? {
         
+        if let url = request.URL?.absoluteString where url.containsString("duosecurity") {
+            Authenticator.iframeContentLoaded = true
+        }
+        
         //intercept and swizzle CSS for Duo Two-Factor
         if let url = request.URL where url.absoluteString?.containsString("base-v3.css") == true {
             guard let pageContents = HttpClient(url: url.absoluteString!).sendGet() else { return nil }

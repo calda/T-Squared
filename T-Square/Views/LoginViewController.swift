@@ -201,7 +201,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
                 
                 //successful login
                 if let reader = reader {
-                    let loginCount = 0//NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey)
+                    let loginCount = NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey)
                     NSUserDefaults.standardUserDefaults().setInteger(loginCount + 1, forKey: TSLoginCountKey)
                     
                     TSAuthenticatedReader = reader

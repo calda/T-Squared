@@ -19,7 +19,7 @@ let TSBackPressedNotification = "edu.gatech.cal.backTriggered"
 let TSNetworkErrorNotification = "edu.gatech.cal.networkerror"
 let TSShowSettingsNotification = "edu.gatech.cal.showSettings"
 
-let TSHideClassCountPopupKey = "edu.gatech.cal.hideClassCountAlert"
+let TSHideClassCountPopupKey = "edu.gatech.cal.hideClassCountAlert_2"
 let TSNeverShowRateAlertKey = "edu.gatech.cal.hideRateAlert_1"
 let TSLoginCountKey = "edu.gatech.cal.loginCount"
 
@@ -70,6 +70,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                     tooManyClassesIndex = NSIndexPath(forItem: index, inSection: 0)
                     rateIndex = nil //only one can be active. this takes precendnce.
                     //take about some crazy spaghetti code with mutable state. this should really be done better.
+                } else {
+                    tooManyClassesIndex = nil
                 }
             }
             
@@ -79,6 +81,8 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 
                 if loginCount % 15 == 0 && loginCount > 0 {
                     rateIndex = NSIndexPath(forItem: index, inSection: 0)
+                } else {
+                    rateIndex = nil
                 }
             }
         }

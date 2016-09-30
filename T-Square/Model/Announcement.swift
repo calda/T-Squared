@@ -69,6 +69,10 @@ class Announcement : CustomStringConvertible {
                     
                     self.message = message.withNoTrailingWhitespace()
                     
+                    //remove weird tags that sometimes end up in announcements
+                    self.message = self.message!.stringByReplacingOccurrencesOfString("<o:p>", withString: "")
+                    self.message = self.message!.stringByReplacingOccurrencesOfString("</o:p>", withString: "")
+                    
                     //load attachments if present
                     for link in page.css("a, link") {
                         let linkURL = link["href"] ?? ""

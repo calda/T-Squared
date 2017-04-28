@@ -245,8 +245,15 @@ class AssignmentCell : UITableViewCell {
         
         dueLabel.textColor = UIColor.blackColor()
         dueLabel.alpha = 0.5
-        if assignment.completed {
+        
+        if assignment.status == .Completed {
             dueLabel.text = "✔︎ Completed"
+            dueLabel.textColor = UIColor(red: 0.0, green: 0.3, blue: 0.0, alpha: 1.0)
+            return
+        }
+        
+        if assignment.status == .Returned {
+            dueLabel.text = "✔︎ Returned"
             dueLabel.textColor = UIColor(red: 0.0, green: 0.3, blue: 0.0, alpha: 1.0)
             return
         }

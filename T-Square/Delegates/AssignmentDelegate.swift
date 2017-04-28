@@ -133,7 +133,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         else if section == 1 { return assignment.attachments == nil ? 0 : assignment.attachments!.count + (assignment.submissions != nil ? 1 : 0) }
         else if section == 2 { return assignment.submissions == nil ? 0 : assignment.submissions!.count + 2 }
         else if section == 3 { return assignment.feedback != nil ? 3 : 0 }
-        else if section == 4 { return !assignment.completed ? 2 : 0 }
+        else if section == 4 { return (assignment.status == .NotSubmitted) ? 2 : 0 }
         else { return 0 }
     }
     
@@ -155,16 +155,23 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
             let fontSize: CGFloat
             let text: String
             switch(identifier) {
+                case "message-white": fontSize = 17.0; text = "something short"; break;
+                case "message-dark": fontSize = 18.0; text = "something short"; break;
                 case "announcementTitle": fontSize = 22.0; text = assignment.name; break;
-                case "announcementTitle": fontSize = 17.0; text = "Due \(assignment.dueDate ?? assignment.rawDueDateString)"; break;
                 case "announcementText": fontSize = 18.0; text = assignment.message ?? "Loading message..."; break;
                 default: fontSize = 19.0; text = "";
             }
+            
+            if text.isEmpty || text.isWhitespace() {
+                return 0 //ignore empty rows
+            }
+            
             let height = heightForText(text, width: tableView.frame.width - 24.0, font: UIFont.systemFontOfSize(fontSize))
             
             if identifier == "announcementText" {
                 return max(100.0, height + 30.0)
             }
+            
             return height
         }
         
@@ -206,10 +213,41 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         return 15.0
     }
     
+    
+    //MARK: - Update once everything is loaded
+    
+    func insertCellsForGrade() {
+        if self.cells.count != 8 { return } //only insert on initial state (fail-safe)
+        if self.assignment.grade == nil { return }
+        
+        cells.insertContentsOf([
+            
+            (identifier: "blank", onDisplay: { cell, _ in cell.hideSeparator() }),
+            
+            (identifier: "announcementTitle", onDisplay: { tableCell, assignment in
+                let cell = tableCell as! TitleCell
+                cell.decorate("Grade")
+                cell.hideSeparator()
+            }),
+            
+            (identifier: "message-dark", onDisplay: { tableCell, assignment in
+                let cell = tableCell as! TitleCell
+                cell.decorate(assignment.grade ?? "Grade Unavailable")
+                cell.hideSeparator()
+            })
+            
+        ], at: 5)
+    }
+    
+    
     //MARK: - Stackable Table Delegate methods
     
     func loadData() {
         assignment.loadMessage()
+        
+        if assignment.grade != nil {
+            self.insertCellsForGrade()
+        }
     }
     
     func loadCachedData() {

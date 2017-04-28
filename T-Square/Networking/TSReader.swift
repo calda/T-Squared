@@ -399,8 +399,8 @@ class TSReader {
                         }
                     }
                     
-                    let complete = statusString != "Not Started" && statusString != ""
-                    let assignment = Assignment(name: name, link: link, dueDate: dueDateString, completed: complete, inClass: currentClass)
+                    let status = Assignment.CompletionStatus.fromString(statusString)
+                    let assignment = Assignment(name: name, link: link, dueDate: dueDateString, status: status, inClass: currentClass)
                     assignments.append(assignment)
                 }
             }

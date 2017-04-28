@@ -9,13 +9,26 @@
 import Foundation
 import Kanna
 
+
 class Assignment {
+    
+    enum CompletionStatus {
+        case NotSubmitted, Completed, Returned
+        
+        static func fromString(string: String) -> CompletionStatus {
+            if string.isEmpty || string.isWhitespace() { return .NotSubmitted }
+            else if string.containsString("Returned") { return .Returned }
+            else if string.containsString("Not") { return .NotSubmitted }
+            else { return .Completed }
+        }
+        
+    }
     
     let name: String
     let link: String
     let rawDueDateString: String
     let dueDate: NSDate?
-    let completed: Bool
+    let status: CompletionStatus
     let owningClass: Class
     
     var message: String?
@@ -23,13 +36,14 @@ class Assignment {
     var submissions: [Attachment]?
     var usesInlineText = false
     var feedback: String?
+    var grade: String?
     
-    init(name: String, link: String, dueDate: String, completed: Bool, inClass owningClass: Class) {
+    init(name: String, link: String, dueDate: String, status: CompletionStatus, inClass owningClass: Class) {
         self.owningClass = owningClass
         self.name = name
         self.link = link
         self.rawDueDateString = dueDate
-        self.completed = completed
+        self.status = status
         self.dueDate = dueDate.dateWithTSquareFormat()
     }
     
@@ -40,6 +54,29 @@ class Assignment {
         feedback = nil
         
         if let page = HttpClient.contentsOfPage(self.link) {
+            
+            //load returned grade
+            if let dataTable = page.at_css(".itemSummary") {
+                for row in dataTable.css("tr") {
+                    if let rowName = row.css("th").first?.text where rowName.containsString("Grade") {
+                        
+                        if var rawGradeText = row.css("td").first?.text?.cleansed() {
+                            
+                            //add extra space that got stripped out since it was actually just a bunch of \t
+                            if rawGradeText.containsString("(max") {
+                                rawGradeText = rawGradeText.stringByReplacingOccurrencesOfString("(max", withString: " (max")
+                            }
+                            
+                            //ignore "ungraded"
+                            if !rawGradeText.containsString("Ungrades") {
+                                self.grade = rawGradeText
+                            }
+                        }
+                    }
+                }
+            }
+            
+            //load instructor message
             
             if !page.toHTML!.containsString("<div class=\"textPanel\">") {
                 if attempt > 10 {
@@ -83,10 +120,6 @@ class Assignment {
                         text = (text as NSString).substringFromIndex(24)
                     }
                     message += text
-                }
-                
-                if message == "" {
-                    message = "No message content."
                 }
                 
                 message = message.withNoTrailingWhitespace()

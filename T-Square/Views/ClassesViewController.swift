@@ -272,10 +272,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let recentCount = iPad() ? 10 : 5
         
         if announcements.count > recentCount {
-            let first = announcements.indices.first!
-            let last = announcements.indices.last!
-            
-            announcements.removeRange(first.advancedBy(recentCount, limit: announcements.count - 1)...last)
+            if let first = announcements.indices.first, let last = announcements.indices.last {
+                announcements.removeRange(first.advancedBy(recentCount, limit: announcements.count - 1) ... last)
+            }
         }
     }
     

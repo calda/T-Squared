@@ -297,9 +297,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         if announcements.count > recentCount {
             if let first = announcements.indices.first, let last = announcements.indices.last {
-                // advancedBy or advanced?
-                print("we're skipping announcement removal. figure this out later")
-//                announcements.removeSubrange(first.advancedBy(recentCount, limit: announcements.count - 1) ... last)
+                if let begin = announcements.index(first, offsetBy: recentCount, limitedBy: (announcements.count - 1)) {
+                    announcements.removeSubrange(begin ... last)
+                }
             }
         }
     }

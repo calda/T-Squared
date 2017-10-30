@@ -23,10 +23,10 @@ protocol Scored {
     
 }
 
-func scorefromString(string: String, isArtificial: Bool, inClass owningClass: Class) -> Scored? {
+func scorefromString(_ string: String, isArtificial: Bool, inClass owningClass: Class) -> Scored? {
     
     if string.hasPrefix("GRADE") {
-        let splits = string.componentsSeparatedByString("~")
+        let splits = string.components(separatedBy: "~")
         if splits.count != 4 && splits.count != 5 { return nil }
         
         //comment (index 4) may or may not exist
@@ -38,7 +38,7 @@ func scorefromString(string: String, isArtificial: Bool, inClass owningClass: Cl
     }
     
     if string.hasPrefix("GROUP") {
-        let splits = string.componentsSeparatedByString("~")
+        let splits = string.components(separatedBy: "~")
         if splits.count != 3 && splits.count != 4 { return nil }
         
         let group = GradeGroup(name: splits[1], weight: "\(splits[2])%", isArtificial: isArtificial, inClass: owningClass)
@@ -57,7 +57,7 @@ func scorefromString(string: String, isArtificial: Bool, inClass owningClass: Cl
     return nil
 }
 
-func equalityFunctionForScore(score: Scored) -> (Scored) -> Bool {
+func equalityFunctionForScore(_ score: Scored) -> (Scored) -> Bool {
     return { other in
         if let grade = score as? Grade, let other = other as? Grade {
             return grade.name == other.name && grade.score == other.score && grade.isArtificial == other.isArtificial
@@ -90,7 +90,7 @@ class Grade : Scored, CustomStringConvertible {
         self.isArtificial = isArtificial
         
         if scoreString.hasPrefix("(") { contributesToAverage = false }
-        let scoreToParse = scoreString.stringByReplacingOccurrencesOfString("(", withString: "").stringByReplacingOccurrencesOfString(")", withString: "")
+        let scoreToParse = scoreString.replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "")
         
         //parse score
         if scoreToParse.hasSuffix("%") {
@@ -100,8 +100,8 @@ class Grade : Scored, CustomStringConvertible {
                 return
             }
         }
-        else if scoreToParse.containsString("/") {
-            let splits = scoreToParse.componentsSeparatedByString("/")
+        else if scoreToParse.contains("/") {
+            let splits = scoreToParse.components(separatedBy: "/")
             if splits.count >= 2 {
                 if let points = splits[0].asDouble(), let total = splits[1].asDouble() {
                     
@@ -130,16 +130,16 @@ class Grade : Scored, CustomStringConvertible {
     func representAsString() -> String {
         var string = "GRADE~\(owningGroup?.name ?? "")~\(name)~\(scoreString)"
         if let comment = comment {
-            let strippedComment = comment.stringByReplacingOccurrencesOfString("~", withString: "-")
-            string.appendContentsOf("~\(strippedComment)")
+            let strippedComment = comment.replacingOccurrences(of: "~", with: "-")
+            string.append("~\(strippedComment)")
         }
         return string
     }
     
-    func performDropCheckWithClass(owningClass: Class) {
+    func performDropCheckWithClass(_ owningClass: Class) {
         //check if this grade has been artificially dropped by the user
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict = data.dictionaryForKey(TSDroppedGradesKey) as? [String : [String]] ?? [:]
+        let data = UserDefaults.standard
+        var dict = data.dictionary(forKey: TSDroppedGradesKey) as? [String : [String]] ?? [:]
         let classKey = TSAuthenticatedReader.username + "~" + owningClass.permanentID
         let droppedClasses = dict[classKey] ?? []
         
@@ -169,7 +169,7 @@ class GradeGroup : Scored, CustomStringConvertible {
             //a grade counts as edited if it is
             // (1) created artificially
             // (2) dropped by the user, meaning !isArtificial and !contributesToAverage
-            func countsAsEdit(scored: Scored) -> Bool {
+            func countsAsEdit(_ scored: Scored) -> Bool {
                 var isEdit = scored.isArtificial
                 if let grade = scored as? Grade {
                     isEdit = isEdit || (!grade.contributesToAverage && grade.score != nil)
@@ -196,19 +196,19 @@ class GradeGroup : Scored, CustomStringConvertible {
         self.name = name
         self.isArtificial = isArtificial
         
-        if let weightString = weight?.cleansed() where weightString.hasSuffix("%") {
-            if let percent = weightString.percentStringAsDouble() where percent != 0.0 {
+        if let weightString = weight?.cleansed(), weightString.hasSuffix("%") {
+            if let percent = weightString.percentStringAsDouble(), percent != 0.0 {
                 self.weight = percent * 100.0
                 return
             }
         }
         
         //attempt to load weight from TSManualCategoryWeights if not already loaded
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict = data.dictionaryForKey(TSManualCategoryWeightsKey) as? [String : Double] ?? [:]
+        let data = UserDefaults.standard
+        var dict = data.dictionary(forKey: TSManualCategoryWeightsKey) as? [String : Double] ?? [:]
         let key = "\(TSAuthenticatedReader.username)~\(owningClass.permanentID)~\(self.name)"
         
-        if let manualWeight = dict[key] where manualWeight != 0.0 {
+        if let manualWeight = dict[key], manualWeight != 0.0 {
             self.weight = manualWeight
             return
         }
@@ -222,9 +222,9 @@ class GradeGroup : Scored, CustomStringConvertible {
         self.isArtificial = isArtificial
     }
     
-    func asRootGroupForClass(currentClass: Class) -> GradeGroup {
-        let data = NSUserDefaults.standardUserDefaults()
-        let dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
+    func asRootGroupForClass(_ currentClass: Class) -> GradeGroup {
+        let data = UserDefaults.standard
+        let dict: [String : Bool] = data.dictionary(forKey: TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
         useAllSubscores = dict[currentClass.permanentID] ?? false
         return self
     }
@@ -291,7 +291,7 @@ class GradeGroup : Scored, CustomStringConvertible {
             let rounded = Double(Int(score * 1000)) / 10.0
             var roundedString = "\(rounded)"
             if roundedString.hasSuffix(".0") {
-                roundedString = (roundedString as NSString).substringToIndex(roundedString.length - 2)
+                roundedString = (roundedString as NSString).substring(to: roundedString.length - 2)
             }
             return "\(roundedString)%"
         }
@@ -314,7 +314,7 @@ class GradeGroup : Scored, CustomStringConvertible {
                 }
                 
             } else {
-                if score.scoreString.containsString("/") || score.score == nil {
+                if score.scoreString.contains("/") || score.score == nil {
                     subcountWithFraction += 1
                 }
             }
@@ -322,7 +322,7 @@ class GradeGroup : Scored, CustomStringConvertible {
         
         if subcountWithFraction == scores.count && scores.count > 0 {
             let (totalPoints, totalWeight) = scoreFraction
-            let fractionString = "\(totalPoints) / \(totalWeight)".stringByReplacingOccurrencesOfString(".0", withString: "")
+            let fractionString = "\(totalPoints) / \(totalWeight)".replacingOccurrences(of: ".0", with: "")
             return fractionString
         }
         return nil
@@ -346,14 +346,14 @@ class GradeGroup : Scored, CustomStringConvertible {
                     flattenedArray.append(Grade(name: "Nothing here yet.", score: "", weight: nil, comment: nil))
                 }
                 else {
-                    flattenedArray.appendContentsOf(group.flattened)
+                    flattenedArray.append(contentsOf: group.flattened)
                 }
                 
                 flattenedArray.append(Grade(name: "", score: "", weight: nil, comment: nil))
             }
             else {
                 flattenedArray.append(score)
-                if let grade = score as? Grade, let comment = grade.comment?.cleansed() where comment != "" && comment != "from Assignments" && comment != "from Tests & Quizzes" {
+                if let grade = score as? Grade, let comment = grade.comment?.cleansed(), comment != "" && comment != "from Assignments" && comment != "from Tests & Quizzes" {
                     flattenedArray.append(Grade(name: comment, score: "COMMENT_PLACEHOLDER", weight: nil, comment: nil))
                 }
             }

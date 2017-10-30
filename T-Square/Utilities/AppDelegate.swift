@@ -23,20 +23,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     //MARK: - Launch from URL
     
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AppDelegate.networkActivityEvent(_:)), name: TSPerformingNetworkActivityNotification, object: nil)
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        NotificationCenter.default.addObserver(self, selector: #selector(AppDelegate.networkActivityEvent(_:)), name: NSNotification.Name(rawValue: TSPerformingNetworkActivityNotification), object: nil)
         
-        if let launchSource = launchOptions?[UIApplicationLaunchOptionsSourceApplicationKey] as? String,
-           let launchURL = launchOptions?[UIApplicationLaunchOptionsURLKey] as? NSURL {
-            self.application(UIApplication.sharedApplication(), openURL: launchURL, sourceApplication: launchSource, annotation: "")
+        if let launchSource = launchOptions?[UIApplicationLaunchOptionsKey.sourceApplication] as? String,
+           let launchURL = launchOptions?[UIApplicationLaunchOptionsKey.url] as? URL {
+            self.application(UIApplication.shared, open: launchURL, sourceApplication: launchSource, annotation: "")
         }
         
         return true
     }
     
-    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
         
-        if sourceApplication == "CBTech.GT" && NSProcessInfo().operatingSystemVersion.majorVersion < 9 {
+        if sourceApplication == "CBTech.GT" && ProcessInfo().operatingSystemVersion.majorVersion < 9 {
             TSWasLaunchedFromGTPortal = true
             let controller = (window?.rootViewController as? LoginViewController)?.classesViewController
             controller?.reloadTable()
@@ -46,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         //check for launch from tsquared:// url
-        TSLaunchedUsername = "\(url)".stringByReplacingOccurrencesOfString("tsquared://", withString: "")
+        TSLaunchedUsername = "\(url)".replacingOccurrences(of: "tsquared://", with: "")
         if TSLaunchedUsername == "" { TSLaunchedUsername = nil }
         return true
     }
@@ -55,7 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //MARK: Tracking Network Activity
     var networkActivityCount = 0
     
-    func networkActivityEvent(notification: NSNotification) {
+    func networkActivityEvent(_ notification: Notification) {
         
         let activityToggle: Bool
         
@@ -77,7 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         else { notificationBool = nil }
         
         if let notificationBool = notificationBool {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetActivityIndicatorEnabledNotification, object: notificationBool, userInfo: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetActivityIndicatorEnabledNotification), object: notificationBool, userInfo: nil)
         }
 
     }
@@ -86,16 +86,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //MARK: Disable selection for cells when the app resigns active
     //like when a notification is tapped on
     
-    func applicationWillResignActive(application: UIApplication) {
+    func applicationWillResignActive(_ application: UIApplication) {
         
         if TSAuthenticatedReader == nil { return }
         
         //disable selection for all cells
         if let loginController = window?.rootViewController as? LoginViewController {
             let tableView = loginController.classesViewController.tableView
-            if let delegate = tableView.delegate as? StackableTableDelegate {
-                for cell in tableView.visibleCells {
-                    if let indexPath = tableView.indexPathForCell(cell) {
+            if let delegate = tableView?.delegate as? StackableTableDelegate {
+                for cell in (tableView?.visibleCells)! {
+                    if let indexPath = tableView?.indexPath(for: cell) {
                         delegate.animateSelection(cell, indexPath: indexPath, selected: false)
                     }
                 }
@@ -103,7 +103,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func applicationDidEnterBackground(application: UIApplication) {
+    func applicationDidEnterBackground(_ application: UIApplication) {
         TSWasLaunchedFromGTPortal = false
         (window?.rootViewController as? LoginViewController)?.classesViewController?.reloadTable()
     }
@@ -140,7 +140,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             //build a manual delegate stack
             //so that the only item in the stack is the ClassesViewController
             classesController.delegateStack = Stack()
-            let stackItem: (delegate: StackableTableDelegate, contentOffset: CGPoint) = (classesController, CGPointMake(0.0, 0.0))
+            let stackItem: (delegate: StackableTableDelegate, contentOffset: CGPoint) = (classesController, CGPoint(x: 0.0, y: 0.0))
             classesController.delegateStack.push(stackItem)
             
             networkActivityCount = 0 //reset counter
@@ -150,7 +150,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     @available(iOS 9.0, *)
-    func application(application: UIApplication, performActionForShortcutItem shortcutItem: UIApplicationShortcutItem, completionHandler: (Bool) -> Void) {
+    func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
         
         guard let info = shortcutItem.userInfo else { return }
         guard let URL = info["URL"] as? String else { return }
@@ -178,13 +178,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     //MARK: Check if a touch happens in the status bar
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        super.touchesBegan(touches, withEvent: event)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
         guard let window = self.window else { return }
         guard let touch = touches.first else { return }
-        let location = touch.locationInView(window)
-        let statusBarFrame = UIApplication.sharedApplication().statusBarFrame
-        if CGRectContainsPoint(statusBarFrame, location) {
+        let location = touch.location(in: window)
+        let statusBarFrame = UIApplication.shared.statusBarFrame
+        if statusBarFrame.contains(location) {
             postNotification(TSStatusBarTappedNotification, object: nil)
         }
     }

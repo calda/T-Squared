@@ -10,34 +10,34 @@ import Foundation
 import Kanna
 import UIKit
 
-let TSNetworkQueue = dispatch_queue_create("edu.gatech.cal.network-queue", DISPATCH_QUEUE_CONCURRENT)
+let TSNetworkQueue = DispatchQueue(label: "edu.gatech.cal.network-queue", attributes: DispatchQueue.Attributes.concurrent)
 
 class HttpClient {
     
     //MARK: - HTTP implementation
     
-    private var url: NSURL?
-    private var session: NSURLSession
+    fileprivate var url: URL?
+    fileprivate var session: URLSession
     
     internal init(url: String, useMobile: Bool = true) {
-        self.url = NSURL(string: url)
+        self.url = URL(string: url)
         
-        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
-        config.requestCachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
         if useMobile {
-            config.HTTPAdditionalHeaders = ["User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4"]
+            config.httpAdditionalHeaders = ["User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4"]
         }
-        self.session = NSURLSession(configuration: config)
-        NSURLCache.setSharedURLCache(SwizzlingNSURLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil))
+        self.session = URLSession(configuration: config)
+        URLCache.shared = SwizzlingNSURLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
         
-        session.configuration.HTTPShouldSetCookies = true
-        session.configuration.HTTPCookieAcceptPolicy = NSHTTPCookieAcceptPolicy.Always
-        session.configuration.HTTPCookieStorage?.cookieAcceptPolicy = NSHTTPCookieAcceptPolicy.Always
-        session.configuration.requestCachePolicy = .ReloadIgnoringLocalCacheData
+        session.configuration.httpShouldSetCookies = true
+        session.configuration.httpCookieAcceptPolicy = HTTPCookie.AcceptPolicy.always
+        session.configuration.httpCookieStorage?.cookieAcceptPolicy = HTTPCookie.AcceptPolicy.always
+        session.configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
     }
     
     internal func sendGet() -> String? {
-        NSURLCache.sharedURLCache().removeAllCachedResponses()
+        URLCache.shared.removeAllCachedResponses()
         
         var attempts = 0
         var failed = false
@@ -46,16 +46,16 @@ class HttpClient {
         var content: String!
         guard let url = self.url else { return nil }
         
-        let request = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 5.0)
+        let request = NSMutableURLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5.0)
         
         while !stopTrying && !ready {
             
             failed = false
             
-            let task = session.dataTaskWithRequest(request) {
+            let task = session.dataTask(with: request as URLRequest, completionHandler: {
                 (data, response, error) -> Void in
                 if let data = data {
-                    if let loadedContent = NSString(data: data, encoding: NSASCIIStringEncoding) {
+                    if let loadedContent = NSString(data: data, encoding: String.Encoding.ascii.rawValue) {
                         content = loadedContent as String
                         ready = true
                         return
@@ -68,7 +68,7 @@ class HttpClient {
                     stopTrying = true
                 }
                 
-            }
+            }) 
             
             task.resume()
             while !ready && !failed && !stopTrying {
@@ -84,17 +84,17 @@ class HttpClient {
         return content
     }
     
-    internal func setUrl(url: String) {
-        self.url = NSURL(string: url)
+    internal func setUrl(_ url: String) {
+        self.url = URL(string: url)
     }
     
-    static func getInfoFromPage(page: NSString, infoSearch: String, terminator: String = "\"") -> String? {
-        let position = page.rangeOfString(infoSearch)
+    static func getInfoFromPage(_ page: NSString, infoSearch: String, terminator: String = "\"") -> String? {
+        let position = page.range(of: infoSearch)
         let location = position.location
         if location > page.length {
             return nil
         }
-        let containsInfo = (page.substringToIndex(min(location + 300, page.length - 1)) as NSString).substringFromIndex(min(location + infoSearch.characters.count, page.length - 1))
+        let containsInfo = (page.substring(to: min(location + 300, page.length - 1)) as NSString).substring(from: min(location + infoSearch.characters.count, page.length - 1))
         let characters = containsInfo.characters
         
         var info = ""
@@ -108,7 +108,7 @@ class HttpClient {
     }
     
     static func clearCookies() {
-        let cookies = NSHTTPCookieStorage.sharedHTTPCookieStorage()
+        let cookies = HTTPCookieStorage.shared
         for cookie in (cookies.cookies ?? []) {
             cookies.deleteCookie(cookie)
         }
@@ -117,13 +117,13 @@ class HttpClient {
     
     //MARK: - HTTP Requests
     
-    static func requestPageWithLoginVerification(url: String) -> HTMLDocument? {
+    static func requestPageWithLoginVerification(_ url: String) -> HTMLDocument? {
         
-        if !url.containsString("t-square") && !url.containsString("/pda/") {
+        if !url.contains("t-square") && !url.contains("/pda/") {
             return HttpClient.contentsOfPage(url, postNotificationOnError: false)
         }
         
-        guard let loginController = (UIApplication.sharedApplication().delegate as? AppDelegate)?.window?.rootViewController as? LoginViewController else { return nil }
+        guard let loginController = (UIApplication.shared.delegate as? AppDelegate)?.window?.rootViewController as? LoginViewController else { return nil }
         
         let requestedPage = HttpClient.contentsOfPage(url, postNotificationOnError: false)
 
@@ -133,21 +133,21 @@ class HttpClient {
             return nil
         }
         
-        if contents.containsString("Georgia Tech :: LAWN :: Login Redirect Page") {
+        if contents.contains("Georgia Tech :: LAWN :: Login Redirect Page") {
             
             sync { loginController.syncronizedNetworkErrorRecieved(showAlert: false) }
             
-            let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Your login with GTother has expired.", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "Nevermind", style: .Destructive, handler: nil))
-            alert.addAction(UIAlertAction(title: "Log In", style: .Default, handler: { _ in
-                UIApplication.sharedApplication().openURL(NSURL(string: "http://t2.gatech.edu")!)
+            let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Your login with GTother has expired.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Nevermind", style: .destructive, handler: nil))
+            alert.addAction(UIAlertAction(title: "Log In", style: .default, handler: { _ in
+                UIApplication.shared.openURL(URL(string: "http://t2.gatech.edu")!)
             }))
-            loginController.presentViewController(alert, animated: true, completion: nil)
+            loginController.present(alert, animated: true, completion: nil)
             
             return nil
         }
         
-        if !contents.containsString("Log Out")  {
+        if !contents.contains("Log Out")  {
             //Cookies invalid. Attempting to reauthenticate.
             
             var username: String
@@ -162,8 +162,7 @@ class HttpClient {
                     
                     //try to pull from the login controller's text fields
                     if let typedUsername = loginController.usernameField.text,
-                       let typedPassword = loginController.passwordField.text
-                       where typedUsername.length > 0 && typedPassword.length > 0 {
+                       let typedPassword = loginController.passwordField.text, typedUsername.length > 0 && typedPassword.length > 0 {
                         username = typedUsername
                         password = typedPassword
                     }
@@ -172,9 +171,9 @@ class HttpClient {
                         //we don't have a copy of the user's credentials anymore
                         loginController.unpresentClassesView()
                         
-                        let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "You were automatically logged out by the server. Please log in again.", preferredStyle: .Alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-                        loginController.presentViewController(alert, animated: true, completion: nil)
+                        let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "You were automatically logged out by the server. Please log in again.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                        loginController.present(alert, animated: true, completion: nil)
                         
                         return nil
                     }
@@ -195,12 +194,12 @@ class HttpClient {
                 else {
                     loginController.unpresentClassesView()
                     
-                    let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "You were automatically logged out by the server. Please log in again.", preferredStyle: .Alert)
+                    let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "You were automatically logged out by the server. Please log in again.", preferredStyle: .alert)
                     
-                    alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-                    alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                    alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { _ in openSettings() }))
                         
-                    loginController.presentViewController(alert, animated: true, completion: nil)
+                    loginController.present(alert, animated: true, completion: nil)
                     TSAuthenticatedReader = nil
                 }
             })
@@ -212,9 +211,9 @@ class HttpClient {
         }
     }
     
-    static func contentsOfPage(url: String, postNotificationOnError: Bool = true) -> HTMLDocument? {
+    static func contentsOfPage(_ url: String, postNotificationOnError: Bool = true) -> HTMLDocument? {
         
-        let fetchURL = url.stringByReplacingOccurrencesOfString("site", withString: "pda")
+        let fetchURL = url.replacingOccurrences(of: "site", with: "pda")
         
         if postNotificationOnError {
             return requestPageWithLoginVerification(fetchURL)
@@ -223,14 +222,22 @@ class HttpClient {
         let page = HttpClient(url: fetchURL)
         
         guard let text = page.sendGet() else { return nil }
-        return Kanna.HTML(html: text as String, encoding: NSUTF8StringEncoding)
+        
+        do {
+            return try Kanna.HTML(html: text as String, encoding: String.Encoding.utf8)
+        } catch {
+            print("cannot return content of page")
+        }
+        
+        return nil
+        
     }
     
-    static func getPageForResourceFolder(resource: ResourceFolder) -> HTMLDocument? {
+    static func getPageForResourceFolder(_ resource: ResourceFolder) -> HTMLDocument? {
         if resource.collectionID == "" && resource.navRoot == "" {
             let contents = contentsOfPage(resource.link)
             if contents == nil {
-                NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: TSNetworkErrorNotification), object: nil)
             }
             return contents
         }
@@ -239,25 +246,25 @@ class HttpClient {
         let url = "\(resource.link)\(postString)"
         
         guard let pageText = contentsOfPage(url) else {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSNetworkErrorNotification), object: nil)
             return nil
         }
         return pageText
     }
     
-    static func getPageWith100Count(originalLink: String) -> HTMLDocument? {
+    static func getPageWith100Count(_ originalLink: String) -> HTMLDocument? {
         
         let postString = "?selectPageSize=100&eventSubmit_doChange_pagesize=changepagesize"
         let url = "\(originalLink)\(postString)"
         
         guard let pageText = contentsOfPage(url) else {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSNetworkErrorNotification), object: nil)
             return nil
         }
         return pageText
     }
     
-    static func markClassActive(currentClass: Class, active: Bool, atPreferencesLink link: String) {
+    static func markClassActive(_ currentClass: Class, active: Bool, atPreferencesLink link: String) {
         
         var postString = "?prefs_form:numtabs=20"
         postString += "&prefs_form:_id\(active ? 43 : 35)=\(currentClass.permanentID)"
@@ -283,11 +290,11 @@ extension String {
         var text = self as NSString
         //cleanse text of weird formatting
         //tabs and newlines
-        text = (text as NSString).stringByReplacingOccurrencesOfString("\n", withString: "")
-        text = (text as NSString).stringByReplacingOccurrencesOfString("\t", withString: "")
-        text = (text as NSString).stringByReplacingOccurrencesOfString("\r", withString: "")
-        text = (text as NSString).stringByReplacingOccurrencesOfString("<o:p>", withString: "")
-        text = (text as NSString).stringByReplacingOccurrencesOfString("</o:p>", withString: "")
+        text = (text as NSString).replacingOccurrences(of: "\n", with: "") as NSString
+        text = (text as NSString).replacingOccurrences(of: "\t", with: "") as NSString
+        text = (text as NSString).replacingOccurrences(of: "\r", with: "") as NSString
+        text = (text as NSString).replacingOccurrences(of: "<o:p>", with: "") as NSString
+        text = (text as NSString).replacingOccurrences(of: "</o:p>", with: "") as NSString
         
         return (text as String).withNoTrailingWhitespace()
     }
@@ -296,12 +303,12 @@ extension String {
         var text = self as NSString
         //leading spaces
         while text.length > 1 && text.stringAtIndex(0).isWhitespace() {
-            text = text.substringFromIndex(1)
+            text = text.substring(from: 1) as NSString
         }
         
         //trailing spaces
         while text.length > 0 && text.stringAtIndex(text.length - 1).isWhitespace() {
-            text = text.substringToIndex(text.length - 1)
+            text = text.substring(to: text.length - 1) as NSString
         }
         
         return text as String
@@ -314,17 +321,23 @@ extension XMLElement {
     var textWithLineBreaks: String {
         //do a switch-up to preserve <br>s
         var html = self.toHTML!
-        html = html.stringByReplacingOccurrencesOfString("<p>", withString: "")
-        html = html.stringByReplacingOccurrencesOfString("</p>", withString: "<br>")
-        html = html.stringByReplacingOccurrencesOfString("&nbsp;", withString: "")
-        html = html.stringByReplacingOccurrencesOfString("\r", withString: "")
-        html = html.stringByReplacingOccurrencesOfString("\n", withString: "")
-        html = html.stringByReplacingOccurrencesOfString("<br>", withString: "~!@!~")
-        html = html.stringByReplacingOccurrencesOfString("</br>", withString: "~!@!~")
-        html = html.stringByReplacingOccurrencesOfString("<br/>", withString: "~!@!~")
+        html = html.replacingOccurrences(of: "<p>", with: "")
+        html = html.replacingOccurrences(of: "</p>", with: "<br>")
+        html = html.replacingOccurrences(of: "&nbsp;", with: "")
+        html = html.replacingOccurrences(of: "\r", with: "")
+        html = html.replacingOccurrences(of: "\n", with: "")
+        html = html.replacingOccurrences(of: "<br>", with: "~!@!~")
+        html = html.replacingOccurrences(of: "</br>", with: "~!@!~")
+        html = html.replacingOccurrences(of: "<br/>", with: "~!@!~")
         
-        let element = HTML(html: html, encoding: NSUTF8StringEncoding)!
-        return element.text!.stringByReplacingOccurrencesOfString("~!@!~", withString: "\n")
+        do {
+            let element = try HTML(html: html, encoding: String.Encoding.utf8)
+            return element.text!.replacingOccurrences(of: "~!@!~", with: "\n")
+        } catch {
+            print("fatal error in HttpClient.swift")
+        }
+        
+        return ""
     }
     
 }

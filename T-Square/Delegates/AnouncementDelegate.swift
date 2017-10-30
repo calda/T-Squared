@@ -42,7 +42,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
                         let cell = tableCell as! AttachmentCell
                         cell.decorate(attachment.fileName)
                         cell.hideSeparator()
-                    }), atIndex: self.cells.count)
+                    }), at: self.cells.count)
                 }
                 
             }
@@ -82,11 +82,11 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             
             var authorName = announcement.author
             //correct to FIRST LAST instead of LAST, FIRST
-            let splits = authorName.componentsSeparatedByString(",")
+            let splits = authorName.components(separatedBy: ",")
             if splits.count == 2 {
                 authorName = splits[1].cleansed() + " " + splits[0]
                 //also trim out middle names???
-                let nameParts = authorName.componentsSeparatedByString(" ")
+                let nameParts = authorName.components(separatedBy: " ")
                 if nameParts.count == 3 {
                     authorName = nameParts[0] + " " + nameParts[2]
                 }
@@ -120,36 +120,36 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
     ]
     
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let (identifier, onDisplay) = cells[indexPath.item]
-            let cell = tableView.dequeueReusableCellWithIdentifier(identifier)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: identifier)!
             onDisplay(cell, announcement)
             return cell
         }
         else { //section 1 is other announcements
             if indexPath.item == 0 {
-                let cell = tableView.dequeueReusableCellWithIdentifier("title")! as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "title")! as! TitleCell
                 cell.decorate("Other Announcements in \(announcement.owningClass.name)")
                 return cell
             }
             else {
-                let cell = tableView.dequeueReusableCellWithIdentifier("announcement")! as! AnnouncementCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "announcement")! as! AnnouncementCell
                 cell.decorate(otherAnnouncements[indexPath.item - 1])
                 return cell
             }
         }
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return section == 0 ? cells.count : otherAnnouncements.count + 1
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
             let identifier = cells[indexPath.item].identifier
             if identifier == "blank" { return 15.0 }
@@ -168,9 +168,9 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             
             let font: UIFont
             if #available(iOS 8.2, *) {
-                font = UIFont.systemFontOfSize(fontSize, weight: UIFontWeightThin)
+                font = UIFont.systemFont(ofSize: fontSize, weight: UIFontWeightThin)
             } else {
-                font = UIFont.systemFontOfSize(fontSize)
+                font = UIFont.systemFont(ofSize: fontSize)
             }
             
             let height = heightForText(text, width: tableView.frame.width - 30.0, font: font)
@@ -203,7 +203,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
         return false
     }
     
-    func canHighlightCell(index: NSIndexPath) -> Bool {
+    func canHighlightCell(_ index: IndexPath) -> Bool {
         if index.section == 1 && index.item != 0 { return true }
         
         if index.section == 0 {
@@ -216,7 +216,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
         return false
     }
     
-    func processSelectedCell(index: NSIndexPath) {
+    func processSelectedCell(_ index: IndexPath) {
         if index.section == 0 {
             if cells[index.item].identifier == "attachment" {
                 let attachment = announcement.attachments![self.cells.count - 1 - index.item]
@@ -246,10 +246,10 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
         }
     }
     
-    func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
+    func animateSelection(_ cell: UITableViewCell, indexPath: IndexPath, selected: Bool) {
         
         //don't highlight "Other Announcements in..." cell
-        if let cell = self.controller.tableView.cellForRowAtIndexPath(indexPath) as? TitleCell where cell.titleLabel.text?.hasPrefix("Other Announcements") == true {
+        if let cell = self.controller.tableView.cellForRow(at: indexPath) as? TitleCell, cell.titleLabel.text?.hasPrefix("Other Announcements") == true {
             return //this is a gnarly fix that doesn't want to resolve itself any other way
         }
         
@@ -260,20 +260,20 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             normalColor = UIColor(red: 0.43, green: 0.69, blue: 1.0, alpha: indexPath.item == 0 ? 0.0 : 0.4)
             touchColor = UIColor(hue: 0.5833333333, saturation: 1.0, brightness: 1.0, alpha: 0.1)
         } else {
-            normalColor = UIColor.clearColor()
+            normalColor = UIColor.clear
             touchColor = UIColor(white: 1.0, alpha: 0.3)
         }
         
         let newBackground = selected ? touchColor : normalColor
-        UIView.animateWithDuration(0.3, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             cell.backgroundColor = newBackground
         })
     }
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: false)
         delay(0.5) {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: true)
         }
     }
     

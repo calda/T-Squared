@@ -26,7 +26,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         cell.hideSeparator()
     }
     
-    static func titleDisplayWithText(text: String, hideSeparator: Bool = false) -> (UITableViewCell, Class) -> () {
+    static func titleDisplayWithText(_ text: String, hideSeparator: Bool = false) -> (UITableViewCell, Class) -> () {
         return { cell, displayClass in
             if let cell = cell as? TitleCell {
                 cell.decorate(text)
@@ -64,9 +64,9 @@ class ClassDelegate : NSObject, StackableTableDelegate {
                 delegate.loadDataAndPushInController(controller)
             }
             else {
-                let alert = UIAlertController(title: "No Resources Folder", message: "This class does not have a Resources folder.", preferredStyle: .Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-                controller.presentViewController(alert, animated: true, completion: nil)
+                let alert = UIAlertController(title: "No Resources Folder", message: "This class does not have a Resources folder.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                controller.present(alert, animated: true, completion: nil)
             }
             
         }),
@@ -81,17 +81,17 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         (identifier: "standardTitle", onDisplay: ClassDelegate.titleDisplayWithText("Syllabus"), onTap: { controller, displayClass in
             
             controller.setActivityIndicatorVisible(true)
-            dispatch_async(TSNetworkQueue) {
+            TSNetworkQueue.async {
                 let (syllabusLink, documentLink) = TSAuthenticatedReader.getSyllabusURLForClass(displayClass)
                 sync {
                     if let documentLink = documentLink {
                         
                         var fixedLink = documentLink
-                        if !fixedLink.containsString("http") {
+                        if !fixedLink.contains("http") {
                             fixedLink = "https://files.t-square.gatech.edu\(documentLink)"
                         }
                         
-                        if let url = NSURL(string: fixedLink) {
+                        if let url = URL(string: fixedLink) {
                             controller.presentDocumentFromURL(url, name: "Syllabus")
                             return
                         }
@@ -105,9 +105,9 @@ class ClassDelegate : NSObject, StackableTableDelegate {
                     
                     //no return, meaning none of the expecting links worked
                     controller.setActivityIndicatorVisible(false)
-                    let alert = UIAlertController(title: "Syllabus not available", message: "The syllabus got away from us somehow. It looks like there isn't one posted.", preferredStyle: .Alert)
-                    alert.addAction(UIAlertAction(title: "ok", style: UIAlertActionStyle.Default, handler: nil))
-                    controller.presentViewController(alert, animated: true, completion: nil)
+                    let alert = UIAlertController(title: "Syllabus not available", message: "The syllabus got away from us somehow. It looks like there isn't one posted.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "ok", style: UIAlertActionStyle.default, handler: nil))
+                    controller.present(alert, animated: true, completion: nil)
 
                 }
             }
@@ -127,11 +127,11 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         
     ]
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return cells.count
         }
@@ -142,23 +142,23 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         else { return 0 }
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let (identifier, onDisplay, _) = cells[indexPath.item]
-            let cell = tableView.dequeueReusableCellWithIdentifier(identifier)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: identifier)!
             onDisplay(cell, displayClass)
             return cell
         }
         
         if indexPath.section == 1 {
             if indexPath.item == 0 {
-                let cell = tableView.dequeueReusableCellWithIdentifier("title") as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "title") as! TitleCell
                 cell.decorate("Announcements")
                 return cell
             }
             
             if indexPath.item == 1 && displayClass.announcements.count == 0 {
-                let cell = tableView.dequeueReusableCellWithIdentifier("message") as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "message") as! TitleCell
                 cell.decorate(controller.loadingAnnouncements ? "Loading Announcements..." : "Nothing here yet.")
                 return cell
             }
@@ -166,21 +166,21 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             let index = indexPath.item - 1
             
             if index >= displayClass.announcements.count { //Load More Announcements
-                let cell = tableView.dequeueReusableCellWithIdentifier("subtitle") as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "subtitle") as! TitleCell
                 cell.decorate("Load more announcements...")
                 cell.backgroundColor = UIColor(red: 0.43, green: 0.69, blue: 1.0, alpha: 0.4)
                 return cell
             }
             
-            let cell = tableView.dequeueReusableCellWithIdentifier("announcement") as! AnnouncementCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "announcement") as! AnnouncementCell
             cell.decorate(displayClass.announcements[index])
             return cell
         }
         
-        return tableView.dequeueReusableCellWithIdentifier("announcementTitle")!
+        return tableView.dequeueReusableCell(withIdentifier: "announcementTitle")!
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
             let identifier = cells[indexPath.item].identifier
             if identifier == "blank" { return 15.0 }
@@ -214,13 +214,13 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         return false
     }
     
-    func canHighlightCell(index: NSIndexPath) -> Bool {
+    func canHighlightCell(_ index: IndexPath) -> Bool {
         return index.section == 0
                ? cells[index.item].onTap != nil
                : index.item != 0
     }
     
-    func processSelectedCell(index: NSIndexPath) {
+    func processSelectedCell(_ index: IndexPath) {
         //announcements
         if index.section == 1 {
             if index.item == 0 { return }
@@ -229,7 +229,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             if index.item - 1 >= displayClass.announcements.count {
                 //load more announcements
                 controller.setActivityIndicatorVisible(true)
-                dispatch_async(TSNetworkQueue) {
+                TSNetworkQueue.async {
                     let allAnnouncements = TSAuthenticatedReader.getAnnouncementsForClass(self.displayClass, loadAll: true)
                     self.displayClass.announcements = allAnnouncements
                     sync {
@@ -253,14 +253,14 @@ class ClassDelegate : NSObject, StackableTableDelegate {
         }
     }
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: false)
         delay(0.5) {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: true)
         }
     }
     
-    func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
+    func animateSelection(_ cell: UITableViewCell, indexPath: IndexPath, selected: Bool) {
         let background: UIColor
         if indexPath.section == 0 {
             background = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
@@ -276,7 +276,7 @@ class ClassDelegate : NSObject, StackableTableDelegate {
             }
         }
         
-        UIView.animateWithDuration(0.3, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             cell.backgroundColor = background
         })
     }

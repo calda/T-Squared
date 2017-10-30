@@ -8,6 +8,30 @@
 
 import Foundation
 import UIKit
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 let TSGradebookCalculationSettingKey = "edu.gatech.cal.gradebookCalculationSetting"
 let TSCustomGradesKey = "edu.gatech.cal.customGrades"
@@ -29,24 +53,24 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Table View Controller methods
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 1 { return 1 }
         return 2 + (scores.count == 0 ? 1 : scores.count + 1)
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return showCalculationSwitch ? 2 : 1
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         //section 1 is toggle switch
         if indexPath.section == 1 {
-            let cell = tableView.dequeueReusableCellWithIdentifier("switch")! as! ToggleCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "switch")! as! ToggleCell
             cell.hideSeparator()
             
-            let data = NSUserDefaults.standardUserDefaults()
-            let dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
+            let data = UserDefaults.standard
+            let dict: [String : Bool] = data.dictionary(forKey: TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
             cell.decorateWithText("Grades with parenthesis are considered dropped. Count in calculations?", initialValue: dict[displayClass.permanentID] ?? false, handler: gradeTogglePressed)
             
             return cell
@@ -54,15 +78,15 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         //section 0 are the grades
         if indexPath.item == 0 {
-            return tableView.dequeueReusableCellWithIdentifier("back")!
+            return tableView.dequeueReusableCell(withIdentifier: "back")!
         }
         if indexPath.item == 1 && (scores.count == 0 || scores.count == 1) {
-            let cell = tableView.dequeueReusableCellWithIdentifier("standardTitle")! as! TitleCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "standardTitle")! as! TitleCell
             cell.decorate("Nothing here yet.")
             return cell
         }
         if indexPath.item == 1 && scores.count != 0 {
-            let cell = tableView.dequeueReusableCellWithIdentifier("classTitle") as! ClassNameCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "classTitle") as! ClassNameCell
             cell.nameLabel.text = displayClass.grades?.scoreString ?? "-"
             
             let score = displayClass.grades?.score
@@ -88,7 +112,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         if indexPath.item == 2 {
             let whatIf: String? = (displayClass.grades?.scores.count > 0) == true ? " (what if)" : nil
-            let cell = tableView.dequeueReusableCellWithIdentifier("button") as! ButtonCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "button") as! ButtonCell
             cell.decorateWithText("Add new grade" + (whatIf ?? ""), buttonImage: "button-add")
             
             if let whatIf = whatIf {
@@ -97,7 +121,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
                 let whatIfAttr = NSMutableAttributedString(string: whatIf)
                 whatIfAttr.addAttribute(NSForegroundColorAttributeName, value: UIColor(white: 0.0, alpha: 0.25), range: NSMakeRange(0, whatIf.length))
                 
-                base.appendAttributedString(whatIfAttr)
+                base.append(whatIfAttr)
                 cell.label?.attributedText = base
             }
             
@@ -106,19 +130,19 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         let score = scores[indexPath.item - 3]
         if let group = score as? GradeGroup {
-            let cell = tableView.dequeueReusableCellWithIdentifier("gradeGroup")! as! GradeGroupCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "gradeGroup")! as! GradeGroupCell
             cell.decorateForGradeGroup(group, inClass: displayClass)
             return cell
         }
         else {
             if score.scoreString == "COMMENT_PLACEHOLDER" {
-                let cell = tableView.dequeueReusableCellWithIdentifier("gradeComment")! as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "gradeComment")! as! TitleCell
                 cell.decorate(score.name)
                 cell.hideSeparator()
                 return cell
             }
             
-            let cell = tableView.dequeueReusableCellWithIdentifier("grade")! as! GradeCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "grade")! as! GradeCell
             cell.decorateForScore(score, inClass: displayClass)
             let isBlank = (score.name == "" && score.scoreString == "")
             if !isBlank || (isBlank && indexPath.item - 3 == 0) {
@@ -130,7 +154,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 1 {
             return 60.0
         }
@@ -152,7 +176,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             if score.scoreString == "COMMENT_PLACEHOLDER" {
                 //calculate height needed to display comment
                 let availableWidth: CGFloat = controller.view.frame.width - 58 - 16
-                let font = UIFont.systemFontOfSize(15.0)
+                let font = UIFont.systemFont(ofSize: 15.0)
                 return heightForText(score.name, width: availableWidth, font: font) + 20.0
             }
             return 35.0
@@ -181,7 +205,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         displayClass.grades?.scoreString //calculate the score so any lingering configuration will be present
     }
     
-    func flattenedGrades(grades: GradeGroup?) -> [Scored] {
+    func flattenedGrades(_ grades: GradeGroup?) -> [Scored] {
         showCalculationSwitch = false
         
         guard let grades = grades else { return [] }
@@ -200,8 +224,8 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
         
         if gradesWithParenthesis == totalGrades {
-            let data = NSUserDefaults.standardUserDefaults()
-            var dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
+            let data = UserDefaults.standard
+            var dict: [String : Bool] = data.dictionary(forKey: TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
             dict[displayClass.permanentID] = true
             data.setValue(TSGradebookCalculationSettingKey, forKey: TSGradebookCalculationSettingKey)
             displayClass.grades?.useAllSubscores = true
@@ -217,14 +241,14 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         return displayClass.grades == nil && !TSAuthenticatedReader.classHasCachedGrades(displayClass)
     }
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: false)
         delay(0.5) {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: true)
         }
     }
     
-    func canHighlightCell(index: NSIndexPath) -> Bool {
+    func canHighlightCell(_ index: IndexPath) -> Bool {
         if index.item == 2 { return true } //add button
         let scoreIndex = index.item - 3
         if scoreIndex >= 0 {
@@ -241,7 +265,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         return false
     }
     
-    func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
+    func animateSelection(_ cell: UITableViewCell, indexPath: IndexPath, selected: Bool) {
         if !canHighlightCell(indexPath) { return }
         
         var background = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
@@ -252,12 +276,12 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             background = UIColor(hue: 0.572, saturation: 0.53, brightness: 1.0, alpha: selected ? 0.0 : 0.14)
         }
         
-        UIView.animateWithDuration(0.3, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             cell.backgroundColor = background
         })
     }
     
-    func processSelectedCell(index: NSIndexPath) {
+    func processSelectedCell(_ index: IndexPath) {
         if !canHighlightCell(index) { return }
         
         if index.item == 2 {
@@ -275,31 +299,31 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - User Interaction
     
-    func gradeTogglePressed(newValue: Bool) {
+    func gradeTogglePressed(_ newValue: Bool) {
         
         let animateScrollUp = self.controller.tableView.contentOffset.y > 40.0
-        let paths = [NSIndexPath(forItem: 1, inSection: 0)]
-        let animation: UITableViewRowAnimation = newValue ? .Right : .Left
+        let paths = [IndexPath(item: 1, section: 0)]
+        let animation: UITableViewRowAnimation = newValue ? .right : .left
         
         if animateScrollUp {
             delay(0.2) {
-                self.controller.tableView.scrollToRowAtIndexPath(NSIndexPath(forItem: 0, inSection: 0), atScrollPosition: .Top, animated: true)
+                self.controller.tableView.scrollToRow(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
             }
             
             delay(0.6) {
                 self.displayClass.grades?.useAllSubscores = newValue
                 self.loadCachedData()
                 
-                self.controller.tableView.reloadRowsAtIndexPaths(paths, withRowAnimation: animation)
+                self.controller.tableView.reloadRows(at: paths, with: animation)
             }
         }
         
         else {
-            self.controller.tableView.reloadRowsAtIndexPaths(paths, withRowAnimation: animation)
+            self.controller.tableView.reloadRows(at: paths, with: animation)
         }
         
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict: [String : Bool] = data.dictionaryForKey(TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
+        let data = UserDefaults.standard
+        var dict: [String : Bool] = data.dictionary(forKey: TSGradebookCalculationSettingKey) as? [String : Bool] ?? [:]
         dict[self.displayClass.permanentID] = newValue
         data.setValue(dict, forKey: TSGradebookCalculationSettingKey)
     }
@@ -332,9 +356,9 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
         
         //ask the user if they want to add a Grade or a Category
-        let alert = UIAlertController(title: "Add a Grade or Category?", message: "A grade represents an assignment. A category represents a group of assignments.", preferredStyle: .Alert)
+        let alert = UIAlertController(title: "Add a Grade or Category?", message: "A grade represents an assignment. A category represents a group of assignments.", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "Grade", style: .Default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Grade", style: .default, handler: { _ in
             if groupCount == 0 {
                 self.showAddGradeDialogInRoot()
             }
@@ -343,12 +367,12 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             }
         }))
         
-        alert.addAction(UIAlertAction(title: "Category", style: .Default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "Category", style: .default, handler: { _ in
             self.showAddCategoryDialog()
         }))
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        controller.presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        controller.present(alert, animated: true, completion: nil)
     }
     
     func showSelectGroupDialog() {
@@ -362,14 +386,14 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         if groups.count == 0 { showAddGradeDialogInRoot() }
         else {
             
-            let alert = UIAlertController(title: "Select a Category", message: nil, preferredStyle: .Alert)
+            let alert = UIAlertController(title: "Select a Category", message: nil, preferredStyle: .alert)
             for group in groups {
-                alert.addAction(UIAlertAction(title: group.name, style: .Default, handler: { _ in
+                alert.addAction(UIAlertAction(title: group.name, style: .default, handler: { _ in
                     self.showAddGradeDialog(inGroup: group)
                 }))
             }
-            alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-            controller.presentViewController(alert, animated: true, completion: nil)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            controller.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -389,7 +413,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
     }
     
-    func showAddCategoryDialog(name: String? = nil) {
+    func showAddCategoryDialog(_ name: String? = nil) {
         getValidGroupInput { group in
             let root = self.displayClass.grades ?? GradeGroup(name: "ROOT", weight: 100.0).asRootGroupForClass(self.displayClass)
             group.owningGroup = root
@@ -399,9 +423,9 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Editing or Deleting existing scores
     
-    func scorePressed(score: Scored) {
+    func scorePressed(_ score: Scored) {
         
-        if let grade = score as? Grade where !score.isArtificial {
+        if let grade = score as? Grade, !score.isArtificial {
             //authentic grades from T-Square can only be dropped and picked up
             (grade.contributesToAverage ? showDropPopupForGrade : showPickUpPopupForGrade)(grade)
             //alertFunction(grade)
@@ -409,24 +433,24 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
         
         //show dialog to delete or edit if score is artificial
-        let alert = UIAlertController(title: "Edit \(score is Grade ? "Grade" : "Category")", message: nil, preferredStyle: .Alert)
+        let alert = UIAlertController(title: "Edit \(score is Grade ? "Grade" : "Category")", message: nil, preferredStyle: .alert)
         
         if let group = score as? GradeGroup {
             
-            alert.addAction(UIAlertAction(title: "Add Grade\(group.isArtificial ? "" : " to Category")", style: .Default, handler: { _ in
+            alert.addAction(UIAlertAction(title: "Add Grade\(group.isArtificial ? "" : " to Category")", style: .default, handler: { _ in
                 self.showAddGradeDialog(inGroup: group)
             }))
             
             if !group.isArtificial {
                 let title = (group.weight == nil || group.weight == 0.0) ? "Add Weight" : "Edit Weight"
-                alert.addAction(UIAlertAction(title: title, style: .Default, handler: editScoreHandler(score, completion: { newScore in
+                alert.addAction(UIAlertAction(title: title, style: .default, handler: editScoreHandler(score, completion: { newScore in
                     if let newCategory = newScore as? GradeGroup {
                         self.setManualWeightForGroup(newCategory, weight: newCategory.weight ?? 0.0)
                     }
                 })))
                 
                 if title == "Edit Weight" {
-                    alert.addAction(UIAlertAction(title: "Remove Weight", style: .Default, handler: { _ in
+                    alert.addAction(UIAlertAction(title: "Remove Weight", style: .default, handler: { _ in
                         self.setManualWeightForGroup(group, weight: 0.0)
                         let newGroup = GradeGroup(name: group.name, weight: nil, isArtificial: false)
                         newGroup.owningGroup = group.owningGroup
@@ -438,37 +462,37 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
         
         if score.isArtificial {
-            alert.addAction(UIAlertAction(title: "Edit", style: .Default, handler: editScoreHandler(score)))
+            alert.addAction(UIAlertAction(title: "Edit", style: .default, handler: editScoreHandler(score)))
             
             if let grade = score as? Grade {
-                alert.addAction(UIAlertAction(title: grade.contributesToAverage ? "Drop" : "Pick Up", style: .Default, handler: { _ in
+                alert.addAction(UIAlertAction(title: grade.contributesToAverage ? "Drop" : "Pick Up", style: .default, handler: { _ in
                     self.setDropStatus(grade.contributesToAverage, forGrade: grade)
                 }))
             }
             
-            alert.addAction(UIAlertAction(title: "Delete", style: .Destructive, handler: deleteScoreHandler(score)))
+            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: deleteScoreHandler(score)))
         }
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        controller.presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        controller.present(alert, animated: true, completion: nil)
     }
     
-    func deleteScoreHandler(score: Scored) -> (UIAlertAction) -> () {
+    func deleteScoreHandler(_ score: Scored) -> (UIAlertAction) -> () {
         return { _ in
             
             var toRemove = [score]
             if let group = score as? GradeGroup {
-                toRemove.appendContentsOf(group.scores)
+                toRemove.append(contentsOf: group.scores)
             }
             
             self.finalizeGradeChanges(add: [], remove: toRemove, swap: [])
         }
     }
     
-    func editScoreHandler(score: Scored, completion: ((Scored) -> ())? = nil) -> (UIAlertAction) -> () {
+    func editScoreHandler(_ score: Scored, completion: ((Scored) -> ())? = nil) -> (UIAlertAction) -> () {
         return { _ in
             
-            func closure(newScore: Scored) {
+            func closure(_ newScore: Scored) {
                 var new = newScore
                 new.owningGroup = score.owningGroup
                 self.finalizeGradeChanges(add: [], remove: [], swap: [(new, score)])
@@ -484,9 +508,9 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         }
     }
     
-    func setManualWeightForGroup(group: GradeGroup, weight: Double) {
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict = data.dictionaryForKey(TSManualCategoryWeightsKey) as? [String : Double] ?? [:]
+    func setManualWeightForGroup(_ group: GradeGroup, weight: Double) {
+        let data = UserDefaults.standard
+        var dict = data.dictionary(forKey: TSManualCategoryWeightsKey) as? [String : Double] ?? [:]
         let key = "\(TSAuthenticatedReader.username)~\(self.displayClass.permanentID)~\(group.name)"
         dict.updateValue(weight, forKey: key)
         data.setValue(dict, forKey: TSManualCategoryWeightsKey)
@@ -498,15 +522,15 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         var add = addScores
         var remove = removeScores
         
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict = data.dictionaryForKey(TSCustomGradesKey) as? [String : [String]] ?? [:]
+        let data = UserDefaults.standard
+        var dict = data.dictionary(forKey: TSCustomGradesKey) as? [String : [String]] ?? [:]
         let classKey = TSAuthenticatedReader.username + "~" + displayClass.permanentID
         var customScores = dict[classKey] ?? []
         
         //make a list of all the scores being edited
         var allScores: [Scored] = []
-        allScores.appendContentsOf(add)
-        allScores.appendContentsOf(remove)
+        allScores.append(contentsOf: add)
+        allScores.append(contentsOf: remove)
         for (add, remove) in swap {
             allScores.append(add)
             allScores.append(remove)
@@ -516,7 +540,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         for score in allScores {
             if let grade = score as? Grade,
                let currentOwner = grade.owningGroup {
-                if let indexInRoot = displayClass.grades?.scores.indexOf(equalityFunctionForScore(currentOwner)) {
+                if let indexInRoot = displayClass.grades?.scores.index(where: equalityFunctionForScore(currentOwner)) {
                     let groupInRoot = displayClass.grades!.scores[indexInRoot] as! GradeGroup
                     grade.owningGroup = groupInRoot
                 }
@@ -540,12 +564,12 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             }
             
             let owner = removeScore.owningGroup?.name == "ROOT" ? displayClass.grades : removeScore.owningGroup
-            if let removeIndex = owner?.scores.indexOf(equalityFunctionForScore(removeScore)) {
+            if let removeIndex = owner?.scores.index(where: equalityFunctionForScore(removeScore)) {
                 owner?.scores[removeIndex] = addScore
             }
             
             if addScore.isArtificial {
-                if let index = customScores.indexOf(removeScore.representAsString()) {
+                if let index = customScores.index(of: removeScore.representAsString()) {
                     customScores[index] = addScore.representAsString()
                 } else {
                     customScores.append(addScore.representAsString())
@@ -556,13 +580,13 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
         //remove grades
         for score in remove {
-            if let index = score.owningGroup?.scores.indexOf(equalityFunctionForScore(score)) {
-                score.owningGroup?.scores.removeAtIndex(index)
+            if let index = score.owningGroup?.scores.index(where: equalityFunctionForScore(score)) {
+                score.owningGroup?.scores.remove(at: index)
             }
             
             let string = score.representAsString()
-            if let index = customScores.indexOf(string) {
-                customScores.removeAtIndex(index)
+            if let index = customScores.index(of: string) {
+                customScores.remove(at: index)
             }
         }
         
@@ -589,13 +613,13 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         controller.tableView.reloadData()
     }
     
-    func getValidGradeInput(initialName: String? = nil, completion: (Grade) -> ()) {
+    func getValidGradeInput(_ initialName: String? = nil, completion: @escaping (Grade) -> ()) {
         let title = "\(initialName != nil ? "Edit" : "Add") a Grade"
         self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: true, previousNameInput: initialName, performingEdit: initialName != nil, completion: { name, scoreInput in
             
             var scoreString = scoreInput
-            if !scoreString.containsString("/") && !scoreString.hasSuffix("%") {
-                scoreString.appendContentsOf("%")
+            if !scoreString.contains("/") && !scoreString.hasSuffix("%") {
+                scoreString.append("%")
             }
             
             let grade = Grade(name: name, score: scoreString, weight: nil, comment: nil, isArtificial: true)
@@ -615,13 +639,13 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         
     }
     
-    func getValidGroupInput(initialName: String? = nil, canEditName: Bool = true, completion: (GradeGroup) -> ()) {
+    func getValidGroupInput(_ initialName: String? = nil, canEditName: Bool = true, completion: @escaping (GradeGroup) -> ()) {
         let title = "\(initialName != nil ? "Edit" : "Add") a Category"
         self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: false, previousNameInput: initialName, performingEdit: initialName != nil, canEditName: canEditName, completion: { name, weightInput in
             
             var weightString = weightInput
             if !weightString.hasSuffix("%") {
-                weightString.appendContentsOf("%")
+                weightString.append("%")
             }
             
             let group = GradeGroup(name: name, weight: weightString, isArtificial: canEditName, inClass: self.displayClass)
@@ -635,7 +659,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
         })
     }
     
-    func showDialogForMultipleInputWithTitle(title: String, shouldAllowFractions: Bool, previousNameInput: String? = nil, performingEdit: Bool = false, canEditName: Bool = true, completion: (String, String) -> (Bool)) {
+    func showDialogForMultipleInputWithTitle(_ title: String, shouldAllowFractions: Bool, previousNameInput: String? = nil, performingEdit: Bool = false, canEditName: Bool = true, completion: @escaping (String, String) -> (Bool)) {
         
         let inputNumberName = shouldAllowFractions ? "Score" : "Weight"
         
@@ -644,36 +668,36 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             error = "You must enter a name. "
         }
         else if previousNameInput != nil && !performingEdit {
-            error = "Invalid \(inputNumberName.lowercaseString). "
+            error = "Invalid \(inputNumberName.lowercased()). "
         }
         
         let message = error + "\(inputNumberName) must be a percentage (90%)" + (shouldAllowFractions ? " or a fraction (9/10)" : "") + "."
         
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         var nameField: UITextField!
         var scoreField: UITextField!
         
-        alert.addTextFieldWithConfigurationHandler({ textField in
+        alert.addTextField(configurationHandler: { textField in
             nameField = textField
             nameField.placeholder = "Name"
-            nameField.autocapitalizationType = .Sentences
-            if let name = previousNameInput where name != "" {
+            nameField.autocapitalizationType = .sentences
+            if let name = previousNameInput, name != "" {
                 nameField.text = name
             }
             
             if !canEditName {
-                nameField.enabled = false
-                nameField.textColor = UIColor.grayColor()
+                nameField.isEnabled = false
+                nameField.textColor = UIColor.gray
             }
             
         })
-        alert.addTextFieldWithConfigurationHandler({ textField in
+        alert.addTextField(configurationHandler: { textField in
             scoreField = textField
-            scoreField.keyboardType = UIKeyboardType.NumbersAndPunctuation
+            scoreField.keyboardType = UIKeyboardType.numbersAndPunctuation
             scoreField.placeholder = inputNumberName
         })
         
-        alert.addAction(UIAlertAction(title: performingEdit ? "Save" : "Add", style: .Default, handler: { _ in
+        alert.addAction(UIAlertAction(title: performingEdit ? "Save" : "Add", style: .default, handler: { _ in
             let name = nameField.text ?? ""
             if name == "" {
                 self.showDialogForMultipleInputWithTitle(title, shouldAllowFractions: shouldAllowFractions, previousNameInput: name, completion: completion)
@@ -695,8 +719,8 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
             
         }))
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        controller.presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        controller.present(alert, animated: true, completion: nil)
         
         delay(0.1) {
             if nameField.text != "" {
@@ -708,38 +732,38 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Dropping and Undropping grades from T-Square
     
-    func showDropPopupForGrade(grade: Grade) {
-        let alert = UIAlertController(title: "Drop grade?", message: "This grade would no longer contribute to your average.", preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: "Drop", style: .Default, handler: { _ in
+    func showDropPopupForGrade(_ grade: Grade) {
+        let alert = UIAlertController(title: "Drop grade?", message: "This grade would no longer contribute to your average.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Drop", style: .default, handler: { _ in
             self.setDropStatus(true, forGrade: grade)
         }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        controller.presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        controller.present(alert, animated: true, completion: nil)
     }
     
-    func showPickUpPopupForGrade(grade: Grade) {
-        let alert = UIAlertController(title: "Pick up grade?", message: "This grade would contribute to your average again.", preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: "Pick up", style: .Default, handler: { _ in
+    func showPickUpPopupForGrade(_ grade: Grade) {
+        let alert = UIAlertController(title: "Pick up grade?", message: "This grade would contribute to your average again.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Pick up", style: .default, handler: { _ in
             self.setDropStatus(false, forGrade: grade)
         }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        controller.presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        controller.present(alert, animated: true, completion: nil)
     }
     
-    func setDropStatus(dropped: Bool, forGrade grade: Grade) {
+    func setDropStatus(_ dropped: Bool, forGrade grade: Grade) {
         //update in memory
         grade.contributesToAverage = !dropped
         
         //update on disk
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict = data.dictionaryForKey(TSDroppedGradesKey) as? [String : [String]] ?? [:]
+        let data = UserDefaults.standard
+        var dict = data.dictionary(forKey: TSDroppedGradesKey) as? [String : [String]] ?? [:]
         let classKey = TSAuthenticatedReader.username + "~" + displayClass.permanentID
         var droppedScores = dict[classKey] ?? []
         
         if grade.contributesToAverage {
             //remove from array
-            if let index = droppedScores.indexOf(grade.representAsString()) {
-                droppedScores.removeAtIndex(index)
+            if let index = droppedScores.index(of: grade.representAsString()) {
+                droppedScores.remove(at: index)
             }
         } else {
             //add to array

@@ -14,7 +14,7 @@ class ClassNameCell : UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var subjectLabel: UILabel!
     
-    func decorate(displayClass: Class) {
+    func decorate(_ displayClass: Class) {
         nameLabel.text = displayClass.name
         subjectLabel.text = displayClass.subjectName ?? ""
         displayClass.displayCell = self
@@ -26,10 +26,10 @@ class ClassNameCellWithIcon : ClassNameCell {
     
     @IBOutlet weak var icon: UIImageView!
     
-    override func decorate(displayClass: Class) {
+    override func decorate(_ displayClass: Class) {
         super.decorate(displayClass)
-        self.icon.image = UIImage(named: displayClass.subjectIcon)?.imageWithRenderingMode(.AlwaysTemplate)
-        self.icon.tintColor = UIColor.blackColor()
+        self.icon.image = UIImage(named: displayClass.subjectIcon)?.withRenderingMode(.alwaysTemplate)
+        self.icon.tintColor = UIColor.black
     }
     
 }
@@ -42,36 +42,36 @@ class ClassNameCellWithSwitch : ClassNameCellWithIcon {
     var preferencesLink: String?
     var controller: ClassesViewController?
     
-    func decorate(displayClass: Class, preferencesLink: String?, controller: ClassesViewController) {
+    func decorate(_ displayClass: Class, preferencesLink: String?, controller: ClassesViewController) {
         self.displayClass = displayClass
         self.preferencesLink = preferencesLink
         self.controller = controller
         
         super.decorate(displayClass)
-        self.toggleSwitch.on = displayClass.isActive
+        self.toggleSwitch.isOn = displayClass.isActive
         
         //if there is a toggle in the queue
-        if let index = ClassNameCellWithSwitch.activeToggleQueue.indexOf({ return $0.displayClass == displayClass }) {
+        if let index = ClassNameCellWithSwitch.activeToggleQueue.index(where: { return $0.displayClass == displayClass }) {
             let (_, newStatus, _, _) = ClassNameCellWithSwitch.activeToggleQueue[index]
-            self.toggleSwitch.on = newStatus
+            self.toggleSwitch.isOn = newStatus
             self.toggleSwitch.alpha = 0.0
             self.activityIndicator.alpha = 1.0
             self.activityIndicator.startAnimating()
         }
         
-        self.toggleSwitch.hidden = preferencesLink == nil
+        self.toggleSwitch.isHidden = preferencesLink == nil
     }
     
-    @IBAction func switchToggled(sender: UISwitch) {
+    @IBAction func switchToggled(_ sender: UISwitch) {
         if let preferencesLink = preferencesLink,
            let displayClass = displayClass,
            let controller = controller {
             
-            let newStatus = sender.on
+            let newStatus = sender.isOn
             
             //animate indicator visible
             self.activityIndicator.startAnimating()
-            UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+            UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
                 self.activityIndicator.alpha = 1.0
                 self.toggleSwitch.alpha = 0.0
             }, completion: nil)
@@ -84,26 +84,26 @@ class ClassNameCellWithSwitch : ClassNameCellWithIcon {
             displayClass.isActive = newStatus
             
         } else {
-            sender.on = !sender.on
+            sender.isOn = !sender.isOn
         }
         
     }
     
     static var activeToggleQueue: [(displayClass: Class, newStatus: Bool, activityIndicator: UIActivityIndicatorView?, toggleSwitch: UISwitch?)] = []
     
-    static func performActiveToggle(displayClass: Class, newStatus: Bool, preferencesLink: String, controller: ClassesViewController,
+    static func performActiveToggle(_ displayClass: Class, newStatus: Bool, preferencesLink: String, controller: ClassesViewController,
         activityIndicator: UIActivityIndicatorView?, toggleSwitch: UISwitch?) {
             
         //make network call
-        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true)
-        dispatch_async(TSNetworkQueue) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSPerformingNetworkActivityNotification), object: true)
+        TSNetworkQueue.async {
             
             HttpClient.markClassActive(displayClass, active: newStatus, atPreferencesLink: preferencesLink)
             
             sync {
-                NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: TSPerformingNetworkActivityNotification), object: false)
                 //animate switch visible
-                UIView.animateWithDuration(0.8, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+                UIView.animate(withDuration: 0.8, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
                     activityIndicator?.alpha = 0.0
                     toggleSwitch?.alpha = 1.0
                 }, completion: { _ in
@@ -115,11 +115,11 @@ class ClassNameCellWithSwitch : ClassNameCellWithIcon {
                     controller.classes?.append(displayClass)
                     TSAuthenticatedReader.classes?.append(displayClass)
                 } else {
-                    if let index = controller.classes?.indexOf(displayClass) {
-                        controller.classes?.removeAtIndex(index)
+                    if let index = controller.classes?.index(of: displayClass) {
+                        controller.classes?.remove(at: index)
                     }
-                    if let index = TSAuthenticatedReader.classes?.indexOf(displayClass) {
-                        TSAuthenticatedReader.classes?.removeAtIndex(index)
+                    if let index = TSAuthenticatedReader.classes?.index(of: displayClass) {
+                        TSAuthenticatedReader.classes?.remove(at: index)
                     }
                 }
                 
@@ -129,8 +129,8 @@ class ClassNameCellWithSwitch : ClassNameCellWithIcon {
                 }
                 
                 //done, pull from queue and continue with next
-                if let index = activeToggleQueue.indexOf({ return $0.displayClass == displayClass }) {
-                    activeToggleQueue.removeAtIndex(index)
+                if let index = activeToggleQueue.index(where: { return $0.displayClass == displayClass }) {
+                    activeToggleQueue.remove(at: index)
                 }
                 
                 if activeToggleQueue.count > 0 {
@@ -153,7 +153,7 @@ class AnnouncementCell : UITableViewCell {
     @IBOutlet weak var descriptionLabel: UILabel!
     static var originalDescriptionText: NSAttributedString?
     
-    func decorate(announcement: Announcement) {
+    func decorate(_ announcement: Announcement) {
         self.announcement = announcement
         
         if AnnouncementCell.originalDescriptionText == nil {
@@ -171,12 +171,12 @@ class AnnouncementCell : UITableViewCell {
         let className = announcement.owningClass.name
         let attributed = AnnouncementCell.originalDescriptionText?.mutableCopy() as? NSMutableAttributedString
             ?? descriptionLabel.attributedText!.mutableCopy() as! NSMutableAttributedString
-        attributed.replaceCharactersInRange(NSMakeRange(18, 8), withString: className)
-        attributed.replaceCharactersInRange(NSMakeRange(0, 14), withString: timeAgo)
+        attributed.replaceCharacters(in: NSMakeRange(18, 8), with: className)
+        attributed.replaceCharacters(in: NSMakeRange(0, 14), with: timeAgo)
         descriptionLabel.attributedText = attributed
     }
     
-    static func presentAnnouncement(announcement: Announcement, inController controller: ClassesViewController) {
+    static func presentAnnouncement(_ announcement: Announcement, inController controller: ClassesViewController) {
         let delegate = AnnouncementDelegate(announcement: announcement, controller: controller)
         delegate.loadDataAndPushInController(controller)
     }
@@ -187,7 +187,7 @@ class TitleCell : UITableViewCell {
     
     @IBOutlet weak var titleLabel: UILabel!
     
-    func decorate(text: String) {
+    func decorate(_ text: String) {
         titleLabel.text = text
     }
     
@@ -199,10 +199,10 @@ class TitleWithButtonCell : BackCell {
     @IBOutlet weak var button: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     
-    func decorate(text: String, buttonText: String, activityIndicatorHidden: Bool) {
+    func decorate(_ text: String, buttonText: String, activityIndicatorHidden: Bool) {
         titleLabel.text = text
         button.text = buttonText
-        activityIndicator.hidden = activityIndicatorHidden
+        activityIndicator.isHidden = activityIndicatorHidden
     }
     
 }
@@ -211,14 +211,14 @@ class AttachmentCell : TitleCell {
     
     @IBOutlet weak var background: UIView!
     
-    override func decorate(text: String) {
+    override func decorate(_ text: String) {
         super.decorate(text)
         background.layer.cornerRadius = 5.0
         background.layer.masksToBounds = true
     }
     
-    static func presentAttachment(attachment: Attachment, inController controller: ClassesViewController) {
-        if let link = attachment.link, let url = NSURL(string: link) {
+    static func presentAttachment(_ attachment: Attachment, inController controller: ClassesViewController) {
+        if let link = attachment.link, let url = URL(string: link) {
             controller.presentDocumentFromURL(url)
         }
         
@@ -227,8 +227,8 @@ class AttachmentCell : TitleCell {
         }
     }
     
-    static func presentResource(resource: Resource, inController controller: ClassesViewController) {
-        if let url = NSURL(string: resource.link) {
+    static func presentResource(_ resource: Resource, inController controller: ClassesViewController) {
+        if let url = URL(string: resource.link) {
             controller.presentDocumentFromURL(url)
         }
     }
@@ -240,19 +240,19 @@ class AssignmentCell : UITableViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var dueLabel: UILabel!
     
-    func decorate(assignment: Assignment) {
+    func decorate(_ assignment: Assignment) {
         titleLabel.text = assignment.name
         
-        dueLabel.textColor = UIColor.blackColor()
+        dueLabel.textColor = UIColor.black
         dueLabel.alpha = 0.5
         
-        if assignment.status == .Completed {
+        if assignment.status == .completed {
             dueLabel.text = "✔︎ Completed"
             dueLabel.textColor = UIColor(red: 0.0, green: 0.3, blue: 0.0, alpha: 1.0)
             return
         }
         
-        if assignment.status == .Returned {
+        if assignment.status == .returned {
             dueLabel.text = "✔︎ Returned"
             dueLabel.textColor = UIColor(red: 0.0, green: 0.3, blue: 0.0, alpha: 1.0)
             return
@@ -260,7 +260,7 @@ class AssignmentCell : UITableViewCell {
         
         if let date = assignment.dueDate {
             dueLabel.text = "Due \(date.agoString())"
-            if (dueLabel.text!.containsString("hour") || dueLabel.text!.containsString("minute")) || date.timeIntervalSinceNow < 0 {
+            if (dueLabel.text!.contains("hour") || dueLabel.text!.contains("minute")) || date.timeIntervalSinceNow < 0 {
                 titleLabel.text = "⚠️ \(assignment.name)"
                 dueLabel.alpha = 0.7
                 dueLabel.textColor = UIColor(red: 0.5, green: 0.0, blue: 0.0, alpha: 1.0)
@@ -283,7 +283,7 @@ class GradeGroupCell : UITableViewCell {
     @IBOutlet weak var titleLabelPosition: NSLayoutConstraint!
     @IBOutlet weak var editButtonHeight: NSLayoutConstraint!
     
-    func decorateForGradeGroup(group: GradeGroup, inClass displayClass: Class) {
+    func decorateForGradeGroup(_ group: GradeGroup, inClass displayClass: Class) {
         titleLabel.text = group.name
         scoreLabel.text = group.scoreString
         weightLabel.text = nil
@@ -295,23 +295,23 @@ class GradeGroupCell : UITableViewCell {
             weightLabel.text = "Excluded from average (not weighted, tap to edit)"
         }
         
-        if let weight = group.weight where weight != 0.0 {
+        if let weight = group.weight, weight != 0.0 {
             weightLabel.text = "Weight: \(Int(weight))%"
         }
         
         if weightLabel.text != nil {
             weightLabel.alpha = 0.5
             titleLabelPosition.constant = -10.0
-            titleLabel.baselineAdjustment = .AlignBaselines
+            titleLabel.baselineAdjustment = .alignBaselines
         }
         else {
             weightLabel.alpha = 0.0
             titleLabelPosition.constant = 0
-            titleLabel.baselineAdjustment = .AlignCenters
+            titleLabel.baselineAdjustment = .alignCenters
         }
         
-        editButton.hidden = !group.isArtificial
-        if !editButton.hidden {
+        editButton.isHidden = !group.isArtificial
+        if !editButton.isHidden {
             editButton.alpha = displayClass.grades?.shouldAppearAsEdited == true ? 1.0 : 0.3
             editButtonHeight.constant = 0
         } else {
@@ -329,7 +329,7 @@ class GradeCell : UITableViewCell {
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var editButton: UIImageView!
     
-    func decorateForScore(grade: Scored, inClass displayClass: Class) {
+    func decorateForScore(_ grade: Scored, inClass displayClass: Class) {
         let name = grade.name.cleansed()
         let scoreString = grade.scoreString
         
@@ -337,7 +337,7 @@ class GradeCell : UITableViewCell {
         scoreLabel.text = scoreString
         editButton.alpha = 0.0
         
-        editButton.hidden = !grade.isArtificial
+        editButton.isHidden = !grade.isArtificial
         editButton.alpha = displayClass.grades?.shouldAppearAsEdited == true ? 1.0 : 0.3
         
         if grade.scoreString == "-" || scoreString.hasPrefix("(") && scoreString.hasSuffix(")")  {
@@ -348,7 +348,7 @@ class GradeCell : UITableViewCell {
             //the grade doesn't contribute to the average (artifically dropped)
             titleLabel.alpha = 0.5
             scoreLabel.alpha = 0.7
-            editButton.hidden = false
+            editButton.isHidden = false
             scoreLabel.text = "(\(scoreLabel.text!))"
         }
         else {
@@ -367,11 +367,11 @@ class BackCell : UITableViewCell {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BackCell.setActivityIndicatorEnabled(_:)), name: TSSetActivityIndicatorEnabledNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(BackCell.setActivityIndicatorEnabled(_:)), name: NSNotification.Name(rawValue: TSSetActivityIndicatorEnabledNotification), object: nil)
     }
     
     override func prepareForReuse() {
-        if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
             activityIndicator.alpha = appDelegate.networkActivityCount > 0 ? 1.0 : 0.0
         }
         else {
@@ -379,7 +379,7 @@ class BackCell : UITableViewCell {
         }
     }
     
-    func setActivityIndicatorEnabled(notification: NSNotification) {
+    func setActivityIndicatorEnabled(_ notification: Notification) {
         self.activityIndicator.startAnimating()
         
         //notification supports Bool or Int
@@ -393,13 +393,13 @@ class BackCell : UITableViewCell {
             return
         }
         
-        UIView.animateWithDuration(0.3, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             self.activityIndicator.alpha = indicatorVisible ? 1.0 : 0.0
         })
     }
     
-    @IBAction func backButtonPressed(sender: UIButton) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSBackPressedNotification, object: nil)
+    @IBAction func backButtonPressed(_ sender: UIButton) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSBackPressedNotification), object: nil)
     }
     
 }
@@ -410,14 +410,14 @@ class ToggleCell : UITableViewCell {
     @IBOutlet weak var toggle: UISwitch!
     var handler: ((Bool) -> ())?
     
-    func decorateWithText(text: String, initialValue: Bool, handler: (Bool) -> ()) {
+    func decorateWithText(_ text: String, initialValue: Bool, handler: @escaping (Bool) -> ()) {
         label.text = text
-        toggle.on = initialValue
+        toggle.isOn = initialValue
         self.handler = handler
     }
     
-    @IBAction func toggleToggled(sender: UISwitch) {
-        let on = sender.on
+    @IBAction func toggleToggled(_ sender: UISwitch) {
+        let on = sender.isOn
         handler?(on)
     }
     
@@ -428,23 +428,23 @@ class ButtonCell : UITableViewCell {
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var button: UIButton!
     
-    func decorateWithText(text: String, buttonImage: String) {
+    func decorateWithText(_ text: String, buttonImage: String) {
         label.text = text
         let image = UIImage(named: buttonImage)
-        button.setImage(image, forState: .Normal)
-        button.setImage(image, forState: .Selected)
+        button.setImage(image, for: UIControlState())
+        button.setImage(image, for: .selected)
     }
     
 }
 
 class LogoutSettingsCell : TitleCell {
     
-    @IBAction func logoutButtonPressed(sender: UIButton) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSLogoutNotification, object: nil)
+    @IBAction func logoutButtonPressed(_ sender: UIButton) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSLogoutNotification), object: nil)
     }
     
-    @IBAction func settingsButtonPressed(sender: UIButton) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSShowSettingsNotification, object: nil)
+    @IBAction func settingsButtonPressed(_ sender: UIButton) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSShowSettingsNotification), object: nil)
     }
     
 }
@@ -455,7 +455,7 @@ class BalloonPopupCell : UITableViewCell {
     @IBOutlet weak var cancelButton: UIImageView!
     
     enum PopupCellAction {
-        case Action, Cancel, None
+        case action, cancel, none
     }
     
     func decorateView() {
@@ -465,25 +465,25 @@ class BalloonPopupCell : UITableViewCell {
         let shadowPath = UIBezierPath(rect: shadowRect)
         self.layer.masksToBounds = false
         self.clipsToBounds = false
-        self.layer.shadowColor = UIColor.blackColor().CGColor
+        self.layer.shadowColor = UIColor.black.cgColor
         self.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
         self.layer.shadowOpacity = 0.08
-        self.layer.shadowPath = shadowPath.CGPath
+        self.layer.shadowPath = shadowPath.cgPath
     }
     
-    func actionForTouch(location: CGPoint) -> PopupCellAction {
+    func actionForTouch(_ location: CGPoint) -> PopupCellAction {
         
-        let actionFrame = actionButton.convertRect(actionButton.frame, toView: self)
-        let actionHitbot = CGRectMake(actionFrame.origin.x - 40.0, actionFrame.origin.y - 60.0, actionFrame.width + 80.0, actionFrame.height + 80.0)
-        if CGRectContainsPoint(actionHitbot, location) {
-            return .Action
+        let actionFrame = actionButton.convert(actionButton.frame, to: self)
+        let actionHitbot = CGRect(x: actionFrame.origin.x - 40.0, y: actionFrame.origin.y - 60.0, width: actionFrame.width + 80.0, height: actionFrame.height + 80.0)
+        if actionHitbot.contains(location) {
+            return .action
         }
         
         if location.x < 50.0 {
-            return .Cancel
+            return .cancel
         }
         
-        return .None
+        return .none
     }
     
 }

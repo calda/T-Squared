@@ -12,7 +12,7 @@ import UIKit
 let TSDisclaimerText = "Cal is a student at Georgia Tech. He is in no way affiliated with campus officials. This app is an unofficial service provided at user discretion. Saved account information is encrypted, and only leaves the device to authenticate with Georgia Tech's official login service."
 let TSLicenseText = "T-Squared is licensed under the GNU General Public License v2.0. Source Code is provided for those interested in validating the security of their credentials. "
 let TSEmailText = "Please feel free to send an email with any feedback, issues, or requests. T-Squared can only get better with the help of people like you!"
-let TSAvailableWidth = UIScreen.mainScreen().bounds.width - 24.0
+let TSAvailableWidth = UIScreen.main.bounds.width - 24.0
 
 
 class SettingsDelegate : NSObject, StackableTableDelegate {
@@ -35,7 +35,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
         (identifier: "classTitle", height: 80.0, onDisplay: { cell in
             if let cell = cell as? ClassNameCell {
                 cell.nameLabel.text = "T-Squared"
-                cell.subjectLabel.text = "Version \(NSBundle.applicationVersionNumber) (\(NSBundle.applicationBuildNumber))"
+                cell.subjectLabel.text = "Version \(Bundle.applicationVersionNumber) (\(Bundle.applicationBuildNumber))"
             }
         }, onTap: nil),
         
@@ -49,7 +49,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
         }),
         
         //disclaimer
-        (identifier: "gradeComment", height: heightForText(TSDisclaimerText, width: TSAvailableWidth - 50.0, font: UIFont.systemFontOfSize(15.0)) + 20.0, onDisplay: { cell in
+        (identifier: "gradeComment", height: heightForText(TSDisclaimerText, width: TSAvailableWidth - 50.0, font: UIFont.systemFont(ofSize: 15.0)) + 20.0, onDisplay: { cell in
             if let cell = cell as? TitleCell {
                 cell.decorate(TSDisclaimerText)
                 cell.titleLabel.alpha = 0.45
@@ -74,7 +74,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
         }),
         
         //disclaimer
-        (identifier: "gradeComment", height: heightForText(TSEmailText, width: TSAvailableWidth - 50.0, font: UIFont.systemFontOfSize(15.0)), onDisplay: { cell in
+        (identifier: "gradeComment", height: heightForText(TSEmailText, width: TSAvailableWidth - 50.0, font: UIFont.systemFont(ofSize: 15.0)), onDisplay: { cell in
             if let cell = cell as? TitleCell {
                 cell.decorate(TSEmailText)
                 cell.titleLabel.alpha = 0.45
@@ -132,7 +132,7 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
         }),
         
         //disclaimer
-        (identifier: "gradeComment", height: heightForText(TSLicenseText, width: TSAvailableWidth - 50.0, font: UIFont.systemFontOfSize(15.0)) + 20.0, onDisplay: { cell in
+        (identifier: "gradeComment", height: heightForText(TSLicenseText, width: TSAvailableWidth - 50.0, font: UIFont.systemFont(ofSize: 15.0)) + 20.0, onDisplay: { cell in
             if let cell = cell as? TitleCell {
                 cell.decorate(TSLicenseText)
                 cell.titleLabel.alpha = 0.45
@@ -145,17 +145,17 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Table View Delegates
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return cells.count
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return cells[indexPath.item].height
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let (identifier, _, onDisplay, _) = cells[indexPath.item]
-        let cell = tableView.dequeueReusableCellWithIdentifier(identifier)!
+        let cell = tableView.dequeueReusableCell(withIdentifier: identifier)!
         onDisplay?(cell)
         cell.hideSeparator()
         return cell
@@ -163,25 +163,25 @@ class SettingsDelegate : NSObject, StackableTableDelegate {
     
     //MARK: - Stackable Table Delegate
     
-    func processSelectedCell(index: NSIndexPath) {
+    func processSelectedCell(_ index: IndexPath) {
         cells[index.item].onTap?(controller)
     }
     
-    func canHighlightCell(index: NSIndexPath) -> Bool {
+    func canHighlightCell(_ index: IndexPath) -> Bool {
         return cells[index.item].onTap != nil
     }
     
-    func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
+    func animateSelection(_ cell: UITableViewCell, indexPath: IndexPath, selected: Bool) {
         let backgroundColor = UIColor(white: 1.0, alpha: selected ? 0.2 : 0.0)
-        UIView.animateWithDuration(0.3, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             cell.backgroundColor = backgroundColor
         })
     }
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: false)
         delay(0.5) {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: true)
         }
     }
     

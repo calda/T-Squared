@@ -40,10 +40,10 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         //transition from old password scheme
-        let data = NSUserDefaults.standardUserDefaults()
+        let data = UserDefaults.standard
         
-        if let savedUsername = data.stringForKey("edu.gatech.cal.username"),
-           let savedPassword = data.stringForKey("edu.gatech.cal.password") {
+        if let savedUsername = data.string(forKey: "edu.gatech.cal.username"),
+           let savedPassword = data.string(forKey: "edu.gatech.cal.password") {
             saveCredentials(username: savedUsername, password: savedPassword)
         }
         
@@ -52,7 +52,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         data.setValue(nil, forKey: "edu.gatech.cal.password")
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         if animated { return }
         if TSAuthenticatedReader != nil { return } //we're already authenticated
         
@@ -62,7 +62,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         var validConnection = true
         
         if let contents = pageContents {
-            if contents.containsString("Log Out") {
+            if contents.contains("Log Out") {
                 //we're still on a valid connection, but the authenticated reader doesn't exist
                 //recreate the reader
                 if let (username, password) = savedCredentials() {
@@ -82,15 +82,15 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         
         self.formCenter.constant = self.view.frame.height / 2.0
-        self.webViewTop.constant = UIScreen.mainScreen().bounds.height
-        self.containerLeading.constant = UIScreen.mainScreen().bounds.width
+        self.webViewTop.constant = UIScreen.main.bounds.height
+        self.containerLeading.constant = UIScreen.main.bounds.width
         self.view.layoutIfNeeded()
         
         originalLoggingInText = loggingInText.attributedText!
         let currentUsername = TSLaunchedUsername
         usernameField.text = currentUsername
         
-        if let (savedUsername, savedPassword) = savedCredentials() where currentUsername == nil || currentUsername == "" || currentUsername == savedUsername {
+        if let (savedUsername, savedPassword) = savedCredentials(), currentUsername == nil || currentUsername == "" || currentUsername == savedUsername {
             usernameField.text = savedUsername
             passwordField.text = savedPassword
             
@@ -101,29 +101,29 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         }
         
-        UIView.animateWithDuration(0.7, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: 0.7, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
             self.formCenter.constant = 10.0
             self.view.layoutIfNeeded()
         }, completion: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.showLogoutAlert), name: TSLogoutNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.dismissWebView as (LoginViewController) -> () -> ()), name: TSDismissWebViewNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.keyboardHeightChanged(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.centerForm), name: UIKeyboardWillHideNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LoginViewController.networkErrorRecieved), name: TSNetworkErrorNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(LoginViewController.showLogoutAlert), name: NSNotification.Name(rawValue: TSLogoutNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(LoginViewController.dismissWebView as (LoginViewController) -> () -> ()), name: NSNotification.Name(rawValue: TSDismissWebViewNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(LoginViewController.keyboardHeightChanged(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(LoginViewController.centerForm), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(LoginViewController.networkErrorRecieved), name: NSNotification.Name(rawValue: TSNetworkErrorNotification), object: nil)
         
-        activityCircle.hidden = false
+        activityCircle.isHidden = false
         activityCircle.layer.cornerRadius = 25.0
         activityCircle.layer.masksToBounds = true
-        activityCircle.transform = CGAffineTransformMakeScale(0.0, 0.0)
+        activityCircle.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let classes = segue.destinationViewController as? ClassesViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let classes = segue.destination as? ClassesViewController {
             classes.loginController = self
             classesViewController = classes
         }
-        if let browser = segue.destinationViewController as? TSWebView {
+        if let browser = segue.destination as? TSWebView {
             browser.loginController = self
             self.browserViewController = browser
         }
@@ -131,19 +131,19 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     //MARK: - Animating and processing form input
     
-    func keyboardHeightChanged(notification: NSNotification) {
+    func keyboardHeightChanged(_ notification: Notification) {
         //ignore if the classes controller is visible
         if self.containerLeading.constant == 0.0 { return }
         
         if let userInfo = notification.userInfo,
-           let keyboardFrame = (userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue {
+           let keyboardFrame = (userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             
-            let keyboardHeight = keyboardFrame().height
+            let keyboardHeight = keyboardFrame.height
             let newConstant = -10 - (keyboardHeight / (is4S() ? 2.5 : 3.0))
             
             if newConstant == formCenter.constant { return }
             
-            UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+            UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
                 self.formCenter.constant = newConstant
                 self.backgroundBottom.constant = keyboardHeight - 100.0
                 self.view.layoutIfNeeded()
@@ -153,22 +153,22 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func centerForm() {
-        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             self.formCenter.constant = -10.0
             self.backgroundBottom.constant = 0.0
             self.view.layoutIfNeeded()
         }, completion: nil)
     }
 
-    @IBAction func switchToPasswordInput(sender: AnyObject) {
+    @IBAction func switchToPasswordInput(_ sender: AnyObject) {
         passwordField.becomeFirstResponder()
     }
     
-    @IBAction func loginPressed(sender: AnyObject) {
+    @IBAction func loginPressed(_ sender: AnyObject) {
         doLogin(newLogin: true)
     }
     
-    func doLogin(newLogin newLogin: Bool) {
+    func doLogin(newLogin: Bool) {
         if usernameField.text! == "" || passwordField.text! == "" {
             shakeView(formView)
             self.animateFormSubviewsWithDuration(0.5, hidden: false)
@@ -185,9 +185,9 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         //easter-egg
         if self.usernameField.text! == "gburdell1927" {
             self.passwordField.text = ""
-            let alert = UIAlertController(title: "Nice Try, you trickster", message: "George Burdell, is that you???", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "You found me out", style: .Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+            let alert = UIAlertController(title: "Nice Try, you trickster", message: "George Burdell, is that you???", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "You found me out", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
             return
         }
         
@@ -196,13 +196,13 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         delay(0.2) { self.animateActivityIndicator(on: true) }
         
         //attempt to authenticate
-        dispatch_async(TSNetworkQueue, {
+        TSNetworkQueue.async(execute: {
             TSReader.authenticatedReader(user: self.usernameField.text!, password: self.passwordField.text!, isNewLogin: newLogin, completion: { reader in
                 
                 //successful login
                 if let reader = reader {
-                    let loginCount = NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey)
-                    NSUserDefaults.standardUserDefaults().setInteger(loginCount + 1, forKey: TSLoginCountKey)
+                    let loginCount = UserDefaults.standard.integer(forKey: TSLoginCountKey)
+                    UserDefaults.standard.set(loginCount + 1, forKey: TSLoginCountKey)
                     
                     TSAuthenticatedReader = reader
                     self.animateFormSubviewsWithDuration(0.5, hidden: false)
@@ -230,7 +230,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    func syncronizedNetworkErrorRecieved(showAlert showAlert: Bool = true) {
+    func syncronizedNetworkErrorRecieved(showAlert: Bool = true) {
         self.animateFormSubviewsWithDuration(0.5, hidden: false)
         self.animateActivityIndicator(on: false)
         
@@ -244,17 +244,17 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         
         if showAlert {
-            let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Are you connected to the internet?", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
-            alert.addAction(UIAlertAction(title: "Settings", style: .Default, handler: { _ in openSettings() }))
-            self.presentViewController(alert, animated: true, completion: nil)
+            let alert = UIAlertController(title: "Couldn't connect to T-Square", message: "Are you connected to the internet?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: nil))
+            alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { _ in openSettings() }))
+            self.present(alert, animated: true, completion: nil)
         }
         
         self.classesViewController.DISABLE_PUSHES = true
     }
     
-    func setSavedCredentials(correct correct: Bool) {
-        if !correct || !saveCredentialsSwitch.on {
+    func setSavedCredentials(correct: Bool) {
+        if !correct || !saveCredentialsSwitch.isOn {
             saveCredentials(username: nil, password: nil)
         }
         else {
@@ -262,65 +262,65 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    func animateFormSubviewsWithDuration(duration: Double, hidden: Bool) {
+    func animateFormSubviewsWithDuration(_ duration: Double, hidden: Bool) {
         for subview in formView.subviews {
             if !(subview is UIVisualEffectView) && subview.tag != -1 {
-                UIView.animateWithDuration(duration) {
+                UIView.animate(withDuration: duration, animations: {
                     subview.alpha = hidden ? 0.0 : (subview.tag == 1 ? 0.3 : 1.0)
-                }
+                }) 
             }
         }
-        UIView.animateWithDuration(duration) {
+        UIView.animate(withDuration: duration, animations: {
             self.loggingInText.alpha = hidden ? 1.0 : 0.0
-        }
+        }) 
         let loggingInString = originalLoggingInText.mutableCopy() as! NSMutableAttributedString
-        loggingInString.replaceCharactersInRange(NSMakeRange(14, 8), withString: usernameField.text!)
+        loggingInString.replaceCharacters(in: NSMakeRange(14, 8), with: usernameField.text!)
         self.loggingInText.attributedText = loggingInString
     }
     
-    func animateActivityIndicator(on on: Bool) {
+    func animateActivityIndicator(on: Bool) {
         
         var originalIndicatorPosition: CGPoint {
-            return CGPointMake(CGRectGetMidX(formView.frame) - activityIndicator.frame.width / 2.0, (CGRectGetMidY(formView.frame) - activityIndicator.frame.height / 2.0) + 50.0)
+            return CGPoint(x: formView.frame.midX - activityIndicator.frame.width / 2.0, y: (formView.frame.midY - activityIndicator.frame.height / 2.0) + 50.0)
         }
         
         if on {
             let originalPosition = originalIndicatorPosition
-            let animationStart = CGPointMake(originalPosition.x, originalPosition.y + 50)
+            let animationStart = CGPoint(x: originalPosition.x, y: originalPosition.y + 50)
             activityIndicator.frame.origin = animationStart
-            UIView.animateWithDuration(0.7, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
+            UIView.animate(withDuration: 0.7, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
                 self.activityIndicator.frame.origin = originalPosition
                 self.activityIndicator.alpha = 1.0
             }, completion: nil)
         }
         else {
             let originalPosition = originalIndicatorPosition
-            let animationEnd = CGPointMake(originalPosition.x, originalPosition.y + 50)
-            UIView.animateWithDuration(0.7, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
+            let animationEnd = CGPoint(x: originalPosition.x, y: originalPosition.y + 50)
+            UIView.animate(withDuration: 0.7, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
                 self.activityIndicator.frame.origin = animationEnd
                 self.activityIndicator.alpha = 0.0
             }, completion: nil)
         }
     }
     
-    @IBAction func defocusTextViews(sender: UITapGestureRecognizer) {
-        let touch = sender.locationInView(self.view)
-        let blurFrame = self.view.convertRect(formBlurView.frame, fromView: formBlurView.superview!)
-        if !CGRectContainsPoint(blurFrame, touch) {
+    @IBAction func defocusTextViews(_ sender: UITapGestureRecognizer) {
+        let touch = sender.location(in: self.view)
+        let blurFrame = self.view.convert(formBlurView.frame, from: formBlurView.superview!)
+        if !blurFrame.contains(touch) {
             usernameField.resignFirstResponder()
             passwordField.resignFirstResponder()
             centerForm()
         }
     }
     
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
     
     //MARK: - Switching Views
     
-    func presentClassesView(reader: TSReader) {
-        tapRecognizer.enabled = false
+    func presentClassesView(_ reader: TSReader) {
+        tapRecognizer.isEnabled = false
         var classes: [Class] = []
         var loadAttempt = 0
         while classes.count == 0 && loadAttempt < 4 && !reader.actuallyHasNoClasses {
@@ -341,13 +341,13 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
             //this means a failed authentication looked like it passed
             //AKA I have no idea what happened
             let message = "This happens every now and then. Please restart T-Squared and try again. If this keeps happening, please send an email to cal@calstephens.tech"
-            let alert = UIAlertController(title: "There was a problem logging you in.", message: message, preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "Restart", style: .Default, handler: { _ in
+            let alert = UIAlertController(title: "There was a problem logging you in.", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Restart", style: .default, handler: { _ in
                 //crash
                 let null: Int! = nil
                 null.threeCharacterString()
             }))
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             self.setSavedCredentials(correct: false)
             return
         }
@@ -356,7 +356,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         classesViewController.reloadTable()
         
         //open to the shortcut item if there is one queued
-        if let delegate = UIApplication.sharedApplication().delegate as? AppDelegate {
+        if let delegate = UIApplication.shared.delegate as? AppDelegate {
             delegate.openShortcutItemIfPresent()
         }
         
@@ -365,9 +365,9 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func animatePresentClassesView() {
-        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             self.formView.alpha = 0.0
-            self.formView.transform = CGAffineTransformMakeScale(0.6, 0.6)
+            self.formView.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
             self.containerLeading.constant = 0.0
             self.view.layoutIfNeeded()
         }, completion: nil)
@@ -377,10 +377,10 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         unpresentClassesView(0.5)
     }
     
-    func unpresentClassesView(duration: Double) {
-        UIView.animateWithDuration(duration, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+    func unpresentClassesView(_ duration: Double) {
+        UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             self.formView.alpha = 1.0
-            self.formView.transform = CGAffineTransformMakeScale(1.0, 1.0)
+            self.formView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
             self.containerLeading.constant = self.view.frame.width
             self.view.layoutIfNeeded()
         }, completion: nil)
@@ -388,16 +388,16 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     //logout from gatech login service and trash saved passwords
     func showLogoutAlert() {
-        let alert = UIAlertController(title: nil, message: "Are you sure you want to log out?", preferredStyle: iPad() ? .Alert : .ActionSheet)
-        alert.addAction(UIAlertAction(title: "Log out", style: .Destructive, handler: { _ in self.logout() }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
+        let alert = UIAlertController(title: nil, message: "Are you sure you want to log out?", preferredStyle: iPad() ? .alert : .actionSheet)
+        alert.addAction(UIAlertAction(title: "Log out", style: .destructive, handler: { _ in self.logout() }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     func logout() {
         self.classesViewController.announcements = []
         self.classesViewController.classes = nil
-        NSURLCache.sharedURLCache().removeAllCachedResponses()
+        URLCache.shared.removeAllCachedResponses()
         HttpClient.clearCookies()
         
         Authenticator.authFormPost = nil
@@ -409,14 +409,14 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         self.twoFactorWebViewCenterConstraint.constant = 220.0
         self.view.layoutIfNeeded()
         self.setSavedCredentials(correct: false)
-        NSUserDefaults.standardUserDefaults().setValue(nil, forKey: TSClassOpenCountKey)
+        UserDefaults.standard.setValue(nil, forKey: TSClassOpenCountKey)
         Class.updateShortcutItems()
         
         unpresentClassesView()
     }
     
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
         
         if self.containerLeading.constant != 0 {
             delay(0.01) {
@@ -437,26 +437,26 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var webViewVisible = false
     
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return webViewVisible ? .LightContent : .Default
+    override var preferredStatusBarStyle : UIStatusBarStyle {
+        return webViewVisible ? .lightContent : .default
     }
     
-    func presentWebViewWithURL(URL: NSURL, title: String) {
+    func presentWebViewWithURL(_ URL: Foundation.URL, title: String) {
         webViewVisible = true
         browserViewController.openLink("\(URL)")
         presentWebViewWithTitle(title)
     }
     
-    func presentWebViewWithText(text: String, title: String) {
+    func presentWebViewWithText(_ text: String, title: String) {
         webViewVisible = true
         browserViewController.renderText(text)
         presentWebViewWithTitle(title)
     }
     
-    private func presentWebViewWithTitle(title: String) {
+    fileprivate func presentWebViewWithTitle(_ title: String) {
         browserViewController.previousURL = nil
         browserViewController.titleLabel.text = title
-        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
             self.webViewTop.constant = 0.0
             self.setNeedsStatusBarAppearanceUpdate()
             self.view.layoutIfNeeded()
@@ -467,12 +467,12 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         dismissWebView(0.5)
     }
     
-    func dismissWebView(duration: Double) {
+    func dismissWebView(_ duration: Double) {
         webViewVisible = false
-        postNotification(TSPerformingNetworkActivityNotification, object: false)
+        postNotification(TSPerformingNetworkActivityNotification, object: false as AnyObject)
         classesViewController.setActivityIndicatorVisible(false)
         
-        UIView.animateWithDuration(duration, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: [], animations: {
             self.webViewTop.constant = self.view.frame.height
             self.view.layoutIfNeeded()
             self.setNeedsStatusBarAppearanceUpdate()

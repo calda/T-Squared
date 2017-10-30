@@ -29,15 +29,15 @@ class TSReader {
         self.initialPage = initialPage
     }
     
-    static func authenticatedReader(user user: String, password: String, isNewLogin: Bool, completion: (TSReader?) -> ()) {
+    static func authenticatedReader(user: String, password: String, isNewLogin: Bool, completion: @escaping (TSReader?) -> ()) {
         Authenticator.authenticateWithUsername(user, password: password, completion: { success, response in
             completion(success ? TSReader(username: user, password: password, initialPage: response) : nil)
         })
         
         //check if this is first time logging in
-        let data = NSUserDefaults.standardUserDefaults()
-        if data.valueForKey(TSInstallDateKey) == nil || isNewLogin {
-            data.setValue(NSDate(), forKey: TSInstallDateKey)
+        let data = UserDefaults.standard
+        if data.value(forKey: TSInstallDateKey) == nil || isNewLogin {
+            data.setValue(Date(), forKey: TSInstallDateKey)
         }
     }
     
@@ -141,8 +141,8 @@ class TSReader {
             guard let workspace = HttpClient.contentsOfPage(workspaceURL) else { return (classes ?? [], nil) }
 
             for worksiteLink in workspace.css("a, link") {
-                if !"Worksite Setup Membership".containsString(worksiteLink["title"] ?? "x") { continue }
-                guard let worksiteURL = worksiteLink["href"]?.stringByReplacingOccurrencesOfString("tool-reset", withString: "tool") else { continue }
+                if !"Worksite Setup Membership".contains(worksiteLink["title"] ?? "x") { continue }
+                guard let worksiteURL = worksiteLink["href"]?.replacingOccurrences(of: "tool-reset", with: "tool") else { continue }
                 
                 //find preferencesLink
                 var preferencesLink: String?
@@ -154,7 +154,7 @@ class TSReader {
                         
                         let forms = mainPreferencesPage.css("form")
                         if forms.count > 0 {
-                            preferencesLink = forms[0]["action"]?.stringByReplacingOccurrencesOfString("/tool-reset/", withString: "/tool/")
+                            preferencesLink = forms[0]["action"]?.replacingOccurrences(of: "/tool-reset/", with: "/tool/")
                         }
                     }
                 }
@@ -182,14 +182,14 @@ class TSReader {
                     
                     //check if this class is an active class
                     if self.classes == nil { self.getActiveClasses() }
-                    if let activeClasses = self.classes where activeClasses.contains(newClass) {
+                    if let activeClasses = self.classes, activeClasses.contains(newClass) {
                         newClass.isActive = true
                     }
                     
                     allClasses.append(newClass)
                     
                     //kick off the process to download the class's specific subject name
-                    dispatch_async(TSNetworkQueue) {
+                    TSNetworkQueue.async {
                         newClass.pullSpecificSubjectNameIfNotCached()
                     }
                 }
@@ -202,7 +202,7 @@ class TSReader {
         return (classes ?? [], nil)
     }
     
-    func getSpecificSubjectNameForClass(currentClass: Class) -> String? {
+    func getSpecificSubjectNameForClass(_ currentClass: Class) -> String? {
         guard let classPage = currentClass.getClassPage() else { return nil }
         
         //load page for class information display
@@ -213,21 +213,21 @@ class TSReader {
             guard let page = HttpClient.contentsOfPage(url) else { return nil }
             
             for div in page.css("div") {
-                if div["class"]?.containsString("siteDescription") == true {
-                    let text = div.text?.stringByReplacingOccurrencesOfString("\n", withString: " ").cleansed()
+                if div["class"]?.contains("siteDescription") == true {
+                    let text = div.text?.replacingOccurrences(of: "\n", with: " ").cleansed()
                     
                     //sometimes there's a paragraph of text instead of just the subject name
                     //try to filter those out
-                    let wordCount = text?.componentsSeparatedByString(" ").count ?? 0
+                    let wordCount = text?.components(separatedBy: " ").count ?? 0
                     if wordCount >= 10 {
                         return nil
                     }
                     
-                    if text?.containsString("--NO TITLE--") == true {
+                    if text?.contains("--NO TITLE--") == true {
                         return nil
                     }
                     
-                    if text?.lowercaseString.containsString("welcome") == true {
+                    if text?.lowercased().contains("welcome") == true {
                         return nil
                     }
                     
@@ -242,7 +242,7 @@ class TSReader {
     
     //MARK: - Loading Announcements
     
-    func getAnnouncementsForClass(currentClass: Class, loadAll: Bool = false) -> [Announcement] {
+    func getAnnouncementsForClass(_ currentClass: Class, loadAll: Bool = false) -> [Announcement] {
         guard let classPage = currentClass.getClassPage() else { return [] }
         
         var announcements: [Announcement] = []
@@ -298,14 +298,14 @@ class TSReader {
     
     //MARK: - Loading Resources
     
-    func getResourcesInRoot(currentClass: Class) -> [Resource] {
+    func getResourcesInRoot(_ currentClass: Class) -> [Resource] {
         if let root = getResourceRootForClass(currentClass) {
             return getResourcesInFolder(root)
         }
         return []
     }
     
-    func getResourceRootForClass(currentClass: Class) -> ResourceFolder? {
+    func getResourceRootForClass(_ currentClass: Class) -> ResourceFolder? {
         
         if let root = currentClass.rootResource {
             return root
@@ -324,7 +324,7 @@ class TSReader {
         return nil
     }
     
-    func getResourcesInFolder(folder: ResourceFolder) -> [Resource] {
+    func getResourcesInFolder(_ folder: ResourceFolder) -> [Resource] {
         var resources: [Resource] = []
         //load resources if they haven't been already
         guard let resourcesPage = HttpClient.getPageForResourceFolder(folder) else { return resources }
@@ -368,7 +368,7 @@ class TSReader {
     
     //MARK: - Loading Assignments
     
-    func getAssignmentsForClass(currentClass: Class) -> [Assignment] {
+    func getAssignmentsForClass(_ currentClass: Class) -> [Assignment] {
         guard let classPage = currentClass.getClassPage() else { return [] }
         
         var assignments: [Assignment] = []
@@ -414,7 +414,7 @@ class TSReader {
     
     //MARK: - Loading Grades
     
-    func getGradesForClass(currentClass: Class) -> GradeGroup {
+    func getGradesForClass(_ currentClass: Class) -> GradeGroup {
         let rootGroup = GradeGroup(name: "ROOT", weight: 1.0)
         
         defer {
@@ -443,11 +443,11 @@ class TSReader {
             
             let thArray = thead.css("th")
             for i in 0 ..< thArray.count {
-                guard let text = thArray[i].text?.lowercaseString else { continue }
-                if text.containsString("title") { nameIndex = i }
-                else if text.containsString("grade") { scoreIndex = i }
-                else if text.containsString("weight") { weightIndex = i }
-                else if text.containsString("comment") { commentIndex = i }
+                guard let text = thArray[i].text?.lowercased() else { continue }
+                if text.contains("title") { nameIndex = i }
+                else if text.contains("grade") { scoreIndex = i }
+                else if text.contains("weight") { weightIndex = i }
+                else if text.contains("comment") { commentIndex = i }
             }
             
             //load grades
@@ -459,7 +459,7 @@ class TSReader {
                 if cols.count < 3 { continue }
                 
                 //start of a new category
-                if (cols[nameIndex ?? 1].toHTML ?? "").containsString("categoryHeading") {
+                if (cols[nameIndex ?? 1].toHTML ?? "").contains("categoryHeading") {
                     if currentGroup !== rootGroup {
                         rootGroup.scores.append(currentGroup)
                     }
@@ -469,7 +469,7 @@ class TSReader {
                     currentGroup = GradeGroup(name: name, weight: weight, inClass: currentClass)
                     
                     //check if the group has an intrinsic grade
-                    if let scoreIndex = scoreIndex where scoreIndex < cols.count {
+                    if let scoreIndex = scoreIndex, scoreIndex < cols.count {
                         let possibleGrade = cols[scoreIndex].text ?? "-"
                         //reuse parsing code within Grade.swift
                         let parsedGrade = Grade(name: "parser", score: possibleGrade, weight: nil, comment: nil)
@@ -489,7 +489,7 @@ class TSReader {
                     let weight: String? = (weightIndex != nil ? cols[weightIndex!].text?.cleansed() : nil)
                     
                     var comment: String? = nil
-                    if let commentIndex = commentIndex where commentIndex < cols.count {
+                    if let commentIndex = commentIndex, commentIndex < cols.count {
                         comment = cols[commentIndex].text?.cleansed()
                     }
                     
@@ -510,14 +510,14 @@ class TSReader {
         return rootGroup
     }
     
-    func classHasCachedGrades(currentClass: Class) -> Bool {
-        let data = NSUserDefaults.standardUserDefaults()
-        let dict = data.dictionaryForKey(TSCachedGradesKey) as? [String : [String]] ?? [:]
+    func classHasCachedGrades(_ currentClass: Class) -> Bool {
+        let data = UserDefaults.standard
+        let dict = data.dictionary(forKey: TSCachedGradesKey) as? [String : [String]] ?? [:]
         let classKey = TSAuthenticatedReader.username + "~" + currentClass.permanentID
         return dict[classKey] != nil
     }
     
-    func getCachedGradesForClass(currentClass: Class) -> GradeGroup {
+    func getCachedGradesForClass(_ currentClass: Class) -> GradeGroup {
         let rootGroup = GradeGroup(name: "ROOT", weight: 1.0).asRootGroupForClass(currentClass)
         
         //load cached
@@ -530,15 +530,15 @@ class TSReader {
         return rootGroup
     }
     
-    func cacheGradesForClass(currentClass: Class, rootGroup: GradeGroup) {
+    func cacheGradesForClass(_ currentClass: Class, rootGroup: GradeGroup) {
         var gradesToCache: [String] = []
         
         for score in rootGroup.scores {
             
-            if let grade = score as? Grade where !grade.isArtificial {
+            if let grade = score as? Grade, !grade.isArtificial {
                 gradesToCache.append(grade.representAsString())
             }
-            if let group = score as? GradeGroup where !group.isArtificial {
+            if let group = score as? GradeGroup, !group.isArtificial {
                 gradesToCache.append(group.representAsString())
                 
                 for grade in group.scores where grade is Grade && !grade.isArtificial {
@@ -547,17 +547,17 @@ class TSReader {
             }
         }
         
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict = data.dictionaryForKey(TSCachedGradesKey) as? [String : [String]] ?? [:]
+        let data = UserDefaults.standard
+        var dict = data.dictionary(forKey: TSCachedGradesKey) as? [String : [String]] ?? [:]
         let classKey = TSAuthenticatedReader.username + "~" + currentClass.permanentID
         
         dict[classKey] = gradesToCache
         data.setValue(dict, forKey: TSCachedGradesKey)
     }
     
-    func getGradesAtKey(key: String, inClass currentClass: Class) -> (grades: [Grade], groups: [GradeGroup]) {
-        let data = NSUserDefaults.standardUserDefaults()
-        let dict = data.dictionaryForKey(key) as? [String : [String]] ?? [:]
+    func getGradesAtKey(_ key: String, inClass currentClass: Class) -> (grades: [Grade], groups: [GradeGroup]) {
+        let data = UserDefaults.standard
+        let dict = data.dictionary(forKey: key) as? [String : [String]] ?? [:]
         let classKey = TSAuthenticatedReader.username + "~" + currentClass.permanentID
         
         if let customGrades = dict[classKey] {
@@ -577,7 +577,7 @@ class TSReader {
         return ([], [])
     }
     
-    func addFlatGradeListToRoot(rootGroup: GradeGroup, inClass currentClass: Class, groups: [GradeGroup], grades: [Grade]) {
+    func addFlatGradeListToRoot(_ rootGroup: GradeGroup, inClass currentClass: Class, groups: [GradeGroup], grades: [Grade]) {
         
         for group in groups {
             rootGroup.scores.append(group)
@@ -592,7 +592,7 @@ class TSReader {
                 group = rootGroup
             } else  {
                 for score in rootGroup.scores {
-                    if let currentGroup = score as? GradeGroup where currentGroup.name.lowercaseString == groupName.lowercaseString {
+                    if let currentGroup = score as? GradeGroup, currentGroup.name.lowercased() == groupName.lowercased() {
                         group = currentGroup
                         break
                     }
@@ -609,7 +609,7 @@ class TSReader {
     
     //MARK: - Getting Resource for Syllabus
     
-    func getSyllabusURLForClass(currentClass: Class) -> (syllabusPage: String?, document: String?) {
+    func getSyllabusURLForClass(_ currentClass: Class) -> (syllabusPage: String?, document: String?) {
         
         guard let classPage = currentClass.getClassPage() else { return (nil, nil) }
         //load page for class announcements
@@ -631,7 +631,7 @@ class TSReader {
             var notIgnore: XMLElement? = nil
             
             for link in syllabusPage.css("a") {
-                if let linkText = link.text?.cleansed() where !ignore.contains(linkText) {
+                if let linkText = link.text?.cleansed(), !ignore.contains(linkText) {
                     //not a link to ignore
                     if notIgnore == nil { notIgnore = link }
                     else { return (syllabusLink, nil) } //multiple links worth keeping, won't pick and choose
@@ -646,21 +646,21 @@ class TSReader {
 
 extension String {
     
-    func dateWithTSquareFormat() -> NSDate? {
+    func dateWithTSquareFormat() -> Date? {
         //convert date string to NSDate
-        let formatter = NSDateFormatter()
-        formatter.locale = NSLocale(localeIdentifier: "en_US")
-        formatter.dateStyle = .MediumStyle
-        formatter.timeStyle = .ShortStyle
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
         //correct formatting to match required style
         //(Aug 27, 2015 11:27 am) -> (Aug 27, 2015, 11:27 AM)
-        var dateString = self.stringByReplacingOccurrencesOfString("pm", withString: "PM")
-        dateString = dateString.stringByReplacingOccurrencesOfString("am", withString: "AM")
+        var dateString = self.replacingOccurrences(of: "pm", with: "PM")
+        dateString = dateString.replacingOccurrences(of: "am", with: "AM")
         
         for year in 1990...2040 { //add comma after years
-            dateString = dateString.stringByReplacingOccurrencesOfString("\(year) ", withString: "\(year), ")
+            dateString = dateString.replacingOccurrences(of: "\(year) ", with: "\(year), ")
         }
-        return formatter.dateFromString(dateString)
+        return formatter.date(from: dateString)
     }
     
 }

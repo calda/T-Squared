@@ -17,7 +17,7 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     
     var loginController: LoginViewController!
     @IBOutlet weak var webView: UIWebView!
-    var previousURL: NSURL? = nil
+    var previousURL: URL? = nil
     var customHTML: String? = nil
     
     @IBOutlet weak var titleLabel: UILabel!
@@ -25,8 +25,8 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     @IBOutlet weak var forwardButton: UIButton!
     @IBOutlet weak var progressBar: UIProgressView!
     
-    var backStack: Stack<NSURL> = Stack()
-    var forwardStack: Stack<NSURL> = Stack()
+    var backStack: Stack<URL> = Stack()
+    var forwardStack: Stack<URL> = Stack()
     var goingBackwards = false
     var goingForwards = false
     var refreshing = false
@@ -34,19 +34,19 @@ class TSWebView : UIViewController, UIWebViewDelegate {
     
     var performAfterNextLoad: (() -> ())?
 
-    func setActivityCircleVisible(visible: Bool) {
+    func setActivityCircleVisible(_ visible: Bool) {
         let scale: CGFloat = visible ? 1.0 : 0.1
-        let transform = CGAffineTransformMakeScale(scale, scale)
+        let transform = CGAffineTransform(scaleX: scale, y: scale)
         
-        UIView.animateWithDuration(visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             self.loginController.activityCircle.transform = transform
             self.loginController.activityCircle.alpha = visible ? 1.0 : 0.0
         }, completion: nil)
     }
     
-    func setContentVisible(visible: Bool) {
+    func setContentVisible(_ visible: Bool) {
         delay(0.2) {
-            self.webView.hidden = !visible
+            self.webView.isHidden = !visible
         }
     }
     
@@ -54,15 +54,15 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         webView.scalesPageToFit = true
     }
     
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return UIStatusBarStyle.LightContent
+    override var preferredStatusBarStyle : UIStatusBarStyle {
+        return UIStatusBarStyle.lightContent
     }
     
-    override func viewWillTransitionToSize(size: CGSize,  withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to size: CGSize,  with coordinator: UIViewControllerTransitionCoordinator) {
         self.webView.frame = CGRect(x: 0, y: 70.0, width: size.width, height: size.height - 70.0)
     }
     
-    func openLink(link: String, reset: Bool = true) {
+    func openLink(_ link: String, reset: Bool = true) {
         if reset {
             customHTML = nil
             backStack = Stack()
@@ -70,23 +70,23 @@ class TSWebView : UIViewController, UIWebViewDelegate {
             updateNavButtons()
         }
         
-        guard let url = NSURL(string: link) else { return }
-        let request = NSMutableURLRequest(URL: url)
-        webView.loadRequest(request)
-        self.webView.hidden = true
+        guard let url = URL(string: link) else { return }
+        let request = NSMutableURLRequest(url: url)
+        webView.loadRequest(request as URLRequest)
+        self.webView.isHidden = true
         
         //on the t-square site, using force.classic also redirects you back to the home page
-        if link.containsString("?force.classic=yes") && link.containsString("gatech") {
+        if link.contains("?force.classic=yes") && link.contains("gatech") {
             performAfterNextLoad = {
                 self.setContentVisible(false)
-                var newLink = link.stringByReplacingOccurrencesOfString("?force.classic=yes", withString: "")
-                newLink = newLink.stringByReplacingOccurrencesOfString("/pda/", withString: "/site/")
+                var newLink = link.replacingOccurrences(of: "?force.classic=yes", with: "")
+                newLink = newLink.replacingOccurrences(of: "/pda/", with: "/site/")
                 self.openLink(newLink, reset: reset)
             }
         }
     }
     
-    func renderText(text: String, resetView: Bool = true) {
+    func renderText(_ text: String, resetView: Bool = true) {
         if resetView {
             backStack = Stack()
             forwardStack = Stack()
@@ -97,10 +97,10 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         
         //convert links to hrefs if there aren't any
         let links = linksInText(text)
-        if !text.containsString("<a") {
+        if !text.contains("<a") {
             for link in links {
                 let href = "<a href=\(link.text)>\(link.text)</a>"
-                html = html.stringByReplacingOccurrencesOfString(link.text, withString: href)
+                html = html.replacingOccurrences(of: link.text, with: href)
             }
         }
         
@@ -113,25 +113,25 @@ class TSWebView : UIViewController, UIWebViewDelegate {
             //if there is only one link on the page, and that link is the entire contents of the page
             //then open that page
             if links.count == 1 && text.cleansed() == links[0].text {
-                guard let url = NSURL(string: links[0].text) else { return }
-                let request = NSMutableURLRequest(URL: url)
+                guard let url = URL(string: links[0].text) else { return }
+                let request = NSMutableURLRequest(url: url)
                 delay(0.1) { self.titleLabel.text = websiteForLink(links[0].text) }
-                webView.loadRequest(request)
+                webView.loadRequest(request as URLRequest)
                 
-                previousURL = NSURL(fileURLWithPath: "customHTML")
+                previousURL = URL(fileURLWithPath: "customHTML")
                 backStack.push(previousURL!)
                 updateNavButtons()
             }
         }
     }
     
-    func webView(webView: UIWebView, shouldStartLoadWithRequest request: NSURLRequest, navigationType: UIWebViewNavigationType) -> Bool {
+    func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
         
         //the UIWebView can't display PDFs, so we have to intercept them and open the request in a Document View Controller
-        if let url = request.URL {
+        if let url = request.url {
             let knownFileExtensions = ["pdf", "ppt", "pptx", "xls", "xlsx", "png", "jpg", "jpeg"]
             for ext in knownFileExtensions {
-                if "\(url)".lowercaseString.hasSuffix(".\(ext)") {
+                if "\(url)".lowercased().hasSuffix(".\(ext)") {
                     loginController.classesViewController.presentDocumentFromURL(url)
                     return false
                 }
@@ -141,11 +141,11 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         return true
     }
     
-    func webViewDidStartLoad(webView: UIWebView) {
+    func webViewDidStartLoad(_ webView: UIWebView) {
         setActivityCircleVisible(true)
     }
     
-    func webViewDidFinishLoad(webView: UIWebView) {
+    func webViewDidFinishLoad(_ webView: UIWebView) {
         self.setContentVisible(true)
         
         if !goingBackwards && !goingForwards {
@@ -159,15 +159,15 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         refreshing = false
         
         if customHTML != nil && backStack.count == 0 {
-            previousURL = NSURL(fileURLWithPath: "customHTML")
+            previousURL = URL(fileURLWithPath: "customHTML")
         }
         else {
-            previousURL = webView.request?.URL
+            previousURL = webView.request?.url
         }
         
         updateNavButtons()
         setActivityCircleVisible(false)
-        webView.scrollView.contentOffset = CGPointMake(0, 0)
+        webView.scrollView.contentOffset = CGPoint(x: 0, y: 0)
         
         if scrollToBottomWhenDoneLoading {
             scrollToBottomWhenDoneLoading = false
@@ -178,7 +178,7 @@ class TSWebView : UIViewController, UIWebViewDelegate {
             let viewHeight = webView.frame.height
             
             UIView.animateWithDuration(1.2, delay: 0.5, usingSpringWithDamping: 0.75) {
-                scrollView.contentOffset = CGPointMake(0, contentHeight - viewHeight)
+                scrollView.contentOffset = CGPoint(x: 0, y: contentHeight - viewHeight)
             }
         }
         
@@ -188,14 +188,14 @@ class TSWebView : UIViewController, UIWebViewDelegate {
 
     //MARK: - User Interaction
     
-    @IBAction func backPressed(sender: AnyObject) {
+    @IBAction func backPressed(_ sender: AnyObject) {
         if backStack.count > 0 {
             goingBackwards = true
             let newURL = backStack.pop()!
             
-            let currentURL = webView.request?.URL
+            let currentURL = webView.request?.url
             
-            if let customHTML = customHTML where newURL == NSURL(fileURLWithPath: "customHTML") {
+            if let customHTML = customHTML, newURL == URL(fileURLWithPath: "customHTML") {
                 renderText(customHTML, resetView: false)
             }
             openLink("\(newURL)", reset: false)
@@ -209,66 +209,72 @@ class TSWebView : UIViewController, UIWebViewDelegate {
         }
     }
     
-    @IBAction func forwardPressed(sender: AnyObject) {
+    @IBAction func forwardPressed(_ sender: AnyObject) {
         if forwardStack.count > 0 {
             goingForwards = true
             let newURL = forwardStack.pop()!
-            let currentURL = webView.request?.URL
+            let currentURL = webView.request?.url
             
             openLink("\(newURL)", reset: false)
             animateNavButton(forwardButton, toLeft: false)
             updateNavButtons()
             
-            if let currentURL = currentURL where "\(currentURL)" != "about:blank" {
+            if let currentURL = currentURL, "\(currentURL)" != "about:blank" {
                 backStack.push(currentURL)
             }
             else if customHTML != nil {
-                backStack.push(NSURL(fileURLWithPath: "customHTML"))
+                backStack.push(URL(fileURLWithPath: "customHTML"))
             }
         }
     }
     
-    func animateNavButton(button: UIButton, toLeft: Bool) {
+    func animateNavButton(_ button: UIButton, toLeft: Bool) {
         let offset: CGFloat = toLeft ? -25.0 : 25.0
         let originalOrigin = button.frame.origin
-        let tempOrigin = CGPointMake(originalOrigin.x + offset, originalOrigin.y)
+        let tempOrigin = CGPoint(x: originalOrigin.x + offset, y: originalOrigin.y)
         
-        UIView.animateWithDuration(0.4, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             button.frame.origin = tempOrigin
         }, completion: nil)
         
-        UIView.animateWithDuration(0.6, delay: 0.4, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: 0.6, delay: 0.4, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.0, options: [], animations: {
             button.frame.origin = originalOrigin
         }, completion: nil)
     }
     
     func updateNavButtons() {
-        backButton.enabled = backStack.count > 0
-        forwardButton.enabled = forwardStack.count > 0
+        backButton.isEnabled = backStack.count > 0
+        forwardButton.isEnabled = forwardStack.count > 0
     }
     
-    @IBAction func exitWebView(sender: AnyObject) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSDismissWebViewNotification, object: nil)
+    @IBAction func exitWebView(_ sender: AnyObject) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSDismissWebViewNotification), object: nil)
     }
     
-    @IBAction func openShareSheet(sender: UIButton) {
-        var shareItems: [AnyObject] = []
-        var activities: [UIActivity] = []
-        
-        if let currentURL = webView.request?.URL where currentURL != NSURL(string: "about:blank") {
-            shareItems.append(currentURL)
-            activities.append(SafariActivity())
-        }
-        else if let customHTML = customHTML, let customDoc = Kanna.HTML(html: customHTML, encoding: NSUTF8StringEncoding), let customText = customDoc.text {
-            shareItems.append(customText)
-        }
-        
-        let shareSheet = UIActivityViewController(activityItems: shareItems, applicationActivities: activities)
-        if iPad() {
-            let popup = UIPopoverController(contentViewController: shareSheet)
-            popup.presentPopoverFromRect(sender.frame, inView: sender.superview!, permittedArrowDirections: .Up, animated: true)
-        } else {
-            self.presentViewController(shareSheet, animated: true, completion: nil)
+    @IBAction func openShareSheet(_ sender: UIButton) {
+        do {
+            var shareItems: [AnyObject] = []
+            var activities: [UIActivity] = []
+            
+            if let currentURL = webView.request?.url, currentURL != URL(string: "about:blank") {
+                shareItems.append(currentURL as AnyObject)
+                activities.append(SafariActivity())
+            }
+            else if let customHTML = customHTML {
+                let customDoc = try Kanna.HTML(html: customHTML, encoding: String.Encoding.utf8)
+                let customText = customDoc.text
+                shareItems.append(customText as AnyObject)
+            }
+            
+            let shareSheet = UIActivityViewController(activityItems: shareItems, applicationActivities: activities)
+            if iPad() {
+                let popup = UIPopoverController(contentViewController: shareSheet)
+                popup.present(from: sender.frame, in: sender.superview!, permittedArrowDirections: .up, animated: true)
+            } else {
+                self.present(shareSheet, animated: true, completion: nil)
+            }
+        } catch {
+            print("cannot open share sheet")
         }
         
     }
@@ -277,40 +283,40 @@ class TSWebView : UIViewController, UIWebViewDelegate {
 
 class SafariActivity : UIActivity {
     
-    var URL: NSURL?
+    var URL: Foundation.URL?
     
-    override func activityType() -> String? {
-        return NSStringFromClass(SafariActivity)
+    override var activityType: UIActivityType? {
+        return UIActivityType.init("SafariActivity")
     }
-    
-    override func activityTitle() -> String? {
+        
+    override var activityTitle : String? {
         return "Open in Safari"
     }
     
-    override func activityImage() -> UIImage? {
+    override var activityImage : UIImage? {
         return UIImage(named: "action-safari")
     }
     
-    override func prepareWithActivityItems(activityItems: [AnyObject]) {
+    override func prepare(withActivityItems activityItems: [Any]) {
         for item in activityItems {
-            if let item = item as? NSURL {
+            if let item = item as? Foundation.URL {
                 URL = item
             }
         }
     }
     
-    override func canPerformWithActivityItems(activityItems: [AnyObject]) -> Bool {
+    override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
         for item in activityItems {
-            if let _ = item as? NSURL {
+            if let _ = item as? Foundation.URL {
                 return true
             }
         }
         return false
     }
     
-    override func performActivity() {
+    override func perform() {
         if let URL = URL {
-            UIApplication.sharedApplication().openURL(URL)
+            UIApplication.shared.openURL(URL)
         }
     }
     

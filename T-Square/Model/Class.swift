@@ -49,17 +49,17 @@ class Class : CustomStringConvertible, Equatable {
     
     convenience init(fromElement element: XMLElement) {
         let fullName = element.text!.cleansed()
-        let link = element["href"]!.stringByReplacingOccurrencesOfString("site", withString: "pda")
+        let link = element["href"]!.replacingOccurrences(of: "site", with: "pda")
         self.init(withFullName: fullName, link: link)
     }
     
     init(withFullName fullName: String, link: String, displayName: String? = nil) {
         self.fullName = fullName
         self.link = link
-        self.permanentID = link.componentsSeparatedByString("/").last ?? fullName
+        self.permanentID = link.components(separatedBy: "/").last ?? fullName
         
         //create user-facing name
-        let nameParts = fullName.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString: "- "))
+        let nameParts = fullName.components(separatedBy: CharacterSet(charactersIn: "- "))
         if nameParts.count >= 2 {
             
             if let displayName = displayName {
@@ -68,8 +68,8 @@ class Class : CustomStringConvertible, Equatable {
                self.name = nameParts[0] + " " + nameParts[1]
             }
             
-            if nameParts[0].containsString("/") || nameParts[0].containsString("\\") {
-                self.subjectID = nameParts[0].componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString: "/\\"))[0]
+            if nameParts[0].contains("/") || nameParts[0].contains("\\") {
+                self.subjectID = nameParts[0].components(separatedBy: CharacterSet(charactersIn: "/\\"))[0]
             } else {
                 self.subjectID = nameParts[0]
             }
@@ -84,7 +84,7 @@ class Class : CustomStringConvertible, Equatable {
             
             //attempt to find the subject name from the first few characters
             for i in 1...min(5,nsname.length) {
-                let substring = nsname.substringToIndex(i)
+                let substring = nsname.substring(to: i)
                 if let subjectInfo = GTSubjects[substring] {
                     self.subjectID = substring
                     self.subjectName = subjectInfo.description
@@ -107,12 +107,12 @@ class Class : CustomStringConvertible, Equatable {
         //not really sure what this function is supposed to do, in retrospect
         //something about classes where there are two names
         
-        if let subjectID = subjectID where (fullName as NSString).countOccurancesOfString(subjectID) > 1 {
+        if let subjectID = subjectID, (fullName as NSString).countOccurancesOfString(subjectID) > 1 {
             var subs: [String] = []
             
-            let subNames = fullName.componentsSeparatedByString(" ")
+            let subNames = fullName.components(separatedBy: " ")
             for sub in subNames {
-                let nameParts = sub.componentsSeparatedByString("-")
+                let nameParts = sub.components(separatedBy: "-")
                 if nameParts.count >= 2 {
                     let new = nameParts[0] + " " + nameParts[1]
                     if !subs.contains(new) {
@@ -134,7 +134,7 @@ class Class : CustomStringConvertible, Equatable {
     }
     
     func useFullName() {
-        self.name = (fullName as NSString).stringByReplacingOccurrencesOfString("-", withString: " ")
+        self.name = (fullName as NSString).replacingOccurrences(of: "-", with: " ")
         offsetOpenCount(0)
     }
     
@@ -146,9 +146,9 @@ class Class : CustomStringConvertible, Equatable {
     
     func useSpecificSubjectNameIfCached() {
         //check if it's cached
-        let data = NSUserDefaults.standardUserDefaults()
-        let dict = data.dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
-        if let specificSubjectName = dict[self.permanentID] where specificSubjectName != "TSSubjectNameUnavailable" {
+        let data = UserDefaults.standard
+        let dict = data.dictionary(forKey: TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
+        if let specificSubjectName = dict[self.permanentID], specificSubjectName != "TSSubjectNameUnavailable" {
             self.subjectName = specificSubjectName
             return
         }
@@ -159,7 +159,7 @@ class Class : CustomStringConvertible, Equatable {
     func pullSpecificSubjectNameIfNotCached() {
         
         //check if it's cached
-        Class.cachedSpecificSubjectNames = NSUserDefaults.standardUserDefaults().dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
+        Class.cachedSpecificSubjectNames = UserDefaults.standard.dictionary(forKey: TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
         if Class.cachedSpecificSubjectNames?[self.permanentID] != nil {
             return
         }
@@ -170,13 +170,13 @@ class Class : CustomStringConvertible, Equatable {
         //reload the dictionary since things are happening asynchronously
         
         if Class.cachedSpecificSubjectNames == nil {
-            Class.cachedSpecificSubjectNames = NSUserDefaults.standardUserDefaults().dictionaryForKey(TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
+            Class.cachedSpecificSubjectNames = UserDefaults.standard.dictionary(forKey: TSSpecificSubjectNamesKey) as? [String : String] ?? [:]
         }
         
         Class.cachedSpecificSubjectNames?.updateValue(specificSubjectName, forKey: self.permanentID)
         
         if let cachedSpecificSubjectNames = Class.cachedSpecificSubjectNames {
-            NSUserDefaults.standardUserDefaults().setValue(cachedSpecificSubjectNames, forKey: TSSpecificSubjectNamesKey)
+            UserDefaults.standard.setValue(cachedSpecificSubjectNames, forKey: TSSpecificSubjectNamesKey)
         }
         
         if specificSubjectName != "TSSubjectNameUnavailable" {
@@ -197,26 +197,26 @@ class Class : CustomStringConvertible, Equatable {
         offsetOpenCount(1)
     }
     
-    private static var ignoreOpenCountOffsets = false
+    fileprivate static var ignoreOpenCountOffsets = false
     
-    private func offsetOpenCount(offset: Int) {
+    fileprivate func offsetOpenCount(_ offset: Int) {
         
         if Class.ignoreOpenCountOffsets { return }
         
         //update open count on disk
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict: [String : Int] = data.dictionaryForKey(TSClassOpenCountKey) as? [String : Int] ?? [:]
+        let data = UserDefaults.standard
+        var dict: [String : Int] = data.dictionary(forKey: TSClassOpenCountKey) as? [String : Int] ?? [:]
         let key = "\(self.fullName)~~\(self.subjectIcon)~~\(self.name)~~\(self.link)"
         var previousCount = dict[key] ?? 0
         
         
         for otherKey in dict.keys {
             //remove any duplicates from a name change out of my control
-            if otherKey.containsString(self.link) && otherKey != key {
+            if otherKey.contains(self.link) && otherKey != key {
                 let otherCount = dict[otherKey]!
                 previousCount += otherCount
                 
-                dict.removeValueForKey(otherKey)
+                dict.removeValue(forKey: otherKey)
             }
         }
         
@@ -230,16 +230,16 @@ class Class : CustomStringConvertible, Equatable {
         Class.ignoreOpenCountOffsets = false
     }
     
-    static func updateShotcutItemsForActiveClasses(classes: [Class]) {
+    static func updateShotcutItemsForActiveClasses(_ classes: [Class]) {
         let activeClassLinks: [String] = classes.map({ return $0.link })
         
-        let data = NSUserDefaults.standardUserDefaults()
-        var dict: [String : Int] = data.dictionaryForKey(TSClassOpenCountKey) as? [String : Int] ?? [:]
+        let data = UserDefaults.standard
+        var dict: [String : Int] = data.dictionary(forKey: TSClassOpenCountKey) as? [String : Int] ?? [:]
         
         for (key, _) in dict {
-            let link = key.componentsSeparatedByString("~~")[3]
+            let link = key.components(separatedBy: "~~")[3]
             if !activeClassLinks.contains(link) {
-                dict.removeValueForKey(key)
+                dict.removeValue(forKey: key)
             }
         }
         
@@ -251,15 +251,15 @@ class Class : CustomStringConvertible, Equatable {
     static func updateShortcutItems() {
         //update Shortcut Items list
         if #available(iOS 9.0, *) {
-            let data = NSUserDefaults.standardUserDefaults()
-            let dict: [String : Int] = data.dictionaryForKey(TSClassOpenCountKey) as? [String : Int] ?? [:]
-            let sorted = dict.sort{ $0.1 > $1.1 }
+            let data = UserDefaults.standard
+            let dict: [String : Int] = data.dictionary(forKey: TSClassOpenCountKey) as? [String : Int] ?? [:]
+            let sorted = dict.sorted{ $0.1 > $1.1 }
             var shortcuts: [UIApplicationShortcutItem] = []
             
             for i in 0 ..< min(4, sorted.count) {
                 
                 let (key, _) = sorted[i]
-                let splits = key.componentsSeparatedByString("~~")
+                let splits = key.components(separatedBy: "~~")
                 
                 if splits.count != 4 { continue }
                 let fullName = splits[0]
@@ -276,7 +276,7 @@ class Class : CustomStringConvertible, Equatable {
                 shortcuts.append(shortcut)
             }
             
-            UIApplication.sharedApplication().shortcutItems = shortcuts
+            UIApplication.shared.shortcutItems = shortcuts
         }
     }
     

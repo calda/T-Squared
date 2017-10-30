@@ -17,7 +17,7 @@ class Announcement : CustomStringConvertible {
     let name: String
     var message: String?
     var author: String
-    var date: NSDate?
+    var date: Date?
     var rawDateString: String
     let link: String
     
@@ -33,10 +33,10 @@ class Announcement : CustomStringConvertible {
         self.author = author
         self.link = link
         self.rawDateString = date
-        self.date = date.dateWithTSquareFormat()
+        self.date = date.dateWithTSquareFormat() as Date?
     }
     
-    func loadMessage(completion: (String) -> ()) {
+    func loadMessage(_ completion: @escaping (String) -> ()) {
         //only load if necessary
         if let message = self.message {
             completion(message)
@@ -44,10 +44,10 @@ class Announcement : CustomStringConvertible {
         }
         
         //load message
-        dispatch_async(TSNetworkQueue, {
+        TSNetworkQueue.async(execute: {
             if let page = HttpClient.contentsOfPage(self.link) {
                 
-                if !page.toHTML!.containsString("<p>") {
+                if !page.toHTML!.contains("<p>") {
                     self.loadMessage(completion)
                 }
                 else {
@@ -60,7 +60,7 @@ class Announcement : CustomStringConvertible {
                     }
                     
                     for imgTag in page.css("img") {
-                        if let src = imgTag["src"] where src.containsString("http") {
+                        if let src = imgTag["src"], src.contains("http") {
                             let attachment = Attachment(link: src, fileName: "Attached image")
                             if self.attachments == nil { self.attachments = [] }
                             self.attachments!.append(attachment)
@@ -70,13 +70,13 @@ class Announcement : CustomStringConvertible {
                     self.message = message.withNoTrailingWhitespace()
                     
                     //remove weird tags that sometimes end up in announcements
-                    self.message = self.message!.stringByReplacingOccurrencesOfString("<o:p>", withString: "")
-                    self.message = self.message!.stringByReplacingOccurrencesOfString("</o:p>", withString: "")
+                    self.message = self.message!.replacingOccurrences(of: "<o:p>", with: "")
+                    self.message = self.message!.replacingOccurrences(of: "</o:p>", with: "")
                     
                     //load attachments if present
                     for link in page.css("a, link") {
                         let linkURL = link["href"] ?? ""
-                        if linkURL.containsString("/attachment/") {
+                        if linkURL.contains("/attachment/") {
                             let attachment = Attachment(link: linkURL, fileName: link.text?.cleansed() ?? "Attached file")
                             if self.attachments == nil { self.attachments = [] }
                             self.attachments!.append(attachment)
@@ -95,24 +95,24 @@ class Announcement : CustomStringConvertible {
     
     func hasBeenRead() -> Bool {
         guard let date = self.date else { return true }
-        let data = NSUserDefaults.standardUserDefaults()
+        let data = UserDefaults.standard
         
         //mark as read if the announcement pre-dates the install date of the app
-        if let installDate = data.valueForKey(TSInstallDateKey) as? NSDate {
-            if installDate.timeIntervalSinceDate(date) > 0 {
+        if let installDate = data.value(forKey: TSInstallDateKey) as? Date {
+            if installDate.timeIntervalSince(date) > 0 {
                 return true
             }
         }
         
-        let read = data.valueForKey(TSReadAnnouncementsKey) as? [NSDate] ?? []
+        let read = data.value(forKey: TSReadAnnouncementsKey) as? [Date] ?? []
         return read.contains(date)
     }
     
     func markRead() {
         guard let date = self.date else { return }
-        let data = NSUserDefaults.standardUserDefaults()
-        var read = data.valueForKey(TSReadAnnouncementsKey) as? [NSDate] ?? []
-        read.insert(date, atIndex: 0)
+        let data = UserDefaults.standard
+        var read = data.value(forKey: TSReadAnnouncementsKey) as? [Date] ?? []
+        read.insert(date, at: 0)
         data.setValue(read, forKey: TSReadAnnouncementsKey)
     }
     

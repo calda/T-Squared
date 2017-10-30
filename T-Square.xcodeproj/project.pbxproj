@@ -28,8 +28,6 @@
 		2E36538B1D84885D00B2403E /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653871D84885D00B2403E /* LoginViewController.swift */; };
 		2E36538C1D84885D00B2403E /* TableViewCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653881D84885D00B2403E /* TableViewCells.swift */; };
 		2E36538D1D84885D00B2403E /* TSWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3653891D84885D00B2403E /* TSWebView.swift */; };
-		2E4B30991BCF5B6700C13222 /* Kanna.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4B30921BCF5B5F00C13222 /* Kanna.framework */; };
-		2E4B309B1BCF5B7700C13222 /* Kanna.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2E4B30921BCF5B5F00C13222 /* Kanna.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2E7C6F651B8E6DDE00E95183 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F631B8E6DDE00E95183 /* Main.storyboard */; };
 		2E7C6F671B8E6DDE00E95183 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F661B8E6DDE00E95183 /* Assets.xcassets */; };
 		2E7C6F6A1B8E6DDE00E95183 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E7C6F681B8E6DDE00E95183 /* LaunchScreen.storyboard */; };
@@ -40,40 +38,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		2E4B30911BCF5B5F00C13222 /* PBXContainerItemProxy */ = {
+		3C50B18B1FA6EC8800378D18 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2E4B308A1BCF5B5F00C13222 /* Kanna.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1EAFA0D81B6039D5001F3D84;
-			remoteInfo = Kanna_iOS;
+			remoteGlobalIDString = 1E7ADC331DF4F3FC006E1815;
+			remoteInfo = Kanna;
 		};
-		2E4B30931BCF5B5F00C13222 /* PBXContainerItemProxy */ = {
+		3C50B18D1FA6EC8800378D18 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2E4B308A1BCF5B5F00C13222 /* Kanna.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1EBA8A6B1B6632E800226B9C;
-			remoteInfo = Kanna_OSX;
-		};
-		2E4B30951BCF5B5F00C13222 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2E4B308A1BCF5B5F00C13222 /* Kanna.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1EAFA0E31B6039D5001F3D84;
-			remoteInfo = KannaTests;
-		};
-		2E4B30971BCF5B5F00C13222 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2E4B308A1BCF5B5F00C13222 /* Kanna.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1E206B841B665E6D00441E12;
-			remoteInfo = "Kanna_OSX Tests";
-		};
-		2E4B309C1BCF5B7700C13222 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2E4B308A1BCF5B5F00C13222 /* Kanna.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 1EAFA0D71B6039D5001F3D84;
-			remoteInfo = Kanna_iOS;
+			remoteGlobalIDString = 1E7ADC3C1DF4F3FC006E1815;
+			remoteInfo = Tests;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -84,7 +61,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				2E4B309B1BCF5B7700C13222 /* Kanna.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -132,7 +108,6 @@
 			files = (
 				2EAB82D71EB3E97B0018017E /* libxml2.2.tbd in Frameworks */,
 				2E7F581A1BE59566000590EB /* Security.framework in Frameworks */,
-				2E4B30991BCF5B6700C13222 /* Kanna.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,10 +175,8 @@
 		2E4B308B1BCF5B5F00C13222 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2E4B30921BCF5B5F00C13222 /* Kanna.framework */,
-				2E4B30941BCF5B5F00C13222 /* Kanna.framework */,
-				2E4B30961BCF5B5F00C13222 /* KannaTests.xctest */,
-				2E4B30981BCF5B5F00C13222 /* Kanna_OSX Tests.xctest */,
+				3C50B18C1FA6EC8800378D18 /* Kanna.framework */,
+				3C50B18E1FA6EC8800378D18 /* Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -266,7 +239,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				2E4B309D1BCF5B7700C13222 /* PBXTargetDependency */,
 			);
 			name = "T-Squared";
 			productName = "T-Square";
@@ -284,8 +256,8 @@
 				TargetAttributes = {
 					2E7C6F5B1B8E6DDE00E95183 = {
 						CreatedOnToolsVersion = 7.0;
-						DevelopmentTeam = FZ89A5SZ7C;
-						LastSwiftMigration = 0800;
+						DevelopmentTeam = 54362BT7G2;
+						LastSwiftMigration = 0820;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 0;
@@ -319,32 +291,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		2E4B30921BCF5B5F00C13222 /* Kanna.framework */ = {
+		3C50B18C1FA6EC8800378D18 /* Kanna.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = Kanna.framework;
-			remoteRef = 2E4B30911BCF5B5F00C13222 /* PBXContainerItemProxy */;
+			remoteRef = 3C50B18B1FA6EC8800378D18 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		2E4B30941BCF5B5F00C13222 /* Kanna.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Kanna.framework;
-			remoteRef = 2E4B30931BCF5B5F00C13222 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		2E4B30961BCF5B5F00C13222 /* KannaTests.xctest */ = {
+		3C50B18E1FA6EC8800378D18 /* Tests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = KannaTests.xctest;
-			remoteRef = 2E4B30951BCF5B5F00C13222 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		2E4B30981BCF5B5F00C13222 /* Kanna_OSX Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "Kanna_OSX Tests.xctest";
-			remoteRef = 2E4B30971BCF5B5F00C13222 /* PBXContainerItemProxy */;
+			path = Tests.xctest;
+			remoteRef = 3C50B18D1FA6EC8800378D18 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -394,14 +352,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		2E4B309D1BCF5B7700C13222 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Kanna_iOS;
-			targetProxy = 2E4B309C1BCF5B7700C13222 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		2E7C6F631B8E6DDE00E95183 /* Main.storyboard */ = {
@@ -513,6 +463,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 54362BT7G2;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "T-Square/Info.plist";
@@ -520,7 +471,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "edu.gatech.cal.T-Squared";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -529,6 +480,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 54362BT7G2;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "T-Square/Info.plist";
@@ -536,7 +488,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "edu.gatech.cal.T-Squared";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

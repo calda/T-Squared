@@ -17,35 +17,35 @@ class ZLKeychainService: NSObject {
     var service = "edu.gatech.cal.t-squared"
     var keychainQuery :[NSString: AnyObject]! = nil
     
-    func save(name name: NSString, value: NSString) -> OSStatus? {
+    func save(name: NSString, value: NSString) -> OSStatus? {
         let statusAdd :OSStatus?
         
-        guard let dataFromString: NSData = value.dataUsingEncoding(NSUTF8StringEncoding) else {
+        guard let dataFromString: Data = value.data(using: String.Encoding.utf8.rawValue) else {
             return nil
         }
         
         keychainQuery = [
             kSecClass       : kSecClassGenericPassword,
-            kSecAttrService : service,
+            kSecAttrService : service as AnyObject,
             kSecAttrAccount : name,
-            kSecValueData   : dataFromString]
+            kSecValueData   : dataFromString as AnyObject]
         if keychainQuery == nil {
             return nil
         }
         
-        SecItemDelete(keychainQuery as CFDictionaryRef)
+        SecItemDelete(keychainQuery as CFDictionary)
         
-        statusAdd = SecItemAdd(keychainQuery! as CFDictionaryRef, nil)
+        statusAdd = SecItemAdd(keychainQuery! as CFDictionary, nil)
         
         return statusAdd;
     }
     
-    func load(name name: NSString) -> String? {
+    func load(name: NSString) -> String? {
         var contentsOfKeychain :String?
         
         keychainQuery = [
             kSecClass       : kSecClassGenericPassword,
-            kSecAttrService : service,
+            kSecAttrService : service as AnyObject,
             kSecAttrAccount : name,
             kSecReturnData  : kCFBooleanTrue,
             kSecMatchLimit  : kSecMatchLimitOne]
@@ -54,11 +54,11 @@ class ZLKeychainService: NSObject {
         }
         
         var dataTypeRef: AnyObject?
-        let status: OSStatus = SecItemCopyMatching(keychainQuery, &dataTypeRef)
+        let status: OSStatus = SecItemCopyMatching(keychainQuery as CFDictionary, &dataTypeRef)
         
         if (status == errSecSuccess) {
-            let retrievedData: NSData? = dataTypeRef as? NSData
-            if let result = NSString(data: retrievedData!, encoding: NSUTF8StringEncoding) {
+            let retrievedData: Data? = dataTypeRef as? Data
+            if let result = NSString(data: retrievedData!, encoding: String.Encoding.utf8.rawValue) {
                 contentsOfKeychain = result as String
             }
         }
@@ -85,6 +85,6 @@ func saveCredentials(username optUsername: String?, password optPassword: String
     let username = (optUsername ?? "_NIL") as NSString
     let password = (optPassword ?? "_NIL") as NSString
     let keychain = ZLKeychainService()
-    keychain.save(name: TSUsernameKey, value: username)
-    keychain.save(name: TSPasswordKey, value: password)
+    keychain.save(name: TSUsernameKey as NSString, value: username)
+    keychain.save(name: TSPasswordKey as NSString, value: password)
 }

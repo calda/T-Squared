@@ -63,22 +63,22 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
     ]
     
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let (identifier, onDisplay) = cells[indexPath.item]
-            let cell = tableView.dequeueReusableCellWithIdentifier(identifier)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: identifier)!
             onDisplay(cell, assignment)
             return cell
         }
         
         if indexPath.section == 1 {
             if indexPath.item == assignment.attachments!.count {
-                let cell = tableView.dequeueReusableCellWithIdentifier("blank")!
+                let cell = tableView.dequeueReusableCell(withIdentifier: "blank")!
                 cell.hideSeparator()
                 return cell
             }
             let attachment = assignment.attachments![indexPath.item]
-            let cell = tableView.dequeueReusableCellWithIdentifier("attachment")! as! AttachmentCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "attachment")! as! AttachmentCell
             cell.decorate(attachment.fileName)
             cell.hideSeparator()
             return cell
@@ -86,16 +86,16 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
             
         else if indexPath.section == 2 {
             if indexPath.item == 0 {
-                let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle")! as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "boldTitle")! as! TitleCell
                 cell.decorate("Submitted Files")
                 return cell
             }
             else if indexPath.item == assignment.submissions!.count + 1 {
-                return tableView.dequeueReusableCellWithIdentifier("blank")!
+                return tableView.dequeueReusableCell(withIdentifier: "blank")!
             }
             else {
                 let attachment = assignment.submissions![indexPath.item - 1]
-                let cell = tableView.dequeueReusableCellWithIdentifier("attachment")! as! AttachmentCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "attachment")! as! AttachmentCell
                 cell.decorate(attachment.fileName)
                 cell.hideSeparator()
                 return cell
@@ -104,15 +104,15 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
             
         else if indexPath.section == 3 {
             if indexPath.item == 0 {
-                let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle")! as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "boldTitle")! as! TitleCell
                 cell.decorate("Feedback")
                 return cell
             }
             else if indexPath.item == 2 {
-                return tableView.dequeueReusableCellWithIdentifier("blank")!
+                return tableView.dequeueReusableCell(withIdentifier: "blank")!
             }
             else {
-                let cell = tableView.dequeueReusableCellWithIdentifier("announcementText")! as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "announcementText")! as! TitleCell
                 cell.decorate(assignment.feedback!)
                 cell.hideSeparator()
                 return cell
@@ -120,28 +120,28 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         }
         else { //if section ==
             if indexPath.item == 0 {
-                return tableView.dequeueReusableCellWithIdentifier("blank")!
+                return tableView.dequeueReusableCell(withIdentifier: "blank")!
             }
-            let cell = tableView.dequeueReusableCellWithIdentifier("boldTitle") as! TitleCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "boldTitle") as! TitleCell
             cell.decorate("Submit Assignment")
             return cell
         }
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 { return cells.count }
         else if section == 1 { return assignment.attachments == nil ? 0 : assignment.attachments!.count + (assignment.submissions != nil ? 1 : 0) }
         else if section == 2 { return assignment.submissions == nil ? 0 : assignment.submissions!.count + 2 }
         else if section == 3 { return assignment.feedback != nil ? 3 : 0 }
-        else if section == 4 { return (assignment.status == .NotSubmitted) ? 2 : 0 }
+        else if section == 4 { return (assignment.status == .notSubmitted) ? 2 : 0 }
         else { return 0 }
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 5
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 4 && indexPath.item == 0 {
             return 20.0
         }
@@ -166,7 +166,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
                 return 0 //ignore empty rows
             }
             
-            let height = heightForText(text, width: tableView.frame.width - 24.0, font: UIFont.systemFontOfSize(fontSize))
+            let height = heightForText(text, width: tableView.frame.width - 24.0, font: UIFont.systemFont(ofSize: fontSize))
             
             if identifier == "announcementText" {
                 return max(100.0, height + 30.0)
@@ -184,7 +184,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         }
         if indexPath.item == 1 && indexPath.section == 3 {
             let text = assignment.feedback!
-            let height = heightForText(text, width: tableView.frame.width - 24.0, font: UIFont.systemFontOfSize(19.0))
+            let height = heightForText(text, width: tableView.frame.width - 24.0, font: UIFont.systemFont(ofSize: 19.0))
             return height * 1.1
         }
         if indexPath.item == 2 && indexPath.section == 3 {
@@ -193,13 +193,13 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         else { return 50.0 }
     }
     
-    func heightForBlankCellAtIndexPath(indexPath: NSIndexPath) -> CGFloat {
+    func heightForBlankCellAtIndexPath(_ indexPath: IndexPath) -> CGFloat {
         
         let rowsInSection = tableView(controller.tableView, numberOfRowsInSection: indexPath.section)
         //find out if this is the last section
         if indexPath.item == (rowsInSection - 1) {
             //find out if this is the last section
-            let sectionCount = numberOfSectionsInTableView(controller.tableView)
+            let sectionCount = numberOfSections(in: controller.tableView)
             if indexPath.section == (sectionCount - 1) { return 50.0 }
             //find out if all following sections have no cell
             for section in (indexPath.section + 1) ..< sectionCount {
@@ -220,7 +220,7 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         if self.cells.count != 8 { return } //only insert on initial state (fail-safe)
         if self.assignment.grade == nil { return }
         
-        cells.insertContentsOf([
+        cells.insert(contentsOf: [
             
             (identifier: "blank", onDisplay: { cell, _ in cell.hideSeparator() }),
             
@@ -258,11 +258,11 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         return assignment.message == nil
     }
     
-    func canHighlightCell(index: NSIndexPath) -> Bool {
+    func canHighlightCell(_ index: IndexPath) -> Bool {
         return (index.section == 1 && index.item != 0) || (index.section == 4 && index.item == 1 )
     }
     
-    func processSelectedCell(index: NSIndexPath) {
+    func processSelectedCell(_ index: IndexPath) {
         if index.section == 0 {
             if cells[index.item].identifier == "announcementText" {
                 if let message = assignment.message {
@@ -303,18 +303,18 @@ class AssignmentDelegate : NSObject, StackableTableDelegate {
         }
     }
     
-    func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
+    func animateSelection(_ cell: UITableViewCell, indexPath: IndexPath, selected: Bool) {
         if indexPath.section == 4 {
-            UIView.animateWithDuration(0.3, animations: {
+            UIView.animate(withDuration: 0.3, animations: {
                 cell.backgroundColor = UIColor(white: 1.0, alpha: selected ? 0.3 : 0.0)
             })
         }
     }
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: false)
         delay(0.5) {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: true)
         }
     }
     

@@ -10,6 +10,30 @@ import Foundation
 import UIKit
 import SafariServices
 import MessageUI
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 //MARK: View Controller and initial Delegate
 
@@ -30,9 +54,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         return 1 + [tooManyClassesIndex, rateIndex, backToGTPortalIndex].filter{ $0 != nil }.count
     }
     
-    var backToGTPortalIndex: NSIndexPath? = nil
-    var tooManyClassesIndex: NSIndexPath? = nil
-    var rateIndex: NSIndexPath? = nil
+    var backToGTPortalIndex: IndexPath? = nil
+    var tooManyClassesIndex: IndexPath? = nil
+    var rateIndex: IndexPath? = nil
     var alertHidden = false
     
     var loadingAnnouncements: Bool = true
@@ -58,16 +82,16 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     //MARK: - Table View cell arrangement
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         //decide what alert to show
-        backToGTPortalIndex = TSWasLaunchedFromGTPortal ? NSIndexPath(forItem: 0, inSection: 0) : nil
+        backToGTPortalIndex = TSWasLaunchedFromGTPortal ? IndexPath(item: 0, section: 0) : nil
         
         if !alertHidden {
-            if !NSUserDefaults.standardUserDefaults().boolForKey(TSHideClassCountPopupKey) {
+            if !UserDefaults.standard.bool(forKey: TSHideClassCountPopupKey) {
                 let index = TSWasLaunchedFromGTPortal ? 2 : 1
                 if classes?.count > 8 {
-                    tooManyClassesIndex = NSIndexPath(forItem: index, inSection: 0)
+                    tooManyClassesIndex = IndexPath(item: index, section: 0)
                     rateIndex = nil //only one can be active. this takes precendnce.
                     //take about some crazy spaghetti code with mutable state. this should really be done better.
                 } else {
@@ -75,12 +99,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 }
             }
             
-            if tooManyClassesIndex == nil && !NSUserDefaults.standardUserDefaults().boolForKey(TSNeverShowRateAlertKey) {
+            if tooManyClassesIndex == nil && !UserDefaults.standard.bool(forKey: TSNeverShowRateAlertKey) {
                 let index = TSWasLaunchedFromGTPortal ? 2 : 1
-                let loginCount = NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey)
+                let loginCount = UserDefaults.standard.integer(forKey: TSLoginCountKey)
                 
                 if loginCount % 15 == 0 && loginCount > 0 {
-                    rateIndex = NSIndexPath(forItem: index, inSection: 0)
+                    rateIndex = IndexPath(item: index, section: 0)
                 } else {
                     rateIndex = nil
                 }
@@ -95,11 +119,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSectionsInTableView(_ tableView: UITableView) -> Int {
         return 2
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath!) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAtIndexPath indexPath: IndexPath!) -> CGFloat {
         if indexPath == nil { return 50.0 }
         
         if indexPath.section == 0 {
@@ -117,7 +141,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         return 50.0
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let index = indexPath.item
         let section = indexPath.section
         
@@ -125,34 +149,34 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         if section == 0 {
             
             if indexPath == backToGTPortalIndex {
-                let cell = tableView.dequeueReusableCellWithIdentifier("title") as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "title") as! TitleCell
                 cell.decorate("Back to GT Portal")
                 return cell
             }
             
             if index == (backToGTPortalIndex == nil ? 0 : 1) {
-                let cell = tableView.dequeueReusableCellWithIdentifier("settings") as! LogoutSettingsCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "settings") as! LogoutSettingsCell
                 cell.decorate(TSAuthenticatedReader?.username ?? "username")
                 cell.hideSeparator()
                 return cell
             }
             
             if indexPath == tooManyClassesIndex {
-                let cell = tableView.dequeueReusableCellWithIdentifier("tooManyClasses")! as! BalloonPopupCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "tooManyClasses")! as! BalloonPopupCell
                 cell.decorateView()
                 cell.hideSeparator()
                 return cell
             }
             
             if indexPath == rateIndex {
-                let cell = tableView.dequeueReusableCellWithIdentifier("rate")! as! BalloonPopupCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "rate")! as! BalloonPopupCell
                 cell.decorateView()
                 cell.hideSeparator()
                 return cell
             }
             
             if index == (classes?.count ?? 0) + classOffsetCount {
-                let cell = tableView.dequeueReusableCellWithIdentifier("subtitle") as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "subtitle") as! TitleCell
                 cell.decorate("View all classes")
                 cell.hideSeparator()
                 return cell
@@ -160,7 +184,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             
             if let classes = classes {
                 let displayClass = classes[index - classOffsetCount]
-                let cell = tableView.dequeueReusableCellWithIdentifier("classWithIcon") as! ClassNameCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "classWithIcon") as! ClassNameCell
                 cell.decorate(displayClass)
                 //if index == classes.count {
                 //    cell.hideSeparator()
@@ -172,32 +196,32 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         //announcements
         if section == 1 {
             if index == 0 {
-                let cell = tableView.dequeueReusableCellWithIdentifier("titleWithButton") as! TitleWithButtonCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "titleWithButton") as! TitleWithButtonCell
                 cell.decorate("Recent Announcements", buttonText: "mark all read", activityIndicatorHidden: !self.loadingAnnouncements)
                 recentAnnouncementsCell = cell
                 
                 //only show button if there is an unread announcement
-                cell.button.hidden = true
+                cell.button.isHidden = true
                 for ann in self.announcements {
                     if !ann.hasBeenRead() {
-                        recentAnnouncementsCell?.button?.hidden = false
+                        recentAnnouncementsCell?.button?.isHidden = false
                         break
                     }
                 }
                 return cell
             }
             if index == 1 && announcements.count == 0 {
-                let cell = tableView.dequeueReusableCellWithIdentifier("message") as! TitleCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: "message") as! TitleCell
                 cell.decorate(loadingAnnouncements ? "Loading Announcements..." : "No announcements posted.")
                 return cell
             }
             let announcement = announcements[index - announcementIndexOffset]
-            let cell = tableView.dequeueReusableCellWithIdentifier("announcement") as! AnnouncementCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "announcement") as! AnnouncementCell
             cell.decorate(announcement)
             return cell
         }
         
-        return tableView.dequeueReusableCellWithIdentifier("classWithIcon")!
+        return tableView.dequeueReusableCell(withIdentifier: "classWithIcon")!
     }
     
     func reloadTable() {
@@ -210,15 +234,15 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     //MARK: - Handle announcements as they're loaded
     
-    func loadAnnouncements(reloadClasses reloadClasses: Bool = true, withInlineActivityIndicator: Bool = false) {
-        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true, userInfo: nil)
+    func loadAnnouncements(reloadClasses: Bool = true, withInlineActivityIndicator: Bool = false) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSPerformingNetworkActivityNotification), object: true, userInfo: nil)
         if reloadClasses { self.classes = TSAuthenticatedReader.getActiveClasses() }
         
         self.loadingAnnouncements = true
         
         //reload the Recent Announcements Cell to get enable the activity indicator
         if withInlineActivityIndicator {
-            tableView.reloadRowsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 1)], withRowAnimation: .None)
+            tableView.reloadRows(at: [IndexPath(item: 0, section: 1)], with: .none)
         }
         
         self.announcements = []
@@ -237,7 +261,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         for currentClass in self.classes ?? [] {
             if TSAuthenticatedReader == nil { break }
             //load announcements as fast as possible
-            dispatch_async(TSNetworkQueue) {
+            TSNetworkQueue.async {
                 let announcements = TSAuthenticatedReader.getAnnouncementsForClass(currentClass)
                 
                 func markLoadedAndCheckIfDone() -> Bool {
@@ -247,23 +271,23 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                 
                 self.addAnnouncements(announcements)
                 if markLoadedAndCheckIfDone() {
-                    dispatch_sync(dispatch_get_main_queue()) { self.doneLoadingAnnoucements() }
+                    DispatchQueue.main.sync { self.doneLoadingAnnoucements() }
                 }
             }
         }
         
     }
     
-    func addAnnouncements(newAnnouncements: [Announcement]) {
+    func addAnnouncements(_ newAnnouncements: [Announcement]) {
         
         for ann in newAnnouncements {
             announcements.append(ann)
         }
         
         //resort
-        announcements.sortInPlace({ ann1, ann2 in
+        announcements.sort(by: { ann1, ann2 in
             if let date1 = ann1.date, let date2 = ann2.date {
-                return date1.timeIntervalSinceDate(date2) > 0
+                return date1.timeIntervalSince(date2 as Date) > 0
             }
             return false
         })
@@ -273,7 +297,9 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         if announcements.count > recentCount {
             if let first = announcements.indices.first, let last = announcements.indices.last {
-                announcements.removeRange(first.advancedBy(recentCount, limit: announcements.count - 1) ... last)
+                // advancedBy or advanced?
+                print("we're skipping announcement removal. figure this out later")
+//                announcements.removeSubrange(first.advancedBy(recentCount, limit: announcements.count - 1) ... last)
             }
         }
     }
@@ -284,7 +310,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
         loadingAnnouncements = false
         
-        NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSPerformingNetworkActivityNotification), object: false)
         
         if announcements.count == 0 { self.reloadTable() }
         
@@ -295,11 +321,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         tableView.beginUpdates()
         
         //reload the Recent Announcements Cell to get rid of the activity indicator
-        tableView.reloadRowsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 1)], withRowAnimation: .None)
+        tableView.reloadRows(at: [IndexPath(item: 0, section: 1)], with: .none)
         
         if announcements.count != 0 {
             //remove "Loading Announcements..."
-            tableView.deleteRowsAtIndexPaths([NSIndexPath(forItem: 1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Left)
+            tableView.deleteRows(at: [IndexPath(item: 1, section: 1)], with: UITableViewRowAnimation.left)
         }
         
         //animate
@@ -307,12 +333,12 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         let previous: [Announcement] = []
         
         for i in 0 ..< recentCount {
-            if previous.count > i && !(announcements as NSArray).containsObject(previous[i]) { //will never be called with the current setup
-                tableView.deleteRowsAtIndexPaths([NSIndexPath(forItem: i + 1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Top)
+            if previous.count > i && !(announcements as NSArray).contains(previous[i]) { //will never be called with the current setup
+                tableView.deleteRows(at: [IndexPath(item: i + 1, section: 1)], with: UITableViewRowAnimation.top)
             }
             
-            if announcements.count > i && !(previous as NSArray).containsObject(announcements[i]) {
-                tableView.insertRowsAtIndexPaths([NSIndexPath(forItem: i + 1, inSection: 1)], withRowAnimation:  UITableViewRowAnimation.Fade)
+            if announcements.count > i && !(previous as NSArray).contains(announcements[i]) {
+                tableView.insertRows(at: [IndexPath(item: i + 1, section: 1)], with:  UITableViewRowAnimation.fade)
             }
         }
         
@@ -332,38 +358,38 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     override func viewDidLoad() {
         refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(ClassesViewController.tableRefreshed(_:)), forControlEvents: .ValueChanged)
+        refreshControl.addTarget(self, action: #selector(ClassesViewController.tableRefreshed(_:)), for: .valueChanged)
         tableView.addSubview(refreshControl)
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         tableView.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 30.0, right: 0.0)
         tableView.tableFooterView = UIView()
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         tableViewRestingPosition = tableView.frame.origin
         updateBottomView()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClassesViewController.setTouchDelegateEnabled(_:)), name: TSSetTouchDelegateEnabledNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClassesViewController.backTriggeredFromButtonPress), name: TSBackPressedNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClassesViewController.scrollToTop), name: TSStatusBarTappedNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClassesViewController.pushSettingsDelegate), name: TSShowSettingsNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ClassesViewController.setTouchDelegateEnabled(_:)), name: NSNotification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ClassesViewController.backTriggeredFromButtonPress), name: NSNotification.Name(rawValue: TSBackPressedNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ClassesViewController.scrollToTop), name: NSNotification.Name(rawValue: TSStatusBarTappedNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ClassesViewController.pushSettingsDelegate), name: NSNotification.Name(rawValue: TSShowSettingsNotification), object: nil)
     }
     
-    override func viewDidDisappear(animated: Bool) {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+    override func viewDidDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self)
     }
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateBottomView()
         
-        NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+        NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: false)
         delay(0.5) {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: true)
         }
     }
     
-    func updateBottomView(offset offset: CGFloat = 0) {
+    func updateBottomView(offset: CGFloat = 0) {
         //update the bottom view
         let contentHeight = tableView.contentSize.height + offset
         let scroll = tableView.contentOffset.y
@@ -375,7 +401,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             self.view.layoutIfNeeded()
         }
         else {
-            UIView.animateWithDuration(0.35, animations: {
+            UIView.animate(withDuration: 0.35, animations: {
                 self.view.layoutIfNeeded()
             })
         }
@@ -393,19 +419,19 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     var panning = false
     
-    @IBAction func viewPanned(sender: UIPanGestureRecognizer) {
+    @IBAction func viewPanned(_ sender: UIPanGestureRecognizer) {
         //do nothing for vertical scrolling until panning actually starts
         if !panning {
-            let velocity = sender.velocityInView(self.tableView)
+            let velocity = sender.velocity(in: self.tableView)
             if 2 * abs(velocity.y) > abs(velocity.x) { return }
         }
         
-        if sender.state == .Began {
+        if sender.state == .began {
             
             //don't start a pan if this touch is ignored by the delegate
-            let touch = sender.locationInView(tableView)
-            if let indexPath = tableView.indexPathForRowAtPoint(touch),
-               let cell = tableView.cellForRowAtIndexPath(indexPath) {
+            let touch = sender.location(in: tableView)
+            if let indexPath = tableView.indexPathForRow(at: touch),
+               let cell = tableView.cellForRow(at: indexPath) {
                 
                 if (tableView.delegate as? StackableTableDelegate)?.shouldIgnoreTouch?(touch, inCell: cell) == true {
                     return
@@ -413,14 +439,14 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
             
             panning = true
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: false)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: false)
             tableViewRestingPosition = tableView.frame.origin
         }
         
         if !panning { return }
         
-        if sender.state == .Ended {
-            NSNotificationCenter.defaultCenter().postNotificationName(TSSetTouchDelegateEnabledNotification, object: true)
+        if sender.state == .ended {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSSetTouchDelegateEnabledNotification), object: true)
             panning = false
         }
         
@@ -428,24 +454,24 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             return
         }
         
-        if sender.state == .Ended {
-            tableView.scrollEnabled = true
-            tableView.userInteractionEnabled = true
+        if sender.state == .ended {
+            tableView.isScrollEnabled = true
+            tableView.isUserInteractionEnabled = true
             
             let newTablePosition = tableViewRestingPosition
-            let newBottomPosition = CGPointMake(tableViewRestingPosition.x, bottomView.frame.origin.y)
+            let newBottomPosition = CGPoint(x: tableViewRestingPosition.x, y: bottomView.frame.origin.y)
             
-            if sender.velocityInView(self.tableView).x <= 0 {
+            if sender.velocity(in: self.tableView).x <= 0 {
                 //if they were swiping back towards the left, do nothing
-                UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
-                    self.tableView.frame.origin = newTablePosition
+                UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
+                    self.tableView.frame.origin = newTablePosition!
                     self.bottomView.frame.origin = newBottomPosition
                 }, completion: nil)
                 return
             }
             
             let endPosition = self.tableView.frame.origin.x
-            self.tableView.frame.origin = newTablePosition
+            self.tableView.frame.origin = newTablePosition!
             self.bottomView.frame.origin = newBottomPosition
             
             if endPosition > tableViewRestingPosition.x + 10.0 {
@@ -457,23 +483,23 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             return
         }
         
-        tableView.scrollEnabled = false
-        tableView.userInteractionEnabled = false
-        let translation = sender.translationInView(self.view)
-        self.tableView.frame.origin = CGPointMake(max(tableViewRestingPosition.x, tableViewRestingPosition.x + translation.x), 0.0)
-        self.bottomView.frame.origin = CGPointMake(max(tableViewRestingPosition.x, tableViewRestingPosition.x + translation.x), bottomView.frame.origin.y)
+        tableView.isScrollEnabled = false
+        tableView.isUserInteractionEnabled = false
+        let translation = sender.translation(in: self.view)
+        self.tableView.frame.origin = CGPoint(x: max(tableViewRestingPosition.x, tableViewRestingPosition.x + translation.x), y: 0.0)
+        self.bottomView.frame.origin = CGPoint(x: max(tableViewRestingPosition.x, tableViewRestingPosition.x + translation.x), y: bottomView.frame.origin.y)
     }
     
-    @IBAction func touchDown(sender: UITapGestureRecognizer) {
-        let touch = sender.locationInView(tableView)
+    @IBAction func touchDown(_ sender: UITapGestureRecognizer) {
+        let touch = sender.location(in: tableView)
         self.processTouchInTableView(touch, state: sender.state)
     }
     
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
     
-    func animateSelection(cell: UITableViewCell, indexPath: NSIndexPath, selected: Bool) {
+    func animateSelection(_ cell: UITableViewCell, indexPath: IndexPath, selected: Bool) {
         let background: UIColor
         
         if indexPath.section == 0 {
@@ -496,19 +522,19 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
         }
         
-        UIView.animateWithDuration(0.3, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             cell.backgroundColor = background
         })
     }
     
-    func setTouchDelegateEnabled(notification: NSNotification) {
+    func setTouchDelegateEnabled(_ notification: Notification) {
         if let enabled = notification.object as? Bool {
-            touchRecognizer.enabled = enabled
+            touchRecognizer.isEnabled = enabled
             
             if !enabled {
                 for cell in tableView.visibleCells {
-                    let index = tableView.indexPathForCell(cell)!
-                    if let delegate = tableView.delegate as? StackableTableDelegate where delegate.canHighlightCell(index) == true {
+                    let index = tableView.indexPath(for: cell)!
+                    if let delegate = tableView.delegate as? StackableTableDelegate, delegate.canHighlightCell(index) == true {
                         delegate.animateSelection(cell, indexPath: index, selected: false)
                     }
                 }
@@ -526,20 +552,20 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         backTriggered()
     }
     
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
         delay(0.01) {
             self.reloadTable()
         }
     }
     
-    func tableRefreshed(refresh: UIRefreshControl) {
+    func tableRefreshed(_ refresh: UIRefreshControl) {
         guard let delegate = tableView.delegate as? StackableTableDelegate else {
             refresh.endRefreshing()
             return
         }
         
-        dispatch_async(TSNetworkQueue) {
+        TSNetworkQueue.async {
             delegate.loadData()
             sync {
                 self.reloadTable()
@@ -550,20 +576,20 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     }
     
     func scrollToTop() {
-        tableView.setContentOffset(CGPointZero, animated: true)
+        tableView.setContentOffset(CGPoint.zero, animated: true)
     }
     
     //MARK: - Stackable Table Delegate methods
     
-    func processSelectedCell(index: NSIndexPath) {
+    func processSelectedCell(_ index: IndexPath) {
         print("SHOULD NOT BE CALLED")
         return //unused in favor of processSelectedCellWithTouch
     }
     
-    func processSelectedCellWithTouch(index: NSIndexPath, _ touchLocationInCell: CGPoint) {
+    func processSelectedCellWithTouch(_ index: IndexPath, _ touchLocationInCell: CGPoint) {
         if index.section == 0 {
             if index == backToGTPortalIndex {
-                UIApplication.sharedApplication().openURL(NSURL(string: "gtportal://")!)
+                UIApplication.shared.openURL(URL(string: "gtportal://")!)
                 return
             }
             if index.item == (backToGTPortalIndex == nil ? 0 : 1) { return }
@@ -575,25 +601,25 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             
             //"That's a lot of classes" popup
             if index == tooManyClassesIndex {
-                if let cell = tableView.cellForRowAtIndexPath(index) as? BalloonPopupCell {
+                if let cell = tableView.cellForRow(at: index) as? BalloonPopupCell {
                     let action = cell.actionForTouch(touchLocationInCell)
                     
-                    if action == .Action {
+                    if action == .action {
                         let delegate = AllClassesDelegate(controller: self)
                         delegate.loadDataAndPushInController(self)
                         return
                     }
                         
-                    else if action == .Cancel {
+                    else if action == .cancel {
                         //remove cell
                         self.tableView.beginUpdates()
                         
                         let oldIndex = tooManyClassesIndex!
                         tooManyClassesIndex = nil
                         self.alertHidden = true
-                        NSUserDefaults.standardUserDefaults().setBool(true, forKey: TSHideClassCountPopupKey)
+                        UserDefaults.standard.set(true, forKey: TSHideClassCountPopupKey)
                         
-                        tableView.deleteRowsAtIndexPaths([oldIndex], withRowAnimation: .Fade)
+                        tableView.deleteRows(at: [oldIndex], with: .fade)
                         self.tableView.endUpdates()
                     }
                 }
@@ -602,14 +628,14 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             
             //rate popup
             if index == rateIndex {
-                if let cell = tableView.cellForRowAtIndexPath(index) as? BalloonPopupCell {
+                if let cell = tableView.cellForRow(at: index) as? BalloonPopupCell {
                     let action = cell.actionForTouch(touchLocationInCell)
                     
-                    if action == .Action {
+                    if action == .action {
                         let link = "itms-apps://itunes.apple.com/us/app/t-squared-for-georgia-tech/id1046350734"
-                        UIApplication.sharedApplication().openURL(NSURL(string: link)!)
+                        UIApplication.shared.openURL(URL(string: link)!)
                         
-                        NSUserDefaults.standardUserDefaults().setBool(true, forKey: TSNeverShowRateAlertKey)
+                        UserDefaults.standard.set(true, forKey: TSNeverShowRateAlertKey)
                         
                         delay(0.5) {
                             self.rateIndex = nil
@@ -617,7 +643,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                         }
                     }
                     
-                    else if action == .Cancel {
+                    else if action == .cancel {
                         let oldIndex = self.rateIndex!
                         
                         //remove cell
@@ -626,11 +652,11 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
                         self.rateIndex = nil
                         
                         //if this isn't the first time seeing this alert, never show it again
-                        if NSUserDefaults.standardUserDefaults().integerForKey(TSLoginCountKey) > 20 {
-                            NSUserDefaults.standardUserDefaults().setBool(true, forKey: TSNeverShowRateAlertKey)
+                        if UserDefaults.standard.integer(forKey: TSLoginCountKey) > 20 {
+                            UserDefaults.standard.set(true, forKey: TSNeverShowRateAlertKey)
                         }
                         
-                        self.tableView.deleteRowsAtIndexPaths([oldIndex], withRowAnimation: .Left)
+                        self.tableView.deleteRows(at: [oldIndex], with: .left)
                         self.tableView.endUpdates()
                         
                         //offset bottom view by height of alert
@@ -661,7 +687,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
     }
     
-    func usesBottomView(delegate: AnyObject) -> Bool {
+    func usesBottomView(_ delegate: AnyObject) -> Bool {
         return delegate is ClassesViewController
             || delegate is AnnouncementDelegate
             || delegate is ClassDelegate
@@ -677,20 +703,20 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
     }
     
-    func pushDelegate(delegate: StackableTableDelegate, ifCurrentMatchesExpected expected: UITableViewDelegate) {
+    func pushDelegate(_ delegate: StackableTableDelegate, ifCurrentMatchesExpected expected: UITableViewDelegate) {
         if expected === tableView.delegate {
             pushDelegate(delegate)
         }
     }
     
-    private func pushDelegate(delegate: StackableTableDelegate) {
+    fileprivate func pushDelegate(_ delegate: StackableTableDelegate) {
         pushDelegate(delegate, hasBeenUpdatedToNewLoadFormat: true)
     }
     
-    override func pushDelegate(delegate: StackableTableDelegate, hasBeenUpdatedToNewLoadFormat: Bool) {
+    override func pushDelegate(_ delegate: StackableTableDelegate, hasBeenUpdatedToNewLoadFormat: Bool) {
         if DISABLE_PUSHES { return }
         
-        bottomView.hidden = !(usesBottomView(delegate))
+        bottomView.isHidden = !(usesBottomView(delegate))
         super.pushDelegate(delegate, hasBeenUpdatedToNewLoadFormat: true)
         updateBottomView()
         let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)
@@ -704,14 +730,14 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         super.popDelegate()
         let delegate = tableView.delegate!
         (delegate as? StackableTableDelegate)?.reloadDataIfNecessary(self)
-        bottomView.hidden = !(usesBottomView(delegate))
+        bottomView.isHidden = !(usesBottomView(delegate))
         updateBottomView()
         let timingFunction = CAMediaTimingFunction(controlPoints: 0.215, 0.61, 0.355, 1)
         playTransitionForView(bottomView, duration: 0.4, transition: kCATransitionPush, subtype: kCATransitionFromLeft, timingFunction: timingFunction)
     }
     
-    func canHighlightCell(index: NSIndexPath) -> Bool {
-        return index != NSIndexPath(forItem: 0, inSection: 1)
+    func canHighlightCell(_ index: IndexPath) -> Bool {
+        return index != IndexPath(item: 0, section: 1)
     }
     
     func loadData() {
@@ -752,54 +778,54 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
             }
         }
         self.reloadTable()
-        recentAnnouncementsCell?.button?.hidden = true
+        recentAnnouncementsCell?.button?.isHidden = true
     }
     
-    func presentDocumentFromURL(webURL: NSURL, name: String = "Attachment") {
+    func presentDocumentFromURL(_ webURL: URL, name: String = "Attachment") {
         self.setActivityIndicatorVisible(true)
         
         //open a .url or .webloc file in a browser instead of trying to download it
-        let url = webURL.absoluteString?.lowercaseString
-        if url?.hasSuffix(".url") == true || url?.hasSuffix(".webloc") == true {
-            self.openLinkInWebView(webURL.absoluteString!, title: name)
+        let url = webURL.absoluteString.lowercased()
+        if url.hasSuffix(".url") == true || url.hasSuffix(".webloc") == true {
+            self.openLinkInWebView(webURL.absoluteString, title: name)
             return
         }
         
-        dispatch_async(TSNetworkQueue, {
-            guard let data = NSData(contentsOfURL: webURL) else {
+        TSNetworkQueue.async(execute: {
+            guard let data = try? Data(contentsOf: webURL) else {
                 sync {
-                    let alert = UIAlertController(title: "Cannot Display Attachment", message: "The attachment is no longer available.", preferredStyle: .Alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-                    self.presentViewController(alert, animated: true, completion: nil)
+                    let alert = UIAlertController(title: "Cannot Display Attachment", message: "The attachment is no longer available.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
                     self.setActivityIndicatorVisible(false)
                 }
                 return
             }
             
             //get the URL's file extension
-            let splits = webURL.path!.componentsSeparatedByString(".")
+            let splits = webURL.path.components(separatedBy: ".")
             let fileType = splits.last!
             
             //get URL to save to
-            let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
+            let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
             let documents = paths[0] as NSString
-            let fileURLpath = documents.stringByAppendingPathComponent("\(name).\(fileType)")
-            data.writeToFile(fileURLpath, atomically: false)
-            let fileURL = NSURL(fileURLWithPath: fileURLpath)
+            let fileURLpath = documents.appendingPathComponent("\(name).\(fileType)")
+            try? data.write(to: URL(fileURLWithPath: fileURLpath), options: [])
+            let fileURL = URL(fileURLWithPath: fileURLpath)
             
             sync() {
-                let controller = UIDocumentInteractionController(URL: fileURL)
+                let controller = UIDocumentInteractionController(url: fileURL)
                 self.documentController = controller
                 controller.delegate = self
                 
-                let success = controller.presentPreviewAnimated(true)
+                let success = controller.presentPreview(animated: true)
                 
                 if (success) {
                     delay(0.5) {
                         self.setActivityIndicatorVisible(false)
                     }
                 } else {
-                    self.openLinkInWebView(webURL.absoluteString!, title: name)
+                    self.openLinkInWebView(webURL.absoluteString, title: name)
                 }
                 
             }
@@ -807,13 +833,13 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         })
     }
     
-    func documentInteractionControllerViewControllerForPreview(controller: UIDocumentInteractionController) -> UIViewController {
+    func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
         return self
     }
     
-    func openFromLinks(links: [String]) {
+    func openFromLinks(_ links: [String]) {
         
-        func shortSiteForLink(link: String) -> String {
+        func shortSiteForLink(_ link: String) -> String {
             let shortWebsite = websiteForLink(link)
             //handle duplicates
             var countMatching = 0
@@ -833,45 +859,45 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
         if links.count == 0 { return }
         if links.count == 1 {
-            let alert = UIAlertController(title: "Open link?", message: websiteForLink(links[0]), preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
-            alert.addAction(UIAlertAction(title: "Open", style: .Default, handler: { _ in
+            let alert = UIAlertController(title: "Open link?", message: websiteForLink(links[0]), preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: nil))
+            alert.addAction(UIAlertAction(title: "Open", style: .default, handler: { _ in
                 self.openLinkInWebView(links[0], title: websiteForLink(links[0]))
             }))
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             return
         }
         
-        let alert = UIAlertController(title: "Open link?", message: "There are multiple links in this message. Which would you like to open?", preferredStyle: .Alert)
+        let alert = UIAlertController(title: "Open link?", message: "There are multiple links in this message. Which would you like to open?", preferredStyle: .alert)
         for link in links {
-            alert.addAction(UIAlertAction(title: shortSiteForLink(link), style: .Default, handler: { _ in
+            alert.addAction(UIAlertAction(title: shortSiteForLink(link), style: .default, handler: { _ in
                 self.openLinkInWebView(link, title: websiteForLink(link))
             }))
         }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Destructive, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
-    func openLinkInWebView(link: String, title: String) {
-        guard let URL = NSURL(string: link) else {
-            let alert = UIAlertController(title: "Could not open link.", message: "We had a problem opening that link. (\(link))", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+    func openLinkInWebView(_ link: String, title: String) {
+        guard let URL = URL(string: link) else {
+            let alert = UIAlertController(title: "Could not open link.", message: "We had a problem opening that link. (\(link))", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "ok", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
             return
         }
         
         loginController.presentWebViewWithURL(URL, title: title)
     }
     
-    func openTextInWebView(text: String, title: String) {
+    func openTextInWebView(_ text: String, title: String) {
         loginController.presentWebViewWithText(text, title: title)
     }
     
-    func setActivityIndicatorVisible(visible: Bool) {
+    func setActivityIndicatorVisible(_ visible: Bool) {
         let scale: CGFloat = visible ? 1.0 : 0.1
-        let transform = CGAffineTransformMakeScale(scale, scale)
+        let transform = CGAffineTransform(scaleX: scale, y: scale)
         
-        UIView.animateWithDuration(visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: visible ? 0.7 : 0.4, delay: 0.0, usingSpringWithDamping: visible ? 0.5 : 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             self.loginController.activityCircle.transform = transform
             self.loginController.activityCircle.alpha = visible ? 1.0 : 0.0
         }, completion: nil)
@@ -883,34 +909,34 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
     
     func openContactEmail() {
         if !MFMailComposeViewController.canSendMail() {
-            let alert = UIAlertController(title: "Cannot Send Mail", message: "You mail account is not set up correctly.", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+            let alert = UIAlertController(title: "Cannot Send Mail", message: "You mail account is not set up correctly.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
         let mail = MFMailComposeViewController()
         mail.setToRecipients(["cal@calstephens.tech"])
-        mail.setSubject("T-Squared Support for Version \(NSBundle.applicationVersionNumber) (\(NSBundle.applicationBuildNumber))")
+        mail.setSubject("T-Squared Support for Version \(Bundle.applicationVersionNumber) (\(Bundle.applicationBuildNumber))")
         mail.mailComposeDelegate = self
-        self.presentViewController(mail, animated: true, completion: nil)
+        self.present(mail, animated: true, completion: nil)
     }
     
-    func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
-        controller.dismissViewControllerAnimated(true, completion: nil)
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true, completion: nil)
     }
     
 }
 
 extension StackableTableDelegate {
     
-    var indexPathsForHeader: [NSIndexPath] {
-        return [NSIndexPath(forItem: 0, inSection: 0)]
+    var indexPathsForHeader: [IndexPath] {
+        return [IndexPath(item: 0, section: 0)]
     }
     
-    func loadDataAndPushInController(controller: ClassesViewController) {
+    func loadDataAndPushInController(_ controller: ClassesViewController) {
         let previousDelegate: UITableViewDelegate! = controller.tableView.delegate
         
         let firstLoad = isFirstLoad()
-        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
         if (firstLoad) {
             controller.setActivityIndicatorVisible(true)
         }
@@ -918,19 +944,19 @@ extension StackableTableDelegate {
         if !firstLoad {
             self.loadCachedData()
             controller.pushDelegate(self)
-            NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: true)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSPerformingNetworkActivityNotification), object: true)
         }
         
-        dispatch_async(TSNetworkQueue, {
+        TSNetworkQueue.async(execute: {
             self.loadData()
             
             sync {
-                UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 if controller.activityIndicator.alpha == 1.0 && !(self is AnnouncementDelegate) {
                     controller.setActivityIndicatorVisible(false)
                 }
                 
-                NSNotificationCenter.defaultCenter().postNotificationName(TSPerformingNetworkActivityNotification, object: false)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: TSPerformingNetworkActivityNotification), object: false)
                 
                 if firstLoad {
                     controller.pushDelegate(self, ifCurrentMatchesExpected: previousDelegate)
@@ -945,12 +971,12 @@ extension StackableTableDelegate {
         
     }
     
-    func reloadDataIfNecessary(controller: ClassesViewController) {
+    func reloadDataIfNecessary(_ controller: ClassesViewController) {
         if isFirstLoad() {
             print("RELOADING DATA for the popped delegate. Something went missing.")
             
             controller.setActivityIndicatorVisible(true)
-            dispatch_async(TSNetworkQueue) {
+            TSNetworkQueue.async {
                 self.loadData()
                 sync() {
                     controller.reloadTable()

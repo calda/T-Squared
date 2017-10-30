@@ -22,14 +22,14 @@ class Authenticator {
     static var webViewDelegate: UIWebViewDelegate?
     static var loadedDuoTwoFactor: Bool = false
     static var iframeContentLoaded: Bool = false
-    static var twoFactorCompletion: ((success: Bool, document: HTMLDocument?) -> ())?
+    static var twoFactorCompletion: ((_ success: Bool, _ document: HTMLDocument?) -> ())?
     
     static var loginController: LoginViewController? {
-        return UIApplication.sharedApplication().keyWindow?.rootViewController as? LoginViewController
+        return UIApplication.shared.keyWindow?.rootViewController as? LoginViewController
     }
     
     //this function is gigantic but it'll have to do.
-    static func authenticateWithUsername(username: String, password userPassword: String, completion: (Bool, HTMLDocument?) -> ()) {
+    static func authenticateWithUsername(_ username: String, password userPassword: String, completion: @escaping (Bool, HTMLDocument?) -> ()) {
         var user = username
         var password = userPassword
         var didCompletion = false
@@ -50,11 +50,11 @@ class Authenticator {
         let client = HttpClient(url: "https://login.gatech.edu/cas/login?service=https%3A%2F%2Ft-square.gatech.edu%2Fsakai-login-tool%2Fcontainer")
         guard let loginScreenText = client.sendGet() else {
             if self.isRunningInBackground { return }
-            NSNotificationCenter.defaultCenter().postNotificationName(TSNetworkErrorNotification, object: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: TSNetworkErrorNotification), object: nil)
             return
         }
         
-        func callCompletionForSuccessWithPageContents(successContents: String) {
+        func callCompletionForSuccessWithPageContents(_ successContents: String) {
             didCompletion = true
             
             authFormPost = nil
@@ -62,14 +62,23 @@ class Authenticator {
             
             if isRunningInBackground {
                 //Calling completion on current thread to resolve background activity
-                completion(true, HTML(html: successContents, encoding: NSUTF8StringEncoding))
+                do {
+                    try completion(true, HTML(html: successContents, encoding: String.Encoding.utf8))
+                } catch {
+                    print("Calling completion on current thread failed")
+                }
             }
             else {
                 sync {
-                    //Calling completion synchronously
-                    completion(true, HTML(html: successContents, encoding: NSUTF8StringEncoding))
+                    do {
+                        //Calling completion synchronously
+                        try completion(true, HTML(html: successContents, encoding: String.Encoding.utf8))
+                    } catch {
+                        print("Calling completion synchronously failed")
+                    }
                 }
             }
+            
         }
         
         //there are some cases where the user is logged in to GT CAS
@@ -77,7 +86,7 @@ class Authenticator {
         //so when we login to T-Square, CAS completes the login automatically
         
         //if the login page has the word "Log Out", then our work is already done
-        if loginScreenText.containsString("Log Out") {
+        if loginScreenText.contains("Log Out") {
             callCompletionForSuccessWithPageContents(loginScreenText)
             return
         }
@@ -129,13 +138,13 @@ class Authenticator {
         }
         
         //incorrect password
-        if response.containsString("Incorrect login or disabled account.") || response.containsString("Login requested by:") {
+        if response.contains("Incorrect login or disabled account.") || response.contains("Login requested by:") {
             didCompletion = true
             sync() { completion(false, nil) }
         }
             
         //two factor required
-        else if response.containsString("iframe") {
+        else if response.contains("iframe") {
             sync {
                 
                 //can't complete two-factor login in the background
@@ -145,7 +154,7 @@ class Authenticator {
                 }
                 
                 //load the Duo Two-Factor page in a Web View
-                loginController?.twoFactorWebView.loadHTMLString(response, baseURL: NSURL(string: "https://login.gatech.edu/cas/login"))
+                loginController?.twoFactorWebView.loadHTMLString(response, baseURL: URL(string: "https://login.gatech.edu/cas/login"))
                 loginController?.twoFactorWebView.superview?.alpha = 1.0
                 
                 Authenticator.webViewDelegate = TwoFactorWebViewDelegate()
@@ -176,7 +185,7 @@ class Authenticator {
     static func presentTwoFactorView() {
         if loginController?.twoFactorWebViewCenterConstraint.constant == 0 { return }
         
-        UIView.animateWithDuration(0.45, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
+        UIView.animate(withDuration: 0.45, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             loginController?.twoFactorWebViewCenterConstraint.constant = 0
             loginController?.view.layoutIfNeeded()
             loginController?.animateActivityIndicator(on: false)
@@ -190,18 +199,18 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
     
     //URL pointed to by the Duo iframe
     //is loaded by the page at runtime
-    func iframeSrc(webView: UIWebView) -> String? {
-        let content = webView.stringByEvaluatingJavaScriptFromString("document.documentElement.outerHTML")
-        let iframe = HttpClient.getInfoFromPage(content ?? "", infoSearch: "<iframe", terminator: ">")
-        return HttpClient.getInfoFromPage(iframe ?? "", infoSearch: "src=\"", terminator: "\"")
+    func iframeSrc(_ webView: UIWebView) -> String? {
+        let content = webView.stringByEvaluatingJavaScript(from: "document.documentElement.outerHTML")
+        let iframe = HttpClient.getInfoFromPage((content ?? "") as NSString, infoSearch: "<iframe", terminator: ">")
+        return HttpClient.getInfoFromPage((iframe ?? "") as NSString, infoSearch: "src=\"", terminator: "\"")
     }
     
-    func webViewDidFinishLoad(webView: UIWebView) {
-        let content = webView.stringByEvaluatingJavaScriptFromString("document.documentElement.outerHTML")
+    func webViewDidFinishLoad(_ webView: UIWebView) {
+        let content = webView.stringByEvaluatingJavaScript(from: "document.documentElement.outerHTML")
         
         //if still waiting on two-factor to complete
         if !Authenticator.loadedDuoTwoFactor {
-            let isCorrectPage = content?.containsString("Two-factor login is needed") == true
+            let isCorrectPage = content?.contains("Two-factor login is needed") == true
             let hasFinishedProcessing = iframeSrc(webView) != nil
             
             if isCorrectPage && hasFinishedProcessing {
@@ -211,16 +220,22 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
                 let javascript = "$($('body').append($('#duo_iframe')));" +
                                  "$('body > *:not(iframe)').hide();" +
                                  "$('#duo_iframe').height(100);"
-                webView.stringByEvaluatingJavaScriptFromString(javascript)
+                webView.stringByEvaluatingJavaScript(from: javascript)
                 
                 Authenticator.presentTwoFactorView()
             }
         }
         
+        
         //successful login
-        if let content = content where content.containsString("My Workspace") == true || content.containsString("Log Out") == true {
-            let document = Kanna.HTML(html: content, encoding: NSUTF8StringEncoding)
-            Authenticator.twoFactorCompletion?(success: true, document: document)
+        if let content = content, content.contains("My Workspace") == true || content.contains("Log Out") == true {
+            
+            do {
+                let document = try Kanna.HTML(html: content, encoding: String.Encoding.utf8)
+                Authenticator.twoFactorCompletion?(true, document)
+            } catch {
+                print("can't fetch Duo document")
+            }
         }
     }
 }
@@ -228,17 +243,17 @@ class TwoFactorWebViewDelegate : NSObject, UIWebViewDelegate {
 
 //MARK: - Custom NSURLCache that swizzles the CSS of the Duo iframe
 
-class SwizzlingNSURLCache : NSURLCache {
+class SwizzlingNSURLCache : URLCache {
     
-    override func cachedResponseForRequest(request: NSURLRequest) -> NSCachedURLResponse? {
+    override func cachedResponse(for request: URLRequest) -> CachedURLResponse? {
         
-        if let url = request.URL?.absoluteString where url.containsString("duosecurity") {
+        if let url = request.url?.absoluteString, url.contains("duosecurity") {
             Authenticator.iframeContentLoaded = true
         }
         
         //intercept and swizzle CSS for Duo Two-Factor
-        if let url = request.URL where url.absoluteString?.containsString("base-v3.css") == true {
-            guard let pageContents = HttpClient(url: url.absoluteString!).sendGet() else { return nil }
+        if let url = request.url, url.absoluteString.contains("base-v3.css") == true {
+            guard let pageContents = HttpClient(url: url.absoluteString).sendGet() else { return nil }
             
             let newCss = ".base-navigation { display: none !important; }" +
                          ".base-main { top: 10px !important; width: 80% !important; margin: 0 auto !important; }" +
@@ -249,19 +264,19 @@ class SwizzlingNSURLCache : NSURLCache {
             var swizzled = pageContents + newCss
             
             //replace a bit because it doesn't want to be overriden by re-declaration
-            swizzled = swizzled.stringByReplacingOccurrencesOfString(".stay-logged-in {\n  margin-top: -6px; }", withString: ".stay-logged-in {\n  margin-top: 35x; }")
+            swizzled = swizzled.replacingOccurrences(of: ".stay-logged-in {\n  margin-top: -6px; }", with: ".stay-logged-in {\n  margin-top: 35x; }")
             
             //pass the modified file up the chain as if it was authentic
-            let response = NSURLResponse(URL: url, MIMEType: "text/css", expectedContentLength: -1, textEncodingName: nil)
-            guard let data = NSString(string: swizzled).dataUsingEncoding(NSUTF8StringEncoding) else { return nil }
-            let cachedResponse = NSCachedURLResponse(response: response, data: data)
+            let response = URLResponse(url: url, mimeType: "text/css", expectedContentLength: -1, textEncodingName: nil)
+            guard let data = "\(NSString(string: swizzled))".data(using: String.Encoding.utf8) else { return nil }
+            let cachedResponse = CachedURLResponse(response: response, data: data)
             
             Authenticator.iframeContentLoaded = true
             return cachedResponse
         }
             
         else {
-            return super.cachedResponseForRequest(request)
+            return super.cachedResponse(for: request)
         }
     }
 }

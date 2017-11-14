@@ -1,0 +1,11 @@
+framework module Kanna {
+  umbrella header "Kanna.h"
+
+  export *
+  module * { export * }
+}
+
+module Kanna.Swift {
+    header "Kanna-Swift.h"
+    requires objc
+}

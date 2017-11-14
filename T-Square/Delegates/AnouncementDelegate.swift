@@ -168,7 +168,7 @@ class AnnouncementDelegate : NSObject, StackableTableDelegate {
             
             let font: UIFont
             if #available(iOS 8.2, *) {
-                font = UIFont.systemFont(ofSize: fontSize, weight: UIFontWeightThin)
+                font = UIFont.systemFont(ofSize: fontSize, weight: .thin)
             } else {
                 font = UIFont.systemFont(ofSize: fontSize)
             }

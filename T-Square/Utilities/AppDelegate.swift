@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if let launchSource = launchOptions?[UIApplicationLaunchOptionsKey.sourceApplication] as? String,
            let launchURL = launchOptions?[UIApplicationLaunchOptionsKey.url] as? URL {
-            self.application(UIApplication.shared, open: launchURL, sourceApplication: launchSource, annotation: "")
+            _ = self.application(UIApplication.shared, open: launchURL, sourceApplication: launchSource, annotation: "")
         }
         
         return true
@@ -55,7 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //MARK: Tracking Network Activity
     var networkActivityCount = 0
     
-    func networkActivityEvent(_ notification: Notification) {
+    @objc func networkActivityEvent(_ notification: Notification) {
         
         let activityToggle: Bool
         

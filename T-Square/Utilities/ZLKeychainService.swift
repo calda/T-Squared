@@ -17,7 +17,7 @@ class ZLKeychainService: NSObject {
     var service = "edu.gatech.cal.t-squared"
     var keychainQuery :[NSString: AnyObject]! = nil
     
-    func save(name: NSString, value: NSString) -> OSStatus? {
+    @discardableResult func save(name: NSString, value: NSString) -> OSStatus? {
         let statusAdd :OSStatus?
         
         guard let dataFromString: Data = value.data(using: String.Encoding.utf8.rawValue) else {

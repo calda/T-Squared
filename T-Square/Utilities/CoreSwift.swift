@@ -186,7 +186,7 @@ func cropImageToCircle(_ image: UIImage) -> UIImage {
     let radius = image.size.width / 2
     let imageCenter = CGPoint(x: image.size.width / 2, y: image.size.height / 2)
     context!.beginPath()
-    context?.addArc(center: CGPoint.init(x: imageCenter.x, y: imageCenter.y), radius: radius, startAngle: 0, endAngle: CGFloat(2*M_PI), clockwise: false)
+    context?.addArc(center: CGPoint.init(x: imageCenter.x, y: imageCenter.y), radius: radius, startAngle: 0, endAngle: CGFloat(2 * CGFloat.pi), clockwise: false)
     context!.closePath()
     context!.clip()
     
@@ -202,7 +202,7 @@ func cropImageToCircle(_ image: UIImage) -> UIImage {
 func heightForText(_ text: String, width: CGFloat, font: UIFont) -> CGFloat {
     let context = NSStringDrawingContext()
     let size = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
-    let rect = text.boundingRect(with: size, options: .usesLineFragmentOrigin, attributes: [NSFontAttributeName : font], context: context)
+    let rect = text.boundingRect(with: size, options: .usesLineFragmentOrigin, attributes: [.font : font], context: context)
     return rect.height
 }
 
@@ -211,7 +211,7 @@ func attributedStringWithHighlightedLinks(_ string: String, linkColor: UIColor) 
 
     let attributed = NSMutableAttributedString(string: string)
     for (_, linkRange) in linksInText(string) {
-        attributed.addAttribute(NSForegroundColorAttributeName, value: linkColor, range: linkRange)
+        attributed.addAttribute(.foregroundColor, value: linkColor, range: linkRange)
     }
     
     return attributed
@@ -247,7 +247,7 @@ func linksInText(_ string: String) -> [(text: String, range: NSRange)] {
             let linkRange = NSMakeRange(wordStart, wordEnd - wordStart)
             let link = text.substring(with: linkRange)
             text = text.replacingCharacters(in: linkRange, with: link.uppercased()) as NSString
-            links.append(text: link, range: linkRange)
+            links.append((text: link, range: linkRange))
         }
     }
     
@@ -532,7 +532,7 @@ extension Array {
         var list = self
         for i in 0..<(list.count - 1) {
             let j = Int(arc4random_uniform(UInt32(list.count - i))) + i
-            swap(&list[i], &list[j])
+            list.swapAt(i, j)
         }
         return list
     }
@@ -542,7 +542,7 @@ extension Int {
     ///Converts an integer to a standardized three-character string. 1 -> 001. 99 -> 099. 123 -> 123.
     func threeCharacterString() -> String {
         let start = "\(self)"
-        let length = start.characters.count
+        let length = start.length
         if length == 1 { return "00\(start)" }
         else if length == 2 { return "0\(start)" }
         else { return start }

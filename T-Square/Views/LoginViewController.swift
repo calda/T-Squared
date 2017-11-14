@@ -131,7 +131,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     //MARK: - Animating and processing form input
     
-    func keyboardHeightChanged(_ notification: Notification) {
+    @objc func keyboardHeightChanged(_ notification: Notification) {
         //ignore if the classes controller is visible
         if self.containerLeading.constant == 0.0 { return }
         
@@ -152,7 +152,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    func centerForm() {
+    @objc func centerForm() {
         UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: [], animations: {
             self.formCenter.constant = -10.0
             self.backgroundBottom.constant = 0.0
@@ -224,7 +224,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         
     }
     
-    func networkErrorRecieved() {
+    @objc func networkErrorRecieved() {
         sync {
             self.syncronizedNetworkErrorRecieved()
         }
@@ -387,7 +387,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     //logout from gatech login service and trash saved passwords
-    func showLogoutAlert() {
+    @objc func showLogoutAlert() {
         let alert = UIAlertController(title: nil, message: "Are you sure you want to log out?", preferredStyle: iPad() ? .alert : .actionSheet)
         alert.addAction(UIAlertAction(title: "Log out", style: .destructive, handler: { _ in self.logout() }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -463,7 +463,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         }, completion: nil)
     }
     
-    func dismissWebView() {
+    @objc func dismissWebView() {
         dismissWebView(0.5)
     }
     

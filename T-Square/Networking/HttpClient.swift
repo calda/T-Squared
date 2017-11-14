@@ -36,7 +36,7 @@ class HttpClient {
         session.configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
     }
     
-    internal func sendGet() -> String? {
+    @discardableResult internal func sendGet() -> String? {
         URLCache.shared.removeAllCachedResponses()
         
         var attempts = 0
@@ -94,6 +94,7 @@ class HttpClient {
         if location > page.length {
             return nil
         }
+        
         let containsInfo = (page.substring(to: min(location + 300, page.length - 1)) as NSString).substring(from: min(location + infoSearch.characters.count, page.length - 1))
         let characters = containsInfo.characters
         

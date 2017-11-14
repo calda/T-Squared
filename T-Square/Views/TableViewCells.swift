@@ -379,7 +379,7 @@ class BackCell : UITableViewCell {
         }
     }
     
-    func setActivityIndicatorEnabled(_ notification: Notification) {
+    @objc func setActivityIndicatorEnabled(_ notification: Notification) {
         self.activityIndicator.startAnimating()
         
         //notification supports Bool or Int

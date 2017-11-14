@@ -527,7 +527,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         })
     }
     
-    func setTouchDelegateEnabled(_ notification: Notification) {
+    @objc func setTouchDelegateEnabled(_ notification: Notification) {
         if let enabled = notification.object as? Bool {
             touchRecognizer.isEnabled = enabled
             
@@ -548,7 +548,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         popDelegate()
     }
     
-    func backTriggeredFromButtonPress() {
+    @objc func backTriggeredFromButtonPress() {
         backTriggered()
     }
     
@@ -559,7 +559,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }
     }
     
-    func tableRefreshed(_ refresh: UIRefreshControl) {
+    @objc func tableRefreshed(_ refresh: UIRefreshControl) {
         guard let delegate = tableView.delegate as? StackableTableDelegate else {
             refresh.endRefreshing()
             return
@@ -575,7 +575,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         
     }
     
-    func scrollToTop() {
+    @objc func scrollToTop() {
         tableView.setContentOffset(CGPoint.zero, animated: true)
     }
     
@@ -903,7 +903,7 @@ class ClassesViewController : TableViewStackController, StackableTableDelegate, 
         }, completion: nil)
     }
     
-    func pushSettingsDelegate() {
+    @objc func pushSettingsDelegate() {
         pushDelegate(SettingsDelegate(controller: self), hasBeenUpdatedToNewLoadFormat: true)
     }
     

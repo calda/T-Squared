@@ -181,7 +181,7 @@ class TSReader {
                     }
                     
                     //check if this class is an active class
-                    if self.classes == nil { self.getActiveClasses() }
+                    if self.classes == nil { _ = self.getActiveClasses() }
                     if let activeClasses = self.classes, activeClasses.contains(newClass) {
                         newClass.isActive = true
                     }

@@ -119,7 +119,7 @@ class GradebookDelegate : NSObject, StackableTableDelegate {
                 //make an attributed string
                 let base = NSMutableAttributedString(string: "Add new grade")
                 let whatIfAttr = NSMutableAttributedString(string: whatIf)
-                whatIfAttr.addAttribute(NSForegroundColorAttributeName, value: UIColor(white: 0.0, alpha: 0.25), range: NSMakeRange(0, whatIf.length))
+                whatIfAttr.addAttribute(.foregroundColor, value: UIColor(white: 0.0, alpha: 0.25), range: NSMakeRange(0, whatIf.length))
                 
                 base.append(whatIfAttr)
                 cell.label?.attributedText = base
